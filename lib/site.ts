@@ -1,0 +1,78 @@
+export const SITE = {
+  name: "Copper Athletic Club",
+  shortName: "Copper AC",
+  tagline: "A sports bar. Not a gym.",
+  url: "https://copperac.com",
+  phone: "(269) 558-8222",
+  phoneHref: "tel:+12695588222",
+  email: "info@copperac.com",
+  street: "133 W. Michigan Ave.",
+  city: "Marshall",
+  state: "MI",
+  zip: "49068",
+  mapUrl:
+    "https://www.google.com/maps/dir/?api=1&destination=133+W+Michigan+Ave,+Marshall,+MI+49068",
+  orderUrl: "https://www.toasttab.com/copper-pub/v3",
+  instagram: "https://www.instagram.com/copper_ac/",
+  facebook: "https://www.facebook.com/TheCopperAC",
+  geo: { lat: 42.2717, lng: -84.9636 },
+} as const;
+
+export const HOURS = [
+  { label: "Monday – Saturday", value: "11:00 AM – 12:00 AM" },
+  { label: "Sunday", value: "9:00 AM – 12:00 AM" },
+  { label: "Sunday Brunch", value: "9:00 AM – 2:00 PM" },
+];
+
+// Kept separate on purpose: the kitchen closing before the bar is the mismatch
+// customers hit today between the site and the Toast ordering page.
+export const KITCHEN_NOTE = "Kitchen closes at 10:00 PM daily.";
+
+export const CONSUMER_ADVISORY =
+  "Consuming raw or undercooked meats, poultry, seafood, shellfish or eggs may increase your risk of foodborne illness, especially if you have certain medical conditions.";
+
+export const ACCESSIBILITY_NOTE =
+  "The main floor bar and dining room are street-level accessible. The Copper Reserve is on the second floor and is not currently wheelchair accessible. Call us and we will do everything we can to accommodate your group downstairs.";
+
+export type CACEvent = {
+  slug: string;
+  title: string;
+  date: string; // ISO
+  displayDate: string;
+  time: string;
+  price?: string;
+  ticketUrl?: string;
+  image?: string;
+  imageAlt?: string;
+  details: string[];
+};
+
+export const EVENTS: CACEvent[] = [
+  {
+    slug: "90s-music-trivia",
+    title: "90's Music Trivia",
+    date: "2026-08-20T19:00:00-04:00",
+    displayDate: "Thursday, August 20",
+    time: "7:00 – 9:00 PM",
+    price: "$10 per person",
+    ticketUrl:
+      "https://order.toasttab.com/online/copper-pub/item-90s-music-trivia_4b1b005d-90e6-49bf-8ba6-8283d85869b4",
+    image: "/img/event-trivia.webp",
+    imageAlt:
+      "90's Music Trivia flyer styled like a Windows 95 Paint window, surrounded by 90s pop culture icons",
+    details: [
+      "Includes a dinner buffet",
+      "6 people max on a team",
+      "Themed prizes for the winners",
+      "Hosted upstairs in the Copper Reserve",
+    ],
+  },
+];
+
+export const NAV = [
+  { href: "/menu", label: "Menu" },
+  { href: "/brunch", label: "Brunch" },
+  { href: "/reserve", label: "The Copper Reserve" },
+  { href: "/events", label: "Events" },
+  { href: "/contact", label: "Contact" },
+];

@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-copper: #b86d2a;
+  --color-copper-light: #d18a48;
+  --color-copper-dark: #8f5219;
+  --color-ink: #0d0d0d;
+  --color-ink-soft: #191919;
+  --color-ink-line: #2a2a2a;
+  --color-cream: #faf7f2;
+  --color-cream-dim: #e8e2d8;
+
+  --font-display: var(--font-oswald), "Oswald", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+::selection {
+  background: var(--color-copper);
+  color: #fff;
+}
+
+/* Visible keyboard focus everywhere. The current site has none. */
+:focus-visible {
+  outline: 2px solid var(--color-copper-light);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
