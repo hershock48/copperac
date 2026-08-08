@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Eyebrow, Heading, Section } from "@/components/ui";
+import Board from "@/components/Board";
+import LiveStatus from "@/components/LiveStatus";
 import { EVENTS, HOURS, KITCHEN_NOTE, SITE } from "@/lib/site";
+
+// The board pulls live Detroit scores, so the homepage regenerates every 15
+// minutes instead of being frozen at build time.
+export const revalidate = 900;
 
 export default function Home() {
   const nextEvent = EVENTS[0];
@@ -41,19 +47,21 @@ export default function Home() {
                 See the Menu
               </Button>
             </div>
-            <p className="mt-8 text-sm text-cream-dim/70">
-              Open today{" "}
-              <span className="text-cream">11:00 AM – 12:00 AM</span> ·{" "}
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-cream-dim/70">
+              <LiveStatus />
               <a
                 href={SITE.phoneHref}
                 className="text-copper-light underline underline-offset-4 hover:text-copper"
               >
                 {SITE.phone}
               </a>
-            </p>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Live Detroit board — the thing their WordPress site can't do. */}
+      <Board />
 
       {/* Three ways in, right below the fold. */}
       <Section dark className="!py-0">

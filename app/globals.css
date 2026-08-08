@@ -48,3 +48,239 @@ h1, h2, h3, .display {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   The Board — sportsbook odds-board treatment
+   Slate panels, amber LED numerals, chalk rules.
+   ============================================================ */
+
+.board-panel {
+  position: relative;
+  border: 1px solid var(--color-ink-line);
+  border-radius: 2px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 120px),
+    #0a0a0a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 40px -30px #000;
+  overflow: hidden;
+}
+/* faint scanlines: reads as an LED board without costing an image */
+.board-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.022) 0 1px,
+    transparent 1px 3px
+  );
+}
+.board-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-ink-line);
+  background: linear-gradient(180deg, rgba(184, 109, 42, 0.12), transparent);
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 46px 1fr auto 74px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.18s ease;
+}
+.board-row:hover { background: rgba(184, 109, 42, 0.06); }
+
+.board-league {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--color-cream-dim);
+  opacity: 0.5;
+}
+.board-matchup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--color-cream-dim);
+}
+.board-at { font-size: 11px; opacity: 0.45; text-transform: lowercase; }
+
+.board-score {
+  font-family: var(--font-display);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--color-copper-light);
+  text-shadow: 0 0 14px rgba(209, 138, 72, 0.35);
+}
+.board-dash { opacity: 0.4; }
+.board-win { color: #7dd18a; text-shadow: 0 0 14px rgba(125, 209, 138, 0.3); }
+.board-loss { color: #d9736b; text-shadow: none; }
+.board-time {
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-cream-dim);
+  opacity: 0.8;
+  text-shadow: none;
+}
+.board-wl {
+  margin-left: 4px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+.board-wl-W { background: rgba(125, 209, 138, 0.14); color: #7dd18a; }
+.board-wl-L { background: rgba(217, 115, 107, 0.14); color: #d9736b; }
+.board-wl-T { background: rgba(232, 226, 216, 0.1); color: var(--color-cream-dim); }
+
+.board-net {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--color-cream-dim);
+  opacity: 0.42;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 460px) {
+  .board-row { grid-template-columns: 40px 1fr auto; gap: 10px; }
+  .board-net { display: none; }
+}
+
+/* live dot on the rail */
+.board-live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #7dd18a;
+  box-shadow: 0 0 0 0 rgba(125, 209, 138, 0.55);
+  animation: boardPulse 2.4s ease-out infinite;
+}
+@keyframes boardPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(125, 209, 138, 0.5); }
+  70%  { box-shadow: 0 0 0 9px rgba(125, 209, 138, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(125, 209, 138, 0); }
+}
+
+/* crawling ticker rail */
+.board-ticker {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--color-ink-line);
+  border-bottom: 1px solid var(--color-ink-line);
+  background: #080808;
+  padding: 11px 0;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.board-ticker-track { display: flex; width: max-content; animation: boardCrawl 42s linear infinite; }
+.board-ticker-run { display: flex; align-items: center; }
+.board-ticker-item {
+  font-family: var(--font-display);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-cream-dim);
+  font-variant-numeric: tabular-nums;
+}
+.board-ticker-item b { color: var(--color-copper-light); }
+.board-ticker-sep { opacity: 0.35; }
+.board-ticker-dot { color: var(--color-copper); opacity: 0.5; font-size: 8px; }
+@keyframes boardCrawl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ============================================================
+   Live open / kitchen status chip
+   ============================================================ */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--color-ink-line);
+  background: rgba(0, 0, 0, 0.4);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--color-cream-dim);
+  backdrop-filter: blur(6px);
+}
+.status-chip-idle { min-width: 190px; opacity: 0; }
+.status-chip b { color: var(--color-cream); }
+.status-sep { opacity: 0.4; }
+.status-detail { opacity: 0.72; letter-spacing: 0.05em; text-transform: none; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.status-open { border-color: rgba(125, 209, 138, 0.32); }
+.status-open .status-dot {
+  background: #7dd18a;
+  animation: statusPulse 2.6s ease-out infinite;
+}
+.status-kitchen-closed { border-color: rgba(209, 138, 72, 0.4); }
+.status-kitchen-closed .status-dot { background: var(--color-copper-light); }
+.status-closed { border-color: rgba(217, 115, 107, 0.3); }
+.status-closed .status-dot { background: #d9736b; }
+@keyframes statusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(125, 209, 138, 0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(125, 209, 138, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(125, 209, 138, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the global reset squashes durations; an infinite crawl would jitter, so stop it */
+  .board-ticker-track { animation: none !important; transform: none !important; }
+  .board-live-dot, .status-open .status-dot { animation: none !important; }
+}
+
+/* four-team strip — every Detroit club, even out of season */
+.board-team {
+  display: grid;
+  gap: 5px;
+  padding: 15px 16px;
+  border: 1px solid var(--color-ink-line);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(184, 109, 42, 0.07), #0a0a0a 70%);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.board-team:hover { border-color: rgba(209, 138, 72, 0.45); transform: translateY(-2px); }
+.board-team-name {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--color-copper-light);
+}
+.board-team-game {
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: 0.04em;
+  color: var(--color-cream);
+  font-variant-numeric: tabular-nums;
+}
+.board-team-when {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-cream-dim);
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
