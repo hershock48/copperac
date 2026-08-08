@@ -84,3 +84,23 @@ export const NAV = [
   { href: "/events", label: "Events" },
   { href: "/contact", label: "Contact" },
 ];
+
+/**
+ * Events that have not finished yet, soonest first.
+ *
+ * Everything that renders an event has to come through here. Reading EVENTS[0]
+ * directly is how a site ends up advertising last month's trivia night: array
+ * order is not a promise about dates, and nothing takes an event down once it
+ * is over. The grace window keeps an event listed while it is still happening.
+ *
+ * Any page calling this must also `export const revalidate`, or the cutoff is
+ * frozen at whatever moment the site was last built.
+ */
+const EVENT_GRACE_MS = 4 * 60 * 60 * 1000;
+
+export function upcomingEvents(now: Date = new Date()): CACEvent[] {
+  const cutoff = now.getTime() - EVENT_GRACE_MS;
+  return EVENTS.filter((e) => new Date(e.date).getTime() >= cutoff).sort(
+    (a, b) => +new Date(a.date) - +new Date(b.date)
+  );
+}

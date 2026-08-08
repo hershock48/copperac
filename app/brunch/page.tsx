@@ -7,7 +7,7 @@ import { CONSUMER_ADVISORY, SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Sunday Brunch",
   description:
-    "Sunday brunch at Copper Athletic Club in Marshall, MI. 9 AM to 2 PM every Sunday. Peach cobbler french toast bake, breakfast nachos, mimosa flights and four house bloody marys.",
+    "Sunday brunch at Copper Athletic Club in Marshall, MI. 9 AM to 2 PM every Sunday. Peach cobbler french toast bake, breakfast nachos and mimosa flights.",
   alternates: { canonical: "/brunch" },
   openGraph: {
     title: "Sunday Brunch | Copper Athletic Club",

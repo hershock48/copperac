@@ -5,9 +5,11 @@ import { Button, Eyebrow, Heading, Section } from "@/components/ui";
 import { ACCESSIBILITY_NOTE, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "The Copper Reserve | Private Event Space",
+  // 63 chars once the "| Copper Athletic Club" template is appended, which
+  // Google truncates. Shorter, and it stops saying Copper three times.
+  title: "The Copper Reserve",
   description:
-    "Marshall's premier private bar and event space. Seats 72 with its own bartender, four TVs with the DIRECTV Sports Package and NFL Sunday Ticket. $50 per hour. Birthdays, fantasy drafts, showers, business meetings.",
+    "Marshall's private bar and event space. Seats 72, its own bartender, four TVs with the NFL Sunday Ticket. $50 per hour. Birthdays, drafts, showers, meetings.",
   alternates: { canonical: "/reserve" },
   openGraph: {
     title: "The Copper Reserve | Private Event Space in Marshall, MI",
@@ -116,7 +118,7 @@ export default function ReservePage() {
             <dl className="mt-9 divide-y divide-ink-line border-y border-ink-line">
               {SPECS.map((s) => (
                 <div key={s.label} className="grid gap-1 py-5 sm:grid-cols-[140px_1fr] sm:gap-6">
-                  <dt className="display text-xs uppercase tracking-[0.2em] text-copper">
+                  <dt className="display text-xs uppercase tracking-[0.2em] text-copper-light">
                     {s.label}
                   </dt>
                   <dd className="text-base leading-relaxed text-cream-dim">{s.value}</dd>
@@ -175,7 +177,7 @@ export default function ReservePage() {
             </p>
             <div className="mt-10 grid gap-10 sm:grid-cols-2">
               <div>
-                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper">
+                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper-light">
                   Popular options
                 </h3>
                 <ul className="mt-5 space-y-2.5 text-base text-cream-dim">
@@ -185,7 +187,7 @@ export default function ReservePage() {
                 </ul>
               </div>
               <div>
-                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper">
+                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper-light">
                   Breakfast &amp; brunch
                 </h3>
                 <ul className="mt-5 space-y-2.5 text-base text-cream-dim">
@@ -196,7 +198,7 @@ export default function ReservePage() {
               </div>
             </div>
           </div>
-          <div className="relative aspect-4/3 min-h-80 overflow-hidden rounded-sm">
+          <div className="relative aspect-4/3 overflow-hidden rounded-sm sm:min-h-80">
             <Image
               src="/img/reserve-food.webp"
               alt="Chafing dishes and serving utensils set along the buffet table in the Copper Reserve"
@@ -224,7 +226,7 @@ export default function ReservePage() {
               </Button>
             </div>
             <div className="mt-12 rounded-sm border border-ink-line p-6">
-              <h3 className="display text-xs uppercase tracking-[0.2em] text-copper">
+              <h3 className="display text-xs uppercase tracking-[0.2em] text-copper-light">
                 Accessibility
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-cream-dim/80">

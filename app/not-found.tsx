@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/ui";
+
+// Without this the 404 inherits the root metadata, so it served the homepage's
+// title, description and rel=canonical while returning a 404 status.
+export const metadata: Metadata = {
+  title: "Page not found",
+  description: "That page does not exist at Copper Athletic Club.",
+  robots: { index: false, follow: true },
+  alternates: { canonical: undefined },
+};
 
 export default function NotFound() {
   return (
     <section className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-5 py-24 text-center">
-      <p className="display text-xs uppercase tracking-[0.3em] text-copper">404</p>
+      <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">404</p>
       <h1 className="mt-5 text-4xl uppercase leading-tight text-cream sm:text-5xl">
         Wrong end of the bar
       </h1>

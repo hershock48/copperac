@@ -56,7 +56,7 @@ export default function Header() {
             href={SITE.orderUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="display hidden rounded-sm bg-copper px-5 py-3 text-sm uppercase tracking-widest text-white transition-colors hover:bg-copper-light sm:inline-block"
+            className="display hidden rounded-sm bg-copper px-5 py-3 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light sm:inline-block"
           >
             Order Online
           </a>
@@ -94,7 +94,7 @@ export default function Header() {
                 href={SITE.orderUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="display rounded-sm bg-copper px-5 py-4 text-center text-sm uppercase tracking-widest text-white"
+                className="display rounded-sm bg-copper px-5 py-4 text-center text-sm uppercase tracking-widest text-ink"
               >
                 Order Online
               </a>

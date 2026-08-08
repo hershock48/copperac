@@ -36,7 +36,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper">Visit Us</h2>
+            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper-light">Visit Us</h2>
             <address className="mt-5 space-y-3 text-sm not-italic leading-relaxed text-cream-dim">
               <p>
                 {SITE.street}
@@ -65,7 +65,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper">Hours</h2>
+            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper-light">Hours</h2>
             <dl className="mt-5 space-y-3 text-sm text-cream-dim">
               {HOURS.map((h) => (
                 <div key={h.label}>
@@ -78,7 +78,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper">Explore</h2>
+            <h2 className="display text-sm uppercase tracking-[0.2em] text-copper-light">Explore</h2>
             <ul className="mt-5 space-y-3 text-sm text-cream-dim">
               {NAV.map((item) => (
                 <li key={item.href}>
@@ -101,7 +101,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-ink-line pt-8 text-xs text-cream-dim/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-4 border-t border-ink-line pt-8 text-xs text-cream-dim/70 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>

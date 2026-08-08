@@ -67,7 +67,7 @@ export default function ContactPage() {
             </div>
 
             <div className="mt-12">
-              <h2 className="display text-sm uppercase tracking-[0.3em] text-copper">Hours</h2>
+              <h2 className="display text-sm uppercase tracking-[0.3em] text-copper-light">Hours</h2>
               <dl className="mt-6 divide-y divide-ink-line border-y border-ink-line">
                 {HOURS.map((h) => (
                   <div key={h.label} className="flex items-baseline justify-between gap-6 py-4">
@@ -80,7 +80,7 @@ export default function ContactPage() {
             </div>
 
             <div className="mt-10 rounded-sm border border-ink-line p-6">
-              <h2 className="display text-xs uppercase tracking-[0.2em] text-copper">
+              <h2 className="display text-xs uppercase tracking-[0.2em] text-copper-light">
                 Accessibility
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-cream-dim/80">

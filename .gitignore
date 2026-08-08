@@ -1,3 +1,16 @@
-.next
+# dependencies
 node_modules
+
+# build output
+.next
 out
+*.tsbuildinfo
+
+# local env
+.env
+.env.local
+.env*.local
+
+# editor / OS
+.DS_Store
+*.log

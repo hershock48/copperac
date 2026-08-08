@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------
+   CONTRAST RULES, measured. Copper is a mid-tone, which is the
+   trap: it looks like a dark colour next to ink and behaves like
+   a light one under white text.
+
+     white       on copper        3.99  FAILS AA
+     white       on copper-light  2.82  FAILS badly
+     white       on copper-dark   6.20  AA
+     ink         on copper        4.77  AA      <- solid buttons
+     ink         on copper-light  6.74  AA      <- their hover
+     copper      on ink-soft      4.40  FAILS AA by a hair
+     copper-light on ink-soft     6.23  AA      <- small copper text
+     cream-dim   on ink-soft     14.6   AAA
+
+   So: never white on copper at any weight, and never plain
+   copper for small text. Solid buttons carry ink text; labels
+   and eyebrows use copper-light.
+--------------------------------------------------------------- */
+
 @theme {
   --color-copper: #b86d2a;
   --color-copper-light: #d18a48;

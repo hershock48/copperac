@@ -85,7 +85,7 @@ export default async function Board() {
           </div>
         )}
 
-        <p className="mt-6 text-xs leading-relaxed text-cream-dim/50">
+        <p className="mt-6 text-xs leading-relaxed text-cream-dim/70">
           Every Detroit game goes up on the wall. Ask and we&apos;ll put your game on a screen too.
         </p>
       </div>
@@ -106,7 +106,7 @@ function Panel({
     <div className="board-panel">
       <div className="board-panel-head">
         <span className="display text-sm uppercase tracking-[0.22em] text-copper-light">{title}</span>
-        <span className="text-[11px] uppercase tracking-[0.14em] text-cream-dim/45">{note}</span>
+        <span className="text-[11px] uppercase tracking-[0.14em] text-cream-dim/70">{note}</span>
       </div>
       <div className="divide-y divide-ink-line/70">{children}</div>
     </div>

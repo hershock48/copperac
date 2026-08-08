@@ -24,7 +24,9 @@ export function Section({
 
 export function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="display text-xs uppercase tracking-[0.3em] text-copper">{children}</p>
+    /* copper-light, not copper: plain copper on ink-soft is 4.40, and this is
+       12px, so it needs the full 4.5. copper-light is 6.23. */
+    <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">{children}</p>
   );
 }
 
@@ -61,10 +63,14 @@ export function Button({
 }) {
   const base =
     "display inline-flex items-center justify-center rounded-sm px-7 py-4 text-sm uppercase tracking-widest transition-colors";
+  // Ink on copper, not white on copper. White measures 3.99 against copper and
+  // 2.82 against the copper-light hover, so the old pair failed AA in both
+  // states. Ink is 4.77 and 6.74, and on a black page a bright copper chip with
+  // dark type reads harder than a washed-out white label anyway.
   const styles =
     variant === "solid"
-      ? "bg-copper text-white hover:bg-copper-light"
-      : "border border-copper text-copper-light hover:bg-copper hover:text-white";
+      ? "bg-copper text-ink hover:bg-copper-light"
+      : "border border-copper text-copper-light hover:bg-copper hover:text-ink";
   const cls = `${base} ${styles} ${className}`;
 
   if (external) {

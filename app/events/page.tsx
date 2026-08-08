@@ -1,30 +1,38 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Button, Eyebrow, Heading, PageHero, Section } from "@/components/ui";
-import { EVENTS, SITE } from "@/lib/site";
+import { SITE, upcomingEvents } from "@/lib/site";
 
-// Metadata is generated from the event data, so it can never drift the way the
-// current site's does (it still advertises Copper Bash 2023 to Google and Facebook).
-const next = EVENTS[0];
+// Re-render hourly so finished events fall off on their own. Without this the
+// page is frozen at build time and keeps advertising a night that already
+// happened, which is exactly what the current site does with Copper Bash 2023.
+export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "Events",
-  description: next
-    ? `${next.title} on ${next.displayDate}, ${next.time} at Copper Athletic Club in Marshall, MI. ${next.price ?? ""} Trivia, watch parties and live events all season.`.trim()
-    : "Trivia, watch parties and live events at Copper Athletic Club in Marshall, MI.",
-  alternates: { canonical: "/events" },
-  openGraph: {
-    title: next ? `${next.title} | Copper Athletic Club` : "Events | Copper Athletic Club",
+// generateMetadata, not a static `metadata` object: a static one is evaluated
+// once at module load, so the date cutoff below would never move.
+export async function generateMetadata(): Promise<Metadata> {
+  const next = upcomingEvents()[0];
+  const price = next?.price ? `${next.price}. ` : "";
+  return {
+    title: "Events",
     description: next
-      ? `${next.displayDate}, ${next.time}. ${next.price ?? ""} ${next.details[0] ?? ""}`.trim()
-      : "Trivia, watch parties and live events in downtown Marshall, MI.",
-    // The branded card rather than the event flyer: flyers are portrait and
-    // already carry their own type, so they crop badly and double up.
-    images: [{ url: "/og/events.jpg", width: 1200, height: 630, alt: "Trivia, watch parties and live music at Copper Athletic Club" }],
-  },
-};
+      ? `${next.title} on ${next.displayDate}, ${next.time} at Copper Athletic Club in Marshall, MI. ${price}Trivia and watch parties all season.`
+      : "Trivia, watch parties and live events at Copper Athletic Club in Marshall, MI.",
+    alternates: { canonical: "/events" },
+    openGraph: {
+      title: next ? `${next.title} | Copper Athletic Club` : "Events | Copper Athletic Club",
+      description: next
+        ? `${next.displayDate}, ${next.time}. ${price}${next.details[0] ?? ""}`.trim()
+        : "Trivia, watch parties and live events in downtown Marshall, MI.",
+      // The branded card rather than the event flyer: flyers are portrait and
+      // already carry their own type, so they crop badly and double up.
+      images: [{ url: "/og/events.jpg", width: 1200, height: 630, alt: "Trivia, watch parties and live music at Copper Athletic Club" }],
+    },
+  };
+}
 
-const eventSchema = EVENTS.map((e) => ({
+function buildEventSchema(events: ReturnType<typeof upcomingEvents>) {
+  return events.map((e) => ({
   "@context": "https://schema.org",
   "@type": "Event",
   name: e.title,
@@ -50,14 +58,21 @@ const eventSchema = EVENTS.map((e) => ({
     ? {
         "@type": "Offer",
         url: e.ticketUrl,
-        price: "10.00",
-        priceCurrency: "USD",
+        // Read the number off the event instead of asserting $10 for
+        // everything. If there is no price to parse, say nothing.
+        ...(e.price?.match(/\$\s*([\d.]+)/)
+          ? { price: e.price.match(/\$\s*([\d.]+)/)![1], priceCurrency: "USD" }
+          : {}),
         availability: "https://schema.org/InStock",
       }
     : undefined,
-}));
+  }));
+}
 
 export default function EventsPage() {
+  const events = upcomingEvents();
+  const eventSchema = buildEventSchema(events);
+
   return (
     <>
       <PageHero
@@ -68,7 +83,7 @@ export default function EventsPage() {
       />
 
       <Section>
-        {EVENTS.length === 0 ? (
+        {events.length === 0 ? (
           <div className="rounded-sm border border-ink-line p-12 text-center">
             <Heading>Nothing on the books right now</Heading>
             <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream-dim">
@@ -86,7 +101,7 @@ export default function EventsPage() {
           </div>
         ) : (
           <div className="space-y-24">
-            {EVENTS.map((e) => (
+            {events.map((e) => (
               <article key={e.slug} className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
                 {e.image && (
                   <div className="relative mx-auto aspect-4/5 w-full max-w-sm overflow-hidden rounded-sm lg:max-w-none">

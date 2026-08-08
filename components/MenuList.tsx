@@ -12,7 +12,7 @@ export default function MenuList({ sections }: { sections: MenuSection[] }) {
     <div className="columns-1 gap-14 lg:columns-2 xl:columns-3">
       {sections.map((section) => (
         <div key={section.name} className="mb-14 break-inside-avoid">
-          <h2 className="display border-b border-copper/40 pb-3 text-xl uppercase tracking-widest text-copper">
+          <h2 className="display border-b border-copper/40 pb-3 text-xl uppercase tracking-widest text-copper-light">
             {section.name}
           </h2>
           <ul className="mt-6 space-y-6">

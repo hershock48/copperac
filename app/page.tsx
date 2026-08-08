@@ -3,14 +3,14 @@ import Link from "next/link";
 import { Button, Eyebrow, Heading, Section } from "@/components/ui";
 import Board from "@/components/Board";
 import LiveStatus from "@/components/LiveStatus";
-import { EVENTS, HOURS, KITCHEN_NOTE, SITE } from "@/lib/site";
+import { HOURS, KITCHEN_NOTE, SITE, upcomingEvents } from "@/lib/site";
 
 // The board pulls live Detroit scores, so the homepage regenerates every 15
 // minutes instead of being frozen at build time.
 export const revalidate = 900;
 
 export default function Home() {
-  const nextEvent = EVENTS[0];
+  const nextEvent = upcomingEvents()[0];
 
   return (
     <>
@@ -47,7 +47,7 @@ export default function Home() {
                 See the Menu
               </Button>
             </div>
-            <p className="display mt-7 text-[11.5px] uppercase tracking-[0.22em] text-cream-dim/45">
+            <p className="display mt-7 text-[11.5px] uppercase tracking-[0.22em] text-cream-dim/70">
               Est. 2013 · 14 screens · 0 treadmills
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-cream-dim/70">
@@ -132,7 +132,8 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Next event, driven by data so it can never go stale silently. */}
+      {/* Next event. upcomingEvents() filters by date, so a finished night
+          disappears here on its own at the next 15-minute revalidate. */}
       {nextEvent && (
         <Section dark>
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
@@ -181,7 +182,7 @@ export default function Home() {
             &ldquo;I just love this place. Dedicated to Detroit, great menu, great food,
             great service. It is a must try if you are in Marshall Michigan.&rdquo;
           </blockquote>
-          <figcaption className="mt-8 text-sm uppercase tracking-[0.25em] text-copper">
+          <figcaption className="mt-8 text-sm uppercase tracking-[0.25em] text-copper-light">
             John Costa
             <span className="mt-2 block tracking-normal text-cream-dim/60 normal-case">
               Google review
@@ -210,7 +211,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <h2 className="display text-sm uppercase tracking-[0.3em] text-copper">Hours</h2>
+            <h2 className="display text-sm uppercase tracking-[0.3em] text-copper-light">Hours</h2>
             <dl className="mt-7 divide-y divide-ink-line border-y border-ink-line">
               {HOURS.map((h) => (
                 <div key={h.label} className="flex items-baseline justify-between gap-6 py-4">

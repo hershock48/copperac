@@ -58,9 +58,38 @@ function fmtTime(iso: string) {
   }).format(new Date(iso));
 }
 
+/**
+ * The slice of ESPN's schedule payload we actually read. Everything is optional
+ * on purpose: it's a third-party feed with no contract, so the normaliser below
+ * treats every field as possibly absent rather than trusting a shape.
+ */
+type EspnScore = number | string | { value?: number; displayValue?: string };
+
+type EspnCompetitor = {
+  team?: { id?: string | number; abbreviation?: string; displayName?: string };
+  homeAway?: string;
+  winner?: boolean;
+  score?: EspnScore;
+};
+
+type EspnCompetition = {
+  status?: { type?: { state?: string; name?: string; shortDetail?: string } };
+  competitors?: EspnCompetitor[];
+  broadcasts?: { media?: { shortName?: string } }[];
+  venue?: { fullName?: string };
+};
+
+type EspnEvent = {
+  id?: string | number;
+  date?: string;
+  competitions?: EspnCompetition[];
+};
+
+type EspnSchedule = { team?: { id?: string | number }; events?: EspnEvent[] };
+
 async function fetchLeague(league: League): Promise<BoardGame[]> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/${league.path}/teams/det/schedule`;
-  let json: any;
+  let json: EspnSchedule;
   try {
     // MLB's full-season payload is ~3.4MB, over Next's 2MB data-cache ceiling,
     // so the raw response can't be stored. We cache the small normalized result
@@ -71,33 +100,35 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
       headers: { accept: "application/json" },
     });
     if (!res.ok) return [];
-    json = await res.json();
+    json = (await res.json()) as EspnSchedule;
   } catch {
     return [];
   }
 
-  const detId: string | undefined = json?.team?.id;
-  const events: any[] = Array.isArray(json?.events) ? json.events : [];
+  const detId = json?.team?.id;
+  const events: EspnEvent[] = Array.isArray(json?.events) ? json.events : [];
 
   const games: BoardGame[] = [];
   for (const ev of events) {
     const comp = ev?.competitions?.[0];
-    if (!comp) continue;
+    // No id or date means we cannot key it or place it on a timeline.
+    if (!comp || ev.id == null || !ev.date) continue;
 
     const state = comp?.status?.type?.state; // pre | in | post
     const name: string = comp?.status?.type?.name ?? "";
     // Postponed, canceled and suspended games are noise on a bar's TV board.
     if (/POSTPONED|CANCELED|CANCELLED|SUSPENDED/i.test(name)) continue;
 
-    const competitors: any[] = comp?.competitors ?? [];
+    const competitors: EspnCompetitor[] = comp?.competitors ?? [];
     const det = competitors.find(
       (c) => (detId && String(c?.team?.id) === String(detId)) || c?.team?.abbreviation === "DET"
     );
     const opp = competitors.find((c) => c !== det);
     if (!det || !opp) continue;
 
-    const num = (v: any) => {
-      const n = typeof v === "object" && v !== null ? Number(v.value ?? v.displayValue) : Number(v);
+    const num = (v: EspnScore | undefined) => {
+      const n =
+        typeof v === "object" && v !== null ? Number(v.value ?? v.displayValue) : Number(v);
       return Number.isFinite(n) ? n : null;
     };
     const detScore = state === "pre" ? null : num(det.score);

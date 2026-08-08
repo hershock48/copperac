@@ -56,7 +56,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
   },
   alternates: { canonical: "/" },
-  icons: { icon: "/img/icon.png", apple: "/img/icon.png" },
+  // Icons come from app/favicon.ico and app/apple-icon.png via Next's file
+  // conventions. The old declaration pointed both at a 192px transparent PNG,
+  // so /favicon.ico 404'd on every visit and iOS scaled a 192 down to 180.
+  // The .ico carries 16/32/48; the two small sizes are a copper C, because the
+  // buck's antlers break into loose pixels below about 40px.
 };
 
 // The current site has no LocalBusiness or Restaurant schema at all. This is what
@@ -138,7 +142,7 @@ export default function RootLayout({
       <body>
         <a
           href="#main"
-          className="display sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-sm focus:bg-copper focus:px-5 focus:py-3 focus:text-sm focus:uppercase focus:tracking-widest focus:text-white"
+          className="display sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-sm focus:bg-copper focus:px-5 focus:py-3 focus:text-sm focus:uppercase focus:tracking-widest focus:text-ink"
         >
           Skip to content
         </a>
