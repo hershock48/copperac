@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>copperac.com, audited &mdash; Glazed Web</title>
+<meta name="description" content="A page-by-page audit of copperac.com, August 2026. Eleven findings, every one linked to the proof on your own site.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="copperac.com, audited">
+<meta property="og:description" content="Eleven findings. Every one links to the proof on your own site.">
+<meta property="og:type" content="website">
+
+<!--
+  Glazed Web pitch page for Copper Athletic Club.
+  Built August 2026. Every claim in the findings list was verified against the
+  live site on 2026-08-08 and carries the URL that proves it.
+
+  Two deliberate rules in here:
+   * No prices. This document argues about the work, not the invoice.
+   * Nothing asserted that was not seen. Where a claim could only be partly
+     verified it is written down to the part that was, and where the client has
+     to check it themselves the page says so and hands them the link.
+
+  One brand note: buttons use raspberry-deep (#CE3672) rather than raspberry.
+  White on raspberry measures 3.58 and fails AA; on raspberry-deep it is 4.78.
+  Same hue family, and a document about someone else's contrast problems should
+  not have one of its own.
+-->
+
+<style>
+  :root {
+    --raspberry: #E84D8A;
+    --raspberry-deep: #CE3672;   /* button backgrounds: white on this is 4.78 */
+    --link: #BE2F68;             /* link text on cream: 5.16, where raspberry-deep is 4.45 */
+    --slime: #BFE07A;
+    --slime-bright: #A9D65C;
+    /* Brand fern is #55974A, which is 3.31 on cream and fails AA at the 12px
+       bold these labels use. Darkened to 4.76 for the same reason as taupe. */
+    --fern: #467A3C;
+    --chocolate: #2B1E16;
+    --chocolate-2: #201712;
+    --cream: #FDF6EC;
+    --cream-2: #FFFDF8;
+    /* Glazed Web's taupe is #8A7663, which measures 4.03 on cream and fails AA
+       for body text. Darkened for this document only. A page auditing someone
+       else's contrast cannot ship a contrast failure of its own. */
+    --taupe: #6F5C4A;
+    --copper: #B86D2A;
+    --rule: rgba(43, 30, 22, 0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cream); color: var(--chocolate);
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--slime); color: var(--chocolate); }
+  a { color: inherit; }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(253, 246, 236, 0.88); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .navwrap { max-width: 1000px; margin: 0 auto; padding: 13px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand .bw { font-weight: 800; font-size: 18px; letter-spacing: -0.6px; }
+  .brand .bw span { font-weight: 350; color: var(--taupe); }
+  .navlinks { display: flex; align-items: center; gap: 22px; font-size: 14px; }
+  .navlinks a { color: #5A4A3A; text-decoration: none; font-weight: 500; }
+  .navlinks a:hover { color: var(--link); }
+  @media (max-width: 780px) { .navlinks { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--raspberry-deep); color: #fff;
+    font-weight: 700; border-radius: 999px; text-decoration: none;
+    padding: 11px 22px; font-size: 14px; border: none; cursor: pointer;
+    box-shadow: 0 6px 16px -6px rgba(206, 54, 114, 0.5);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    font-family: inherit;
+  }
+  .btn:hover { transform: translateY(-2px); background: var(--raspberry); box-shadow: 0 10px 22px -8px rgba(206,54,114,.6); }
+  .btn.big { padding: 16px 32px; font-size: 16px; }
+  .btn.ghost { background: transparent; color: var(--chocolate); box-shadow: none; border: 2px solid rgba(43,30,22,0.2); }
+  .btn.ghost:hover { background: transparent; border-color: var(--link); color: var(--link); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 66px 0 54px; }
+  .kicker { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--fern); font-weight: 700; margin-bottom: 20px; }
+  h1 { font-size: clamp(34px, 5.4vw, 58px); font-weight: 800; letter-spacing: -2px; line-height: 1.04; max-width: 20ch; }
+  h1 em { font-style: normal; color: var(--link); }
+  .lede { margin-top: 24px; font-size: 19px; line-height: 1.6; color: #6B5747; max-width: 58ch; }
+  .lede b { color: var(--chocolate); }
+  .herocta { margin-top: 32px; display: flex; gap: 13px; flex-wrap: wrap; }
+  .stamp {
+    margin-top: 30px; display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--taupe); border: 1px dashed rgba(43,30,22,.22);
+    border-radius: 999px; padding: 8px 16px;
+  }
+  .stamp b { color: var(--chocolate); }
+
+  /* ---------- drip divider ---------- */
+  .drip { display: block; width: 100%; height: 46px; }
+
+  /* ---------- sections ---------- */
+  section.band { padding: 62px 0; }
+  section.band.tint { background: var(--cream-2); }
+  section.band.dark { background: var(--chocolate); color: var(--cream); }
+  section.band.dark .eyebrow { color: var(--slime); }
+  section.band.dark h2 { color: var(--cream-2); }
+  section.band.dark p { color: rgba(253,246,236,.82); }
+  .eyebrow { font-size: 12px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--fern); font-weight: 700; }
+  h2 { font-size: clamp(27px, 3.6vw, 40px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.1; margin-top: 14px; max-width: 24ch; }
+  h3 { font-size: 19px; font-weight: 750; letter-spacing: -0.3px; line-height: 1.3; }
+  .body { margin-top: 20px; font-size: 17px; line-height: 1.68; color: #5C4A3B; max-width: 66ch; }
+  .body + .body { margin-top: 15px; }
+  .body a { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- filter chips ---------- */
+  .chips { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    font: inherit; font-size: 13.5px; font-weight: 650; cursor: pointer;
+    border: 1.5px solid rgba(43,30,22,.16); background: transparent; color: #5C4A3B;
+    border-radius: 999px; padding: 8px 16px; transition: all .14s ease;
+  }
+  .chip:hover { border-color: rgba(43,30,22,.34); }
+  .chip[aria-pressed="true"] { background: var(--chocolate); border-color: var(--chocolate); color: var(--cream); }
+  .chip .n { opacity: .55; margin-left: 5px; font-weight: 600; }
+
+  /* ---------- finding cards ---------- */
+  .findings { margin-top: 30px; display: grid; gap: 14px; }
+  .finding {
+    background: #fff; border: 1px solid var(--rule); border-radius: 16px;
+    box-shadow: 0 2px 3px rgba(43,30,22,.03);
+    overflow: hidden; transition: box-shadow .16s ease, transform .16s ease;
+  }
+  .finding:hover { box-shadow: 0 12px 28px -18px rgba(43,30,22,.4); }
+  .finding[hidden] { display: none; }
+  .fhead { display: grid; grid-template-columns: 42px 1fr; gap: 16px; padding: 22px 24px; align-items: start; }
+  @media (max-width: 640px) { .fhead { grid-template-columns: 34px 1fr; gap: 12px; padding: 18px 16px; } }
+  .fnum {
+    font-size: 15px; font-weight: 800; color: #A32557; /* 4.22 at raspberry-deep; this passes */
+    background: rgba(232,77,138,.1); border-radius: 10px;
+    height: 34px; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  .tagrow { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; align-items: center; }
+  .tag {
+    font-size: 11px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 6px;
+  }
+  .tag.cost { background: rgba(206,54,114,.12); color: #A32557; }
+  .tag.found { background: rgba(85,151,74,.14); color: #3D6E35; }
+  .tag.polish { background: rgba(138,118,99,.16); color: #6A5847; }
+  .fsub { margin-top: 9px; font-size: 15.5px; line-height: 1.6; color: #5C4A3B; }
+  .fsub b { color: var(--chocolate); }
+
+  .toggle {
+    font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    background: transparent; border: none; color: var(--link);
+    padding: 4px 0; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .toggle:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .toggle .caret { transition: transform .18s ease; display: inline-block; font-size: 10px; }
+  .toggle[aria-expanded="true"] .caret { transform: rotate(90deg); }
+
+  .proof { display: none; padding: 0 24px 22px 82px; }
+  @media (max-width: 640px) { .proof { padding: 0 16px 18px 16px; } }
+  .proof.open { display: block; }
+  .proofbox {
+    background: #FBF7F1; border: 1px solid var(--rule); border-left: 3px solid var(--slime-bright);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .plabel { font-size: 10.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--fern); }
+  .quote { margin-top: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.65; color: var(--chocolate-2); word-break: break-word; }
+  .quote em { font-style: normal; background: rgba(191,224,122,.45); padding: 1px 3px; border-radius: 3px; }
+  .plinks { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .plink {
+    font-size: 12.5px; font-weight: 650; text-decoration: none;
+    border: 1px solid rgba(43,30,22,.16); border-radius: 999px; padding: 6px 13px;
+    color: #5C4A3B; background: #fff; transition: all .14s ease;
+  }
+  .plink:hover { border-color: var(--link); color: var(--link); }
+  .pnote { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--taupe); }
+
+  /* ---------- live hours widget ---------- */
+  .clockcard {
+    margin-top: 30px; background: var(--chocolate-2); border-radius: 18px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.07);
+  }
+  .clockhead {
+    padding: 16px 22px; border-bottom: 1px solid rgba(255,255,255,.09);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  }
+  .clocknow { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: rgba(253,246,236,.55); font-weight: 700; }
+  .clocktime { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 15px; color: var(--slime); font-weight: 600; }
+  .clockgrid { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 620px) { .clockgrid { grid-template-columns: 1fr; } }
+  .clockcell { padding: 22px; }
+  .clockcell + .clockcell { border-left: 1px solid rgba(255,255,255,.09); }
+  @media (max-width: 620px) { .clockcell + .clockcell { border-left: none; border-top: 1px solid rgba(255,255,255,.09); } }
+  .cclabel { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 800; }
+  .cclabel.bad { color: #E8869F; }
+  .cclabel.good { color: var(--slime); }
+  .ccbig { margin-top: 12px; font-size: 26px; font-weight: 800; letter-spacing: -0.8px; color: var(--cream-2); line-height: 1.15; }
+  .ccsub { margin-top: 8px; font-size: 14px; line-height: 1.55; color: rgba(253,246,236,.62); }
+  .ccsrc { margin-top: 14px; font-size: 12px; color: rgba(253,246,236,.66); }
+  .ccsrc a { color: var(--slime); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- staleness timeline ---------- */
+  .stale { margin-top: 30px; display: grid; gap: 11px; }
+  .srow { display: grid; grid-template-columns: 118px 1fr 152px; align-items: center; gap: 14px; font-size: 14px; }
+  @media (max-width: 640px) { .srow { grid-template-columns: 92px 1fr; } .srow .sdays { grid-column: 2; text-align: left; margin-top: -6px; } }
+  .spath { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 600; }
+  .strack { display: block; height: 12px; background: rgba(43,30,22,.07); border-radius: 999px; overflow: hidden; }
+  /* On the dark band the cream-tuned track and labels all but disappeared. */
+  .band.dark .strack { background: rgba(253,246,236,.13); }
+  .band.dark .spath { color: var(--cream-2); }
+  .band.dark .sdays { color: rgba(253,246,236,.66); }
+  .band.dark .sdays b { color: var(--slime); }
+  /* A default fill so the track is not an empty box when JS is off. */
+  /* display:block is load-bearing. These are spans, and width/height do not
+     apply to an inline box, so every bar was rendering at zero width. */
+  .sbar { display: block; height: 100%; width: 100%; background: rgba(253,246,236,.28); border-radius: 999px; transition: width 1.1s cubic-bezier(.2,.8,.3,1); }
+  .sbar.old { background: linear-gradient(90deg, var(--raspberry), var(--raspberry-deep)); }
+  .sbar.mid { background: linear-gradient(90deg, #E9C46A, #D9A63C); }
+  .sbar.new { background: linear-gradient(90deg, var(--slime), var(--slime-bright)); }
+  .sdays { font-size: 13px; color: var(--taupe); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sdays b { color: var(--chocolate); font-weight: 700; }
+
+  /* ---------- share card compare ---------- */
+  .compare { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+  .cc { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+  .cc img { display: block; width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; background: #1a1a1a; }
+  .ccap { padding: 13px 16px; font-size: 13.5px; line-height: 1.55; color: #5C4A3B; }
+  .ccap b { display: block; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 6px; }
+  .ccap.was b { color: #A32557; }
+  .ccap.now b { color: var(--fern); }
+
+  /* ---------- build list ---------- */
+  .builds { margin-top: 34px; display: grid; gap: 13px; }
+  .build { display: grid; grid-template-columns: 30px 1fr; gap: 15px; align-items: start; }
+  .bdot { width: 22px; height: 22px; border-radius: 999px; background: var(--slime); display: grid; place-items: center; margin-top: 2px; }
+  .bdot svg { width: 12px; height: 12px; }
+  .build h3 { font-size: 17px; }
+  .build p { margin-top: 5px; font-size: 15.5px; line-height: 1.6; color: #5C4A3B; }
+  section.band.dark .build p { color: rgba(253,246,236,.75); }
+  .build .live { font-size: 13px; font-weight: 650; }
+  .build .live a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+  section.band.dark .build .live a { color: var(--slime); }
+
+  /* ---------- steps ---------- */
+  .steps { margin-top: 32px; counter-reset: s; display: grid; gap: 20px; }
+  .step { display: grid; grid-template-columns: 40px 1fr; gap: 16px; align-items: start; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    width: 32px; height: 32px; border-radius: 999px; background: var(--chocolate); color: var(--cream);
+    display: grid; place-items: center; font-weight: 800; font-size: 14px;
+  }
+  .step h3 { font-size: 17.5px; }
+  .step p { margin-top: 5px; font-size: 15.5px; line-height: 1.6; color: #5C4A3B; }
+
+  footer { padding: 46px 0 60px; border-top: 1px solid var(--rule); font-size: 13.5px; color: var(--taupe); line-height: 1.7; }
+  footer a { color: var(--link); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sbar { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- the glazedweb mark, lifted from components/Logo.jsx -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%">
+      <stop offset="0%" stop-color="#F887B2"/><stop offset="55%" stop-color="#E84D8A"/><stop offset="100%" stop-color="#CE3672"/>
+    </radialGradient>
+    <linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D9EDA0"/><stop offset="55%" stop-color="#BFE07A"/><stop offset="100%" stop-color="#A3CE55"/>
+    </linearGradient>
+    <linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E3F2B0"/><stop offset="100%" stop-color="#C3E181"/>
+    </linearGradient>
+    <linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5FA850"/><stop offset="100%" stop-color="#43813A"/>
+    </linearGradient>
+    <symbol id="mark" viewBox="0 0 200 250" overflow="visible">
+      <g fill="url(#dgGrad)">
+        <ellipse cx="100" cy="110" rx="38" ry="15"/>
+        <path d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"/>
+        <path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"/>
+      </g>
+      <g fill="url(#lgGrad)">
+        <path d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"/>
+        <path d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"/>
+        <path d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"/>
+      </g>
+      <circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"/>
+      <path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"/>
+      <path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+      <path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"/>
+      <g stroke="#F1F8DC" fill="none" stroke-linecap="round">
+        <path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity=".85"/>
+        <path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity=".8"/>
+        <path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity=".8"/>
+      </g>
+      <circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity=".9"/>
+      <circle cx="100" cy="72" r="13" fill="#FDF6EC"/>
+      <circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity=".3"/>
+      <path d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity=".75"/>
+      <circle cx="92" cy="26" r="3.5" fill="#FFFFFF" opacity=".75"/>
+    </symbol>
+    <symbol id="dripEdge" viewBox="0 0 1440 60" preserveAspectRatio="none">
+      <path d="M0,0 H1440 V16 C1408 16 1400 44 1378 44 C1356 44 1362 16 1332 16 H1180 C1160 16 1156 52 1132 52 C1110 52 1116 16 1088 16 H880 C862 16 860 38 842 38 C824 38 828 16 802 16 H590 C574 16 572 48 550 48 C528 48 532 16 506 16 H300 C284 16 282 36 264 36 C246 36 250 16 224 16 H0 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <div class="navwrap">
+    <a class="brand" href="https://glazedweb.com">
+      <svg width="24" height="31" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><use href="#mark"/></svg>
+      <span class="bw">glazed<span>web</span></span>
+    </a>
+    <nav class="navlinks">
+      <a href="#found">What we found</a>
+      <a href="#most">What matters most</a>
+      <a href="#build">What we'd build</a>
+      <a href="#next">What happens next</a>
+    </nav>
+    <a class="btn" href="https://copperac.vercel.app" target="_blank" rel="noopener">See the rebuild</a>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <div class="wrap hero">
+    <p class="kicker">Copper Athletic Club &middot; August 2026</p>
+    <h1>Your hours page never mentions <em>the kitchen.</em></h1>
+    <p class="lede">
+      It says midnight. The kitchen closes at ten. Both numbers are right, and nothing
+      on your website ties them together, so somebody read your hours this week and
+      walked in at 10:30 wanting food. <b>That is one of eleven things we found on
+      copperac.com.</b> Every one of them links to the proof on your own site, so you
+      can check all of it without taking our word for anything.
+    </p>
+    <div class="herocta">
+      <a class="btn big" href="#found">Read the findings</a>
+      <a class="btn big ghost" href="https://copperac.vercel.app" target="_blank" rel="noopener">See the rebuild &nearr;</a>
+    </div>
+    <div class="stamp">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      Audited page by page on <b>8 August 2026</b>. Nothing here is guesswork.
+    </div>
+  </div>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--cream)" aria-hidden="true"><use href="#dripEdge" fill="#FFFDF8"/></svg>
+
+  <!-- ================= FINDINGS ================= -->
+  <section class="band tint" id="found">
+    <div class="wrap">
+      <p class="eyebrow">Part one</p>
+      <h2>What we found</h2>
+      <p class="body">
+        We went through every page in your sitemap. None of this is a judgement about
+        anyone's effort, and most of it is the platform rather than the people: a
+        WordPress and Elementor site has no idea what today's date is, so nothing ever
+        comes down on its own. Filter by what it is costing you.
+      </p>
+
+      <div class="chips" role="group" aria-label="Filter findings">
+        <button class="chip" aria-pressed="true" data-filter="all">Everything <span class="n">11</span></button>
+        <button class="chip" aria-pressed="false" data-filter="cost">Costing you customers <span class="n">4</span></button>
+        <button class="chip" aria-pressed="false" data-filter="found">Making you hard to find <span class="n">4</span></button>
+        <button class="chip" aria-pressed="false" data-filter="polish">Reads as neglect <span class="n">3</span></button>
+      </div>
+
+      <div class="findings" id="flist">
+      <article class="finding" data-cat="cost">
+      <div class="fhead">
+        <span class="fnum">1</span>
+        <div>
+          <h3>Your hours never mention the kitchen</h3>
+          <p class="fsub">The contact page lists <b>11AM &ndash; 12AM</b> and stops there. Toast, on a different screen, says <b>Closes at 10PM</b>. Both are true: the kitchen shuts at ten and the bar runs to midnight. Nothing on either page says so, so the guess a customer makes is the wrong one.</p>
+          <div class="tagrow">
+            <span class="tag cost">Costing you customers</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-1">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-1">
+        <div class="proofbox">
+          <p class="plabel">Verbatim, from your contact page</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/contact/" target="_blank" rel="noopener">Your hours page &nearr;</a><a class="plink" href="https://order.toasttab.com/online/copper-pub" target="_blank" rel="noopener">Your Toast page &nearr;</a></div>
+        <p class="pnote">This is the only finding on the list that turns a hungry customer around at the door.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="cost">
+      <div class="fhead">
+        <span class="fnum">2</span>
+        <div>
+          <h3>Copper Bash 2023 is still on your events page</h3>
+          <p class="fsub">In August 2026, alongside the 90's Music Trivia night. Anyone who scrolls past the current event finds a party from three years ago and quietly concludes the page is not kept up.</p>
+          <div class="tagrow">
+            <span class="tag cost">Costing you customers</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-2">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-2">
+        <div class="proofbox">
+          <p class="plabel">Still on the page today</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/events/" target="_blank" rel="noopener">See it live &nearr;</a></div>
+        <p class="pnote">Scroll past the trivia listing. It is below the fold, which is exactly why nobody has noticed.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="cost">
+      <div class="fhead">
+        <span class="fnum">3</span>
+        <div>
+          <h3>66 dishes, not one photograph</h3>
+          <p class="fsub">Your menu is real text with real descriptions, which is better than the PDF most bars use. But there is not a single food photo attached to any item, and photos are the thing that makes somebody choose you over the next tab.</p>
+          <div class="tagrow">
+            <span class="tag cost">Costing you customers</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-3">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-3">
+        <div class="proofbox">
+          <p class="plabel">Every image file on your menu page</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/menus/" target="_blank" rel="noopener">Your menu &nearr;</a></div>
+        <p class="pnote">The writing is already good. “Natural cut fries drizzled with garlic mayo, hoisin sauce, sriracha, red onions, crushed peanuts, parmesan cheese, and cilantro” deserves a picture.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="cost">
+      <div class="fhead">
+        <span class="fnum">4</span>
+        <div>
+          <h3>Order Online takes a detour every time</h3>
+          <p class="fsub">The button points at an old Toast address that redirects to the real one. Every single person ordering food pays for that extra hop before the menu even starts loading.</p>
+          <div class="tagrow">
+            <span class="tag cost">Costing you customers</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-4">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-4">
+        <div class="proofbox">
+          <p class="plabel">What the button does</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/menus/" target="_blank" rel="noopener">The link on your menu page &nearr;</a><a class="plink" href="https://order.toasttab.com/online/copper-pub" target="_blank" rel="noopener">Where it lands &nearr;</a></div>
+        <p class="pnote">A one-line fix that nobody will ever thank you for, which is usually the sign it is worth doing.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="found">
+      <div class="fhead">
+        <span class="fnum">5</span>
+        <div>
+          <h3>Google is being told your homepage is called “CAC Home”</h3>
+          <p class="fsub">The title tag is the single biggest on-page SEO signal you have and the first line a person reads in search results. Yours is an internal page name that escaped into public.</p>
+          <div class="tagrow">
+            <span class="tag found">Making you hard to find</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-5">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-5">
+        <div class="proofbox">
+          <p class="plabel">Your homepage title tag</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://www.google.com/search?q=site%3Acopperac.com" target="_blank" rel="noopener">Check it yourself &nearr;</a></div>
+        <p class="pnote">Search for site:copperac.com and read the first blue line. That is what people searching “sports bar Marshall MI” see.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="found">
+      <div class="fhead">
+        <span class="fnum">6</span>
+        <div>
+          <h3>Your sitemap exists, and nothing points to it</h3>
+          <p class="fsub">Yoast is generating a perfectly good sitemap. Your robots.txt, the first file every crawler reads, never mentions it. One missing line.</p>
+          <div class="tagrow">
+            <span class="tag found">Making you hard to find</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-6">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-6">
+        <div class="proofbox">
+          <p class="plabel">The entire contents of copperac.com/robots.txt</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/robots.txt" target="_blank" rel="noopener">Your robots.txt &nearr;</a><a class="plink" href="https://copperac.com/sitemap.xml" target="_blank" rel="noopener">The sitemap it forgot &nearr;</a></div>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="found">
+      <div class="fhead">
+        <span class="fnum">7</span>
+        <div>
+          <h3>None of the listing sites carry your menu</h3>
+          <p class="fsub">Your 66 priced dishes are invisible everywhere except your own site. Restaurantji is worse than blank: it still files you under the old Copper Bar name, shows an “Add a Menu” placeholder, and has no link back to your website at all.</p>
+          <div class="tagrow">
+            <span class="tag found">Making you hard to find</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-7">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-7">
+        <div class="proofbox">
+          <p class="plabel">What Restaurantji shows</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://www.restaurantji.com/mi/marshall/copper-bar-/" target="_blank" rel="noopener">Restaurantji &nearr;</a><a class="plink" href="https://www.tripadvisor.com/Restaurant_Review-g42442-d7706798-Reviews-Copper_Athletic_Club-Marshall_Calhoun_County_Michigan.html" target="_blank" rel="noopener">Tripadvisor &nearr;</a></div>
+        <p class="pnote">Tripadvisor and michigan.org have no menu link either. Structured menu data on your own site is what feeds those surfaces.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="found">
+      <div class="fhead">
+        <span class="fnum">8</span>
+        <div>
+          <h3>There is a “COPPER BAR – CLOSED” page at your address</h3>
+          <p class="fsub">A separate Yelp listing for 133 W Michigan Ave, marked closed, updated as recently as February 2026. Somebody searching your address can land on a page telling them you are shut.</p>
+          <div class="tagrow">
+            <span class="tag found">Making you hard to find</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-8">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-8">
+        <div class="proofbox">
+          <p class="plabel">The listing title, as Yelp has it</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://www.yelp.com/biz/copper-bar-marshall" target="_blank" rel="noopener">The closed listing &nearr;</a><a class="plink" href="https://www.yelp.com/biz/the-copper-athletic-club-marshall" target="_blank" rel="noopener">Your real listing &nearr;</a></div>
+        <p class="pnote">This one is free to fix and has nothing to do with your website. Claim the duplicate and mark it moved.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="polish">
+      <div class="fhead">
+        <span class="fnum">9</span>
+        <div>
+          <h3>Three of your five pages have no headline at all</h3>
+          <p class="fsub">Menu, brunch and contact have no H1 anywhere on them. On the contact page the largest heading is an H5. The Reserve page has the opposite problem: four separate H1s. Screen readers and search engines both use that structure to work out what a page is about.</p>
+          <div class="tagrow">
+            <span class="tag polish">Reads as neglect</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-9">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-9">
+        <div class="proofbox">
+          <p class="plabel">Top heading on each page</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/menus/" target="_blank" rel="noopener">Menu &nearr;</a><a class="plink" href="https://copperac.com/brunch/" target="_blank" rel="noopener">Brunch &nearr;</a><a class="plink" href="https://copperac.com/contact/" target="_blank" rel="noopener">Contact &nearr;</a></div>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="polish">
+      <div class="fhead">
+        <span class="fnum">10</span>
+        <div>
+          <h3>The Copper Reserve is wearing a different brand</h3>
+          <p class="fsub">That page loads a blue Copper Reserve logo at the same time as your black-and-copper one. Two identities on a single page, which makes the upstairs room feel like a different business from the bar underneath it.</p>
+          <div class="tagrow">
+            <span class="tag polish">Reads as neglect</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-10">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-10">
+        <div class="proofbox">
+          <p class="plabel">Two logo files, one page</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/reserve/" target="_blank" rel="noopener">The Reserve page &nearr;</a></div>
+        <p class="pnote">Check it in ten seconds: open the page, right-click the Reserve logo, choose Inspect or Copy image address, and read the file name. We are claiming only what the file names show, not any exact colour value.</p>
+        </div>
+      </div>
+    </article>
+      <article class="finding" data-cat="polish">
+      <div class="fhead">
+        <span class="fnum">11</span>
+        <div>
+          <h3>Two typos and a price format nobody uses</h3>
+          <p class="fsub">Small things, but they are on the two pages people read most closely, and they are the kind of detail that makes a careful customer wonder what else is not being checked.</p>
+          <div class="tagrow">
+            <span class="tag polish">Reads as neglect</span>
+            <button class="toggle" aria-expanded="false" aria-controls="proof-11">
+              <span class="caret">&#9656;</span><span class="tlabel">Show me the proof</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="proof" id="proof-11">
+        <div class="proofbox">
+          <p class="plabel">As published</p>
+          <p class="quote">None</p>
+          <div class="plinks"><a class="plink" href="https://copperac.com/brunch/" target="_blank" rel="noopener">Brunch &nearr;</a><a class="plink" href="https://copperac.com/reserve/" target="_blank" rel="noopener">Reserve &nearr;</a></div>
+        <p class="pnote">Also worth knowing: your menus asterisk the eggs and burgers, but there is no consumer advisory anywhere on the site to explain what the asterisk means.</p>
+        </div>
+      </div>
+    </article>
+      </div>
+
+      <p class="body" style="margin-top:26px;font-size:15px;color:var(--taupe)">
+        Two things we could <i>not</i> verify and are therefore not claiming: any page-speed
+        score for copperac.com (Google's API rate-limited us every time), and the exact
+        colours on the Reserve page. For that one we can only prove the blue logo file,
+        not a hex value, so that is all finding&nbsp;10 says.
+      </p>
+    </div>
+  </section>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--cream-2)" aria-hidden="true"><use href="#dripEdge" fill="#FDF6EC"/></svg>
+
+  <!-- ================= LIVE HOURS ================= -->
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow">Finding one, live</p>
+      <h2>What your site is telling somebody right now</h2>
+      <p class="body">
+        This reads your published hours and the clock in Marshall. It updates on its own,
+        so whatever it says below is what a real customer sees at this moment.
+      </p>
+
+      <div class="clockcard">
+        <div class="clockhead">
+          <span class="clocknow">Right now in Marshall, Michigan</span>
+          <span class="clocktime" id="clocktime">&hellip;</span>
+        </div>
+        <div class="clockgrid">
+          <div class="clockcell">
+            <p class="cclabel bad">What copperac.com implies</p>
+            <p class="ccbig" id="oldsays">&hellip;</p>
+            <p class="ccsub" id="oldsub">&hellip;</p>
+            <p class="ccsrc">Source: <a href="https://copperac.com/contact/" target="_blank" rel="noopener">copperac.com/contact &nearr;</a></p>
+          </div>
+          <div class="clockcell">
+            <p class="cclabel good">What is actually true</p>
+            <p class="ccbig" id="newsays">&hellip;</p>
+            <p class="ccsub" id="newsub">&hellip;</p>
+            <p class="ccsrc">Live on the rebuild: <a href="https://copperac.vercel.app" target="_blank" rel="noopener">copperac.vercel.app &nearr;</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--cream)" aria-hidden="true"><use href="#dripEdge" fill="#2B1E16"/></svg>
+
+  <!-- ================= THE PART THAT MATTERS MOST ================= -->
+  <section class="band dark" id="most">
+    <div class="wrap">
+      <p class="eyebrow">Part two</p>
+      <h2>The part that matters most</h2>
+      <p class="body" style="color:rgba(253,246,236,.85)">
+        Your events page was edited on <b style="color:var(--slime)">30 July 2026</b>. Nine days
+        before we looked at it. And Copper Bash 2023 was still on it after that edit.
+      </p>
+      <p class="body" style="color:rgba(253,246,236,.85)">
+        That is the whole diagnosis in one fact. Somebody is in there maintaining the site.
+        The problem is that the tool makes adding easy and removing invisible, and nothing
+        in it knows that September 2023 has been and gone. So the new thing goes on top and
+        the old thing stays underneath, and three years later a page you touched last week
+        is still inviting people to a party that already happened.
+      </p>
+      <p class="body" style="color:rgba(253,246,236,.85)">
+        You cannot fix that with more discipline. Here is the same page in your sitemap,
+        which is how we know the dates:
+      </p>
+
+      <div class="stale" id="stale">
+      <div class="srow">
+        <span class="spath">/contact/</span>
+        <span class="strack"><span class="sbar" data-iso="2023-09-24"></span></span>
+        <span class="sdays" data-iso="2023-09-24">24 September 2023</span>
+      </div>
+      <div class="srow">
+        <span class="spath">/menus/</span>
+        <span class="strack"><span class="sbar" data-iso="2023-10-26"></span></span>
+        <span class="sdays" data-iso="2023-10-26">26 October 2023</span>
+      </div>
+      <div class="srow">
+        <span class="spath">/brunch/</span>
+        <span class="strack"><span class="sbar" data-iso="2023-10-26"></span></span>
+        <span class="sdays" data-iso="2023-10-26">26 October 2023</span>
+      </div>
+      <div class="srow">
+        <span class="spath">/</span>
+        <span class="strack"><span class="sbar" data-iso="2025-07-08"></span></span>
+        <span class="sdays" data-iso="2025-07-08">8 July 2025</span>
+      </div>
+      <div class="srow">
+        <span class="spath">/reserve/</span>
+        <span class="strack"><span class="sbar" data-iso="2026-03-25"></span></span>
+        <span class="sdays" data-iso="2026-03-25">25 March 2026</span>
+      </div>
+      <div class="srow">
+        <span class="spath">/events/</span>
+        <span class="strack"><span class="sbar" data-iso="2026-07-30"></span></span>
+        <span class="sdays" data-iso="2026-07-30">30 July 2026</span>
+      </div>
+      </div>
+
+      <p class="body" style="color:rgba(253,246,236,.7);font-size:15px;margin-top:22px">
+        Every date above comes straight from
+        <a href="https://copperac.com/page-sitemap.xml" target="_blank" rel="noopener" style="color:var(--slime)">copperac.com/page-sitemap.xml &nearr;</a>,
+        which your own SEO plugin publishes. Menu and contact are the two pages a customer
+        needs most, and they are the two nobody has been able to touch since 2023.
+      </p>
+    </div>
+  </section>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--chocolate)" aria-hidden="true"><use href="#dripEdge" fill="#FDF6EC"/></svg>
+
+  <!-- ================= SHARE CARD ================= -->
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow">One you can see instantly</p>
+      <h2>What comes up when somebody shares you</h2>
+      <p class="body">
+        Paste copperac.com into a group text or a Facebook post and this is the picture
+        that appears: a photo file uploaded in February 2021 with nothing on it. The
+        link under the left panel opens that exact file on your own server, so you can
+        confirm it is the real one.
+      </p>
+      <div class="compare">
+        <div class="cc">
+          <img src="/img/taps.webp" loading="eager" decoding="async"
+               alt="The photo copperac.com currently uses as its share image: beer taps along the bar, with no logo, headline or text on it">
+          <p class="ccap was"><b>Today</b>
+            Their own tap photo, and nothing else. No name, no headline, no address.
+            The file behind it was uploaded in February 2021 and it is still what every
+            share preview shows.
+            <a href="https://copperac.com/wp-content/uploads/2021/02/CAC_Taps_web.jpg" target="_blank" rel="noopener" style="color:var(--link);font-weight:600">Open the original file &nearr;</a>
+          </p>
+        </div>
+        <div class="cc">
+          <img src="/og/home.jpg" loading="eager" decoding="async" alt="The rebuild's share card: the room photograph with the buck lockup, the headline A sports bar. Not a gym., and the line Est. 2013, 14 screens, 0 treadmills">
+          <p class="ccap now"><b>On the rebuild</b>
+            Your room, your logo, your line, sized to the ratio every app crops to.
+            <a href="https://copperac.vercel.app/og/home.jpg" target="_blank" rel="noopener" style="color:var(--fern);font-weight:600">Open the file &nearr;</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--cream)" aria-hidden="true"><use href="#dripEdge" fill="#FFFDF8"/></svg>
+
+  <!-- ================= WHAT WE'D BUILD ================= -->
+  <section class="band tint" id="build">
+    <div class="wrap">
+      <p class="eyebrow">Part three</p>
+      <h2>What we would build</h2>
+      <p class="body">
+        Your brand stays yours. The copper, the buck, the black, your photography, your
+        menu copy, and the headline you already had, because "A sports bar. Not a gym."
+        is better than anything we would have written. What changes is everything
+        underneath it. All of this is already standing up at
+        <a href="https://copperac.vercel.app" target="_blank" rel="noopener">copperac.vercel.app</a>
+        and you can click any of it.
+      </p>
+
+      <div class="builds" id="buildlist">
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>A status line that cannot lie</h3>
+          <p>Reads the clock in Marshall and says “Open now, kitchen till 10”, then flips to “Bar open, kitchen closed” after ten, then “Closed, opens 11AM” overnight. Nobody updates it. Finding one, solved permanently.</p>
+        <p class="live"><a href="https://copperac.vercel.app" target="_blank" rel="noopener">copperac.vercel.app &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>The Board</h3>
+          <p>Live Detroit scores and what is on the screens tonight, pulled straight from ESPN for the Tigers, Lions, Pistons and Red Wings, in a sportsbook treatment. No account, no key, nothing for anyone to maintain. It is the most sports-bar thing a sports bar site can have and no template ships it.</p>
+        <p class="live"><a href="https://copperac.vercel.app/#board" target="_blank" rel="noopener">copperac.vercel.app/#board &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>Events that take themselves down</h3>
+          <p>Every event carries a date, and anything past it disappears from the page, the search listing and the share preview on its own. Copper Bash 2023 could not survive on this site even if somebody wanted it to.</p>
+        <p class="live"><a href="https://copperac.vercel.app/events" target="_blank" rel="noopener">copperac.vercel.app/events &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>Your whole menu, rebuilt</h3>
+          <p>All of it, food and brunch, as real structured text with prices as $12 rather than 12.00, the typos fixed, and a consumer advisory where the asterisks are. Ready for food photography whenever you are.</p>
+        <p class="live"><a href="https://copperac.vercel.app/menu" target="_blank" rel="noopener">copperac.vercel.app/menu &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>Told properly to Google</h3>
+          <p>Full restaurant markup with your address, hours, phone, menu and an order action, so search can show your hours and your menu directly. A sitemap and a robots file that agree with each other.</p>
+        <p class="live"><a href="https://copperac.vercel.app/sitemap.xml" target="_blank" rel="noopener">copperac.vercel.app/sitemap.xml &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>Share cards for every page</h3>
+          <p>Your room, your logo and your line, at the exact size every app crops to. Six of them, one per page, instead of a 2021 photo of taps.</p>
+        <p class="live"><a href="https://copperac.vercel.app/og/home.jpg" target="_blank" rel="noopener">copperac.vercel.app/og/home.jpg &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>One brand, upstairs and down</h3>
+          <p>The Reserve runs the same copper-on-black as the bar, using your own logo recoloured to your own copper. Same buttons, same type, same everything, on every page.</p>
+        <p class="live"><a href="https://copperac.vercel.app/reserve" target="_blank" rel="noopener">copperac.vercel.app/reserve &nearr;</a></p>
+        </div>
+      </div>
+      <div class="build">
+        <span class="bdot"><svg viewBox="0 0 24 24" fill="none" stroke="#2B1E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <div>
+          <h3>Built to stay fast</h3>
+          <p>Every page is prerendered, so it is already finished before the browser asks. No plugin stack, no theme, no database waiting to fall over on a Saturday night.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <svg class="drip" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:var(--cream-2)" aria-hidden="true"><use href="#dripEdge" fill="#FDF6EC"/></svg>
+
+  <!-- ================= NEXT ================= -->
+  <section class="band" id="next">
+    <div class="wrap">
+      <p class="eyebrow">Part four</p>
+      <h2>What happens next</h2>
+      <div class="steps">
+        <div class="step">
+          <div>
+            <h3>Go break it</h3>
+            <p>Open <a href="https://copperac.vercel.app" target="_blank" rel="noopener" style="color:var(--link);font-weight:600">copperac.vercel.app</a>
+            on your phone, at the bar, on a Sunday morning. Check the hours against the clock. Look for the game that's on tonight.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Tell us what's wrong with it</h3>
+            <p>Wrong dish description, wrong photo, a joke that does not sound like you. That list is more useful to us than a compliment, and it is faster to fix now than later.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Give us thirty minutes</h3>
+            <p>We walk it together, screen to screen, and you ask whatever you want about how it is built and who owns it. Short answer on that second one: you do.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Then you decide</h3>
+            <p>No pressure and no expiry on this page. If the answer is no, you still keep every finding above, and you can hand the list to whoever looks after the site today.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="herocta" style="margin-top:38px">
+        <a class="btn big" href="mailto:kevin@beanumber.org?subject=Copper%20Athletic%20Club%20website">Set up the thirty minutes</a>
+        <a class="btn big ghost" href="https://copperac.vercel.app" target="_blank" rel="noopener">Open the rebuild &nearr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p>
+        Prepared by <a href="https://glazedweb.com">Glazed Web</a>, Marshall, Michigan, on 8 August 2026.
+        The Copper Athletic Club logo and photography belong to Copper Athletic Club and are
+        used here with permission, to show their own site back to them.
+      </p>
+      <p style="margin-top:12px">
+        Every finding on this page was checked against the live site on the date above. If any
+        of it has since been fixed, good, and please tell us so we can take it down.
+      </p>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* ------------------------------------------------------------------
+   Progressive enhancement only. Every finding, build row and date
+   below is already in the HTML above; this file adds the filtering,
+   the proof drawers, the live clock and the bar fill. Turn JS off and
+   the document still makes its whole argument.
+   ------------------------------------------------------------------ */
+
+/* ---- proof drawers ---- */
+document.getElementById("flist").addEventListener("click", (e) => {
+  const btn = e.target.closest(".toggle");
+  if (!btn) return;
+  const open = btn.getAttribute("aria-expanded") === "true";
+  btn.setAttribute("aria-expanded", String(!open));
+  document.getElementById(btn.getAttribute("aria-controls")).classList.toggle("open", !open);
+  btn.querySelector(".tlabel").textContent = open ? "Show me the proof" : "Hide the proof";
+});
+
+/* ---- filter chips ---- */
+document.querySelectorAll(".chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+    const want = chip.dataset.filter;
+    document.querySelectorAll(".finding").forEach((card) => {
+      card.hidden = want !== "all" && card.dataset.cat !== want;
+    });
+  });
+});
+/* ------------------------------------------------------------------
+   Live hours. Evaluated in America/Detroit whatever timezone the
+   reader is in, so the two panels are always about the same moment.
+   Hours per copperac.com/contact: Sun opens 9, otherwise 11, bar to
+   midnight. Kitchen closes at 22:00, confirmed with the owner.
+   ------------------------------------------------------------------ */
+function detroitParts(now) {
+  const p = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Detroit", weekday: "short", hour: "numeric",
+    minute: "2-digit", hour12: false
+  }).formatToParts(now);
+  const g = (t) => p.find((x) => x.type === t)?.value ?? "";
+  return { wd: g("weekday"), h: parseInt(g("hour"), 10) % 24, m: parseInt(g("minute"), 10) };
+}
+
+function paintClock() {
+  const now = new Date();
+  const { wd, h, m } = detroitParts(now);
+  const mins = h * 60 + m;
+  const sunday = wd === "Sun";
+  const open = sunday ? 9 * 60 : 11 * 60;
+  const kitchen = 22 * 60;
+  const close = 24 * 60;
+
+  document.getElementById("clocktime").textContent =
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Detroit", weekday: "long", hour: "numeric", minute: "2-digit"
+    }).format(now) + " ET";
+
+  const oldSays = document.getElementById("oldsays");
+  const oldSub = document.getElementById("oldsub");
+  const newSays = document.getElementById("newsays");
+  const newSub = document.getElementById("newsub");
+  const openStr = sunday ? "9:00 AM" : "11:00 AM";
+
+  if (mins < open || mins >= close) {
+    oldSays.textContent = "Closed";
+    oldSub.textContent = `Your page implies you open at ${openStr}. On this one, it is right.`;
+    newSays.textContent = "Closed";
+    newSub.textContent = `Opens at ${openStr}. The rebuild says the same thing, and says it by reading the clock rather than by someone remembering to.`;
+  } else if (mins >= kitchen) {
+    oldSays.textContent = "Open until midnight";
+    oldSub.textContent = "Which a hungry person reads as: the kitchen is on. It is not. This is the window where somebody drives over for food and does not get any.";
+    newSays.textContent = "Bar open, kitchen closed";
+    newSub.textContent = "Said plainly, on every page, before they get in the car.";
+  } else {
+    oldSays.textContent = "Open until midnight";
+    oldSub.textContent = `True right now. It stops being true at 10:00 PM, and your site will still be saying it.`;
+    newSays.textContent = "Open now, kitchen till 10";
+    newSub.textContent = "The kitchen time is on screen before anyone has to ask for it.";
+  }
+}
+paintClock();
+setInterval(paintClock, 30000);
+
+/* ------------------------------------------------------------------
+   Staleness. The published dates are already in the HTML; this reads
+   them off the markup and adds the live day count and the bar width,
+   so the page cannot itself go stale while arguing about staleness.
+   ------------------------------------------------------------------ */
+const bars = [...document.querySelectorAll("#stale .sbar")];
+const ages = bars.map((b) => {
+  const d = Math.max(0, Math.round((Date.now() - new Date(b.dataset.iso + "T12:00:00Z")) / 86400000));
+  return d;
+});
+const worst = Math.max(...ages, 1);
+
+bars.forEach((bar, i) => {
+  const days = ages[i];
+  bar.classList.add(days > 500 ? "old" : days > 120 ? "mid" : "new");
+  bar.style.width = Math.max(2, (days / worst) * 100) + "%";
+  const label = document.querySelectorAll("#stale .sdays")[i];
+  const yrs = days >= 365 ? ` (${(days / 365).toFixed(1)} yrs)` : "";
+  label.innerHTML = `<b>${days.toLocaleString()}</b> days ago${yrs}`;
+  label.title = "Last modified " + label.dataset.iso;
+});
+</script>
+</body>
+</html>

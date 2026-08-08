@@ -54,6 +54,28 @@ Findings from an audit of the live WordPress/Elementor site.
 
 Images converted to WebP and resized. The event flyer went from a 1.9MB PNG to 252KB, the hero from 1.4MB to 175KB. The live homepage loads 32 script tags and 33 stylesheets; this one ships about 100KB of JS total.
 
+## The pitch page
+
+`public/pitch/copper-athletic-club.html` is a standalone Glazed Web document,
+served at `/pitch/copper-athletic-club` via a rewrite in `next.config.ts`. It is
+a single self-contained file with no build step, so it can be edited directly.
+
+Every finding on it was verified against the live site on 8 August 2026 and
+carries the URL that proves it. Two things were deliberately left out because
+they could not be verified: any page-speed score for copperac.com (Google's
+PageSpeed API rate-limited every attempt) and any hex value for the Reserve
+page's palette (only the blue logo file name is provable). Do not add either
+back without checking them first. There are no prices on the page by request.
+
+Content is static HTML on purpose. An earlier draft generated the findings with
+JavaScript and used a scroll-reveal animation, which meant the document had no
+findings on it with JS off and left elements invisible when the observer did not
+fire. JS now only enhances: filter chips, proof drawers, the live clock and the
+bar widths.
+
+**Delete this file and the rewrite once Copper has signed or passed.** A sales
+page arguing with the client does not belong on the client's live site.
+
 ## The enquiry form does not reach an inbox yet
 
 Read this before showing anyone the `/reserve` or `/contact` form, because it is
