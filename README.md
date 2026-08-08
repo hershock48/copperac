@@ -56,9 +56,36 @@ Images converted to WebP and resized. The event flyer went from a 1.9MB PNG to 2
 
 ## The pitch page
 
-`public/pitch/copper-athletic-club.html` is a standalone Glazed Web document,
-served at `/pitch/copper-athletic-club` via a rewrite in `next.config.ts`. It is
-a single self-contained file with no build step, so it can be edited directly.
+`public/pitch/copper-athletic-club.html` is a standalone Glazed Web document. It
+is a single self-contained file with no build step, so it can be edited directly.
+
+It is served on its own marketing host:
+
+| URL | Serves |
+| --- | --- |
+| `copperac.glazedweb.com` | the pitch |
+| `copperac.glazedweb.com/demo` | this site, the working rebuild |
+| `copperac.com` and `copperac.vercel.app` | this site at the root, no pitch anywhere |
+
+That split is three host-scoped rewrites in `next.config.ts`, and they live in
+`beforeFiles` for a reason: a plain `rewrites()` array is `afterFiles`, which
+only runs once Next has failed to find a page, and `app/page.tsx` already
+answers `/`. In `afterFiles` the root rewrite silently never fires.
+
+It is done with host scoping rather than `basePath: "/demo"` because `basePath`
+is global to a build, so it would also bury the real client site under `/demo`
+the day `copperac.com` goes live.
+
+One known wart, and it is acceptable: the app's links are root-relative, so a
+visitor who lands on `/demo` and clicks Menu ends up at `/menu`, not
+`/demo/menu`. Nothing 404s and they stay on the demo host; the prefix just drops
+off after the first click. Making it persist would require `basePath` and the
+trade above.
+
+Every path on `copperac.glazedweb.com` sends `X-Robots-Tag: noindex, nofollow`,
+because `/demo` is a full copy of the client's site and must never compete with
+`copperac.com` for their own name. `copperac.vercel.app` is still indexable and
+is the same duplicate-content risk; worth a noindex or deletion before launch.
 
 Every finding on it was verified against the live site on 8 August 2026 and
 carries the URL that proves it. Two things were deliberately left out because
