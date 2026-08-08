@@ -12,7 +12,15 @@ export const SITE = {
   zip: "49068",
   mapUrl:
     "https://www.google.com/maps/dir/?api=1&destination=133+W+Michigan+Ave,+Marshall,+MI+49068",
-  orderUrl: "https://www.toasttab.com/copper-pub/v3",
+  // Canonical Toast ordering URL. The legacy /copper-pub/v3 link the current
+  // site uses 301-redirects here, so every "Order Online" click pays for a
+  // needless hop — point straight at the destination instead.
+  //
+  // Toast blocks cross-origin iframes (x-frame-options: SAMEORIGIN), so true
+  // on-page ordering isn't possible. The on-brand option is Toast Online
+  // Ordering Pro on a subdomain: set up order.copperac.com, then this becomes
+  // "https://order.copperac.com" and nothing else in the app has to change.
+  orderUrl: "https://order.toasttab.com/online/copper-pub",
   instagram: "https://www.instagram.com/copper_ac/",
   facebook: "https://www.facebook.com/TheCopperAC",
   geo: { lat: 42.2717, lng: -84.9636 },
