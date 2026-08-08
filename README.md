@@ -54,15 +54,57 @@ Findings from an audit of the live WordPress/Elementor site.
 
 Images converted to WebP and resized. The event flyer went from a 1.9MB PNG to 252KB, the hero from 1.4MB to 175KB. The live homepage loads 32 script tags and 33 stylesheets; this one ships about 100KB of JS total.
 
+## The enquiry form does not reach an inbox yet
+
+Read this before showing anyone the `/reserve` or `/contact` form, because it is
+the one thing on the site that can cost the client real business.
+
+Right now `app/api/inquiry/route.ts` answers `503 not_configured`, and
+`InquiryForm` responds by opening the visitor's email app with every field
+prefilled, addressed to `SITE.email`. It does not claim the message was sent.
+That is the intended unconfigured behaviour, not a bug, and it is a deliberate
+replacement for what was there before: a stub that waited half a second, showed
+"Thanks, we got it", and sent nothing anywhere.
+
+Two separate things are missing, and fixing one without the other gets you
+nothing:
+
+**1. Nobody has confirmed the club's inbox.** `info@copperac.com` in
+`lib/site.ts` is a placeholder. Ask the owner for the address a human actually
+reads, and set it as `INQUIRY_TO`.
+
+**2. No mail provider is configured.** The Resend call is written and tested. It
+needs three environment variables in the Vercel project, listed in
+`.env.example`.
+
+On the sending domain, which is the part that trips people up: Resend requires
+DNS records on whatever domain the From address lives on, and we do not control
+`copperac.com`'s DNS, the client does. **Do not wait on them.** Verify
+`glazedweb.com` in Resend and send from something like `copper@glazedweb.com`.
+The route sets `reply_to` to the customer's own address, so the club hits reply
+and the reply lands with the customer. No client DNS work, and one verified
+domain covers every site we build.
+
+Then submit the form once against the deploy and confirm it arrives. The success
+panel only renders when Resend accepted the message, so seeing it is the proof.
+
+Known gap while it stays unconfigured: the `mailto:` handoff needs a registered
+mail handler on the visitor's machine. Desktop webmail users get the on-screen
+note and the phone number and nothing else. Closing that means rendering the
+composed message on the page with a copy button, the way the Cookin' with Beans
+order builder does.
+
 ## Before launch
 
+- [ ] **Confirm the club's real enquiry inbox** (`info@copperac.com` in `lib/site.ts` is a placeholder)
+- [ ] **Configure enquiry delivery**: verify `glazedweb.com` in Resend, then set `RESEND_API_KEY`, `INQUIRY_FROM` and `INQUIRY_TO` in Vercel. See `.env.example` and the section above
 - [ ] Confirm kitchen close time (`KITCHEN_NOTE` in `lib/site.ts`)
-- [ ] Confirm the email address (`info@copperac.com` is a placeholder)
-- [ ] Wire the forms to a route handler and the client's inbox. Currently `components/InquiryForm.tsx` is a UI stub
 - [ ] Confirm the accessibility wording with the owner
 - [ ] Verify the lat/lng pin
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
-- [ ] Point `copperac.com` at the deploy, keeping the `/menus` → `/menu` redirect
+- [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
+- [ ] Confirm the Toast plan includes Online Ordering Pro, then set up `order.copperac.com` and update `SITE.orderUrl`
+- [ ] Decide on Next 16: three high-severity advisories in `postcss` and `sharp` only clear with the major bump
 
 ## Structure
 

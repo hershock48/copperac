@@ -4,14 +4,41 @@ import { SITE } from "@/lib/site";
 /**
  * Reserve and contact enquiries.
  *
- * Deliberately fails loudly. Until RESEND_API_KEY and INQUIRY_TO are set in the
- * environment this returns 503 with reason "not_configured", and the form falls
- * back to opening a prefilled email. A form that reports success without
- * sending anything is worse than no form at all, so there is no path here that
- * returns ok:true without a provider having accepted the message.
+ * ==========================================================================
+ * STATUS: NOT LIVE. No enquiry sent through this site reaches an inbox yet.
+ * ==========================================================================
  *
- * To switch it on: add RESEND_API_KEY, verify the sending domain with Resend,
- * and set INQUIRY_TO to whoever reads enquiries (defaults to SITE.email).
+ * Deliberately fails loudly. With no RESEND_API_KEY or INQUIRY_FROM set this
+ * returns 503 reason "not_configured" and InquiryForm hands off to the
+ * visitor's email app with the fields prefilled. There is no path below that
+ * returns ok:true without a provider having accepted the message, because a
+ * form that reports success without delivering is worse than no form. The
+ * version this replaced waited 500ms, said "Thanks, we got it" and sent
+ * nothing anywhere.
+ *
+ * TO SWITCH IT ON, four steps:
+ *
+ *   1. Get the club's real monitored inbox. SITE.email is currently
+ *      info@copperac.com and that is a placeholder nobody has confirmed.
+ *
+ *   2. Verify a sending domain in Resend. Resend requires DNS records on
+ *      whatever domain the From address lives on, and we do not control
+ *      copperac.com's DNS, the client does. Do not wait on them: verify
+ *      glazedweb.com and send from e.g. copper@glazedweb.com. The reply_to
+ *      below is set to the customer's own address, so the club hits reply and
+ *      it goes straight to the customer. Same verified domain works for every
+ *      site we build.
+ *
+ *   3. Set RESEND_API_KEY, INQUIRY_FROM and INQUIRY_TO in the Vercel project.
+ *      See .env.example.
+ *
+ *   4. Redeploy, then actually submit the form once and confirm it arrives.
+ *      The success panel only appears when Resend accepted the message, so if
+ *      you see it, delivery was accepted.
+ *
+ * Known gap while this is unconfigured: the mailto fallback needs the visitor
+ * to have a registered mail handler. Desktop webmail users get nothing from
+ * that click beyond the on-screen note and the phone number.
  */
 
 const REQUIRED = ["first", "last", "email", "phone"] as const;

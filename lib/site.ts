@@ -5,6 +5,11 @@ export const SITE = {
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",
+  // PLACEHOLDER. Nobody has confirmed this mailbox exists. It is both the
+  // address the enquiry form's mailto fallback writes to and the default for
+  // INQUIRY_TO, so if it is wrong, enquiries go nowhere and no error is raised.
+  // Get the real monitored inbox from the club. See README, "The enquiry form
+  // does not reach an inbox yet".
   email: "info@copperac.com",
   street: "133 W. Michigan Ave.",
   city: "Marshall",
