@@ -38,8 +38,8 @@ export default function MenuPage() {
   return (
     <>
       <PageHero
-        title="The Menu"
-        subtitle="Bar favorites and hometown comfort eats. Everything below is available for dine-in, carryout and online ordering."
+        title="The Training Table"
+        subtitle="Bar favorites and hometown comfort eats. Dine in, carry out, or order online. The only reps we count are 12 oz."
         image="/img/burger.webp"
         imageAlt="A Copper Athletic Club burger on a brioche bun with a side of natural cut fries"
       />
@@ -56,6 +56,16 @@ export default function MenuPage() {
         </div>
 
         <MenuList sections={FOOD_MENU} />
+
+        {/* The bar, named in the house voice. No invented tap list — the taps
+            rotate, so this points people at the bar instead of lying about it. */}
+        <div className="curls mt-14">
+          <div>
+            <span className="curls-title display">12 oz curls</span>
+            <p className="curls-sub">Draft, bottles, cans and a full bar. The only reps we count.</p>
+          </div>
+          <p className="curls-note">Taps rotate — ask what&apos;s pouring.</p>
+        </div>
 
         <div className="mt-10 space-y-3 border-t border-ink-line pt-8 text-xs leading-relaxed text-cream-dim/60">
           <p>Prices subject to change. Ask your server about seasonal specials.</p>

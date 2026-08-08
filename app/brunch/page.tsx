@@ -21,8 +21,8 @@ export default function BrunchPage() {
   return (
     <>
       <PageHero
-        title="Sunday Brunch"
-        subtitle="Every Sunday, 9 AM to 2 PM. Walk in, bring the whole table, and start with a mimosa flight."
+        title="Recovery"
+        subtitle="Sunday brunch, 9 AM to 2 PM. Walk in, bring the whole table, and start with a mimosa flight. Rest day earned."
         image="/img/interior-bar.webp"
         imageAlt="The Copper Athletic Club bar set for service on a Sunday morning"
       />

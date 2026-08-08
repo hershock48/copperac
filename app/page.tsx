@@ -47,7 +47,10 @@ export default function Home() {
                 See the Menu
               </Button>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-cream-dim/70">
+            <p className="display mt-7 text-[11.5px] uppercase tracking-[0.22em] text-cream-dim/45">
+              Est. 2013 · 14 screens · 0 treadmills
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-cream-dim/70">
               <LiveStatus />
               <a
                 href={SITE.phoneHref}
@@ -67,20 +70,20 @@ export default function Home() {
       <Section dark className="!py-0">
         <div className="grid divide-y divide-ink-line lg:grid-cols-3 lg:divide-x lg:divide-y-0">
           <QuickCard
-            title="Eat"
-            body="Burgers, coneys, wings and a Detroit-style loose burger that people drive in for."
+            title="Training Table"
+            body="Burgers, coneys, wings and a Detroit-style loose burger that people drive in for. Kitchen runs till 10."
             href="/menu"
             cta="View the menu"
           />
           <QuickCard
-            title="Brunch"
-            body="Every Sunday, 9 AM to 2 PM. Peach cobbler french toast, four kinds of bloody, mimosa flights."
+            title="Recovery"
+            body="Sunday brunch, 9 to 2. Peach cobbler french toast, four kinds of bloody, mimosa flights."
             href="/brunch"
             cta="See brunch"
           />
           <QuickCard
-            title="Book"
-            body="The Copper Reserve upstairs seats 72 with its own bar, four TVs and the Sunday Ticket."
+            title="Membership"
+            body="The Copper Reserve upstairs seats 72 with its own bar, four TVs and the Sunday Ticket. No dues."
             href="/reserve"
             cta="Reserve the space"
           />
