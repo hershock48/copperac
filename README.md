@@ -1,4 +1,4 @@
-# Copper Athletic Club — Glazed Web concept
+# Copper Athletic Club: Glazed Web concept
 
 A rebuild concept for [copperac.com](https://copperac.com), a sports bar at 133 W. Michigan Ave. in Marshall, MI.
 
@@ -58,7 +58,7 @@ Images converted to WebP and resized. The event flyer went from a 1.9MB PNG to 2
 
 - [ ] Confirm kitchen close time (`KITCHEN_NOTE` in `lib/site.ts`)
 - [ ] Confirm the email address (`info@copperac.com` is a placeholder)
-- [ ] Wire the forms to a route handler and the client's inbox — currently `components/InquiryForm.tsx` is a UI stub
+- [ ] Wire the forms to a route handler and the client's inbox. Currently `components/InquiryForm.tsx` is a UI stub
 - [ ] Confirm the accessibility wording with the owner
 - [ ] Verify the lat/lng pin
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
@@ -77,7 +77,7 @@ app/
   contact/          hours, map, directions, contact form
 components/         Header, Footer, MenuList, InquiryForm, shared UI
 lib/
-  site.ts           business facts, hours, events — single source of truth
+  site.ts           business facts, hours, events (single source of truth)
   menu.ts           menu data
 public/img/         WebP photography and logos
 ```

@@ -41,14 +41,19 @@ export const metadata: Metadata = {
     title: "Copper Athletic Club | Sports Bar in Marshall, MI",
     description:
       "A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan.",
-    images: [{ url: "/img/interior-wide.webp", width: 1920, height: 1080, alt: SITE.name }],
+    // Designed share card, not a raw photo: 1200x630 (the ratio every scraper
+    // crops to) and JPG, because some previewers still won't render WebP.
+    // The Restaurant schema below keeps pointing at real photography, which is
+    // what Google actually wants there.
+    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Copper Athletic Club: a sports bar, not a gym. Downtown Marshall, Michigan." }],
   },
   twitter: {
+    // Only the card type is set here. Title, description and image are
+    // deliberately left off: sub-pages override openGraph but not twitter, so
+    // repeating them at the root meant every inner page advertised the
+    // homepage's title and image to any scraper that prefers twitter:*.
+    // Absent twitter:* tags fall back to og:*, which is per-page and correct.
     card: "summary_large_image",
-    title: "Copper Athletic Club | Sports Bar in Marshall, MI",
-    description:
-      "A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan.",
-    images: ["/img/interior-wide.webp"],
   },
   alternates: { canonical: "/" },
   icons: { icon: "/img/icon.png", apple: "/img/icon.png" },

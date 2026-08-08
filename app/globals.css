@@ -50,7 +50,7 @@ h1, h2, h3, .display {
 }
 
 /* ============================================================
-   The Board — sportsbook odds-board treatment
+   The Board: sportsbook odds-board treatment
    Slate panels, amber LED numerals, chalk rules.
    ============================================================ */
 
@@ -252,7 +252,7 @@ h1, h2, h3, .display {
   .board-live-dot, .status-open .status-dot { animation: none !important; }
 }
 
-/* four-team strip — every Detroit club, even out of season */
+/* four-team strip: every Detroit club, even out of season */
 .board-team {
   display: grid;
   gap: 5px;
@@ -285,7 +285,7 @@ h1, h2, h3, .display {
   font-variant-numeric: tabular-nums;
 }
 
-/* "12 oz curls" — the bar, in the house voice */
+/* "12 oz curls": the bar, in the house voice */
 .curls {
   display: flex;
   flex-wrap: wrap;

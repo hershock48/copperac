@@ -18,12 +18,9 @@ export const metadata: Metadata = {
     description: next
       ? `${next.displayDate}, ${next.time}. ${next.price ?? ""} ${next.details[0] ?? ""}`.trim()
       : "Trivia, watch parties and live events in downtown Marshall, MI.",
-    images: [
-      {
-        url: next?.image ?? "/img/interior-wide.webp",
-        alt: next?.imageAlt ?? "Copper Athletic Club",
-      },
-    ],
+    // The branded card rather than the event flyer: flyers are portrait and
+    // already carry their own type, so they crop badly and double up.
+    images: [{ url: "/og/events.jpg", width: 1200, height: 630, alt: "Trivia, watch parties and live music at Copper Athletic Club" }],
   },
 };
 

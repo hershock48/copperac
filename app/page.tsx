@@ -63,27 +63,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Live Detroit board — the thing their WordPress site can't do. */}
+      {/* Live Detroit board, the thing their WordPress site can't do. */}
       <Board />
 
-      {/* Three ways in, right below the fold. */}
+      {/* Three ways in, right below the fold. Named plainly on purpose: these
+          are the things people came to find, so they get the words people
+          search for, not the house joke. */}
       <Section dark className="!py-0">
         <div className="grid divide-y divide-ink-line lg:grid-cols-3 lg:divide-x lg:divide-y-0">
           <QuickCard
-            title="Training Table"
+            title="Menu"
             body="Burgers, coneys, wings and a Detroit-style loose burger that people drive in for. Kitchen runs till 10."
             href="/menu"
             cta="View the menu"
           />
           <QuickCard
-            title="Recovery"
-            body="Sunday brunch, 9 to 2. Peach cobbler french toast, four kinds of bloody, mimosa flights."
+            title="Sunday Brunch"
+            body="Every Sunday, 9 to 2. Peach cobbler french toast, four kinds of bloody, mimosa flights."
             href="/brunch"
             cta="See brunch"
           />
           <QuickCard
-            title="Membership"
-            body="The Copper Reserve upstairs seats 72 with its own bar, four TVs and the Sunday Ticket. No dues."
+            title="Copper Reserve"
+            body="The private room upstairs seats 72 with its own bar, four TVs and the Sunday Ticket. $50 an hour."
             href="/reserve"
             cta="Reserve the space"
           />

@@ -1,12 +1,12 @@
 import { unstable_cache } from "next/cache";
 
 /**
- * The Board — live Detroit sports results and upcoming games.
+ * The Board: live Detroit sports results and upcoming games.
  *
  * Data comes from ESPN's public site API: no key, no account, no vendor
  * lock-in. Fetched on the server and cached for 15 minutes, so the page stays
  * fast and the board is never more than a quarter-hour stale. If a league's
- * request fails we drop that league and still render — the board degrades,
+ * request fails we drop that league and still render. The board degrades,
  * the page never breaks.
  */
 
@@ -62,7 +62,7 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/${league.path}/teams/det/schedule`;
   let json: any;
   try {
-    // MLB's full-season payload is ~3.4MB — over Next's 2MB data-cache ceiling,
+    // MLB's full-season payload is ~3.4MB, over Next's 2MB data-cache ceiling,
     // so the raw response can't be stored. We cache the small normalized result
     // instead (see the unstable_cache wrapper below), which is a few hundred
     // bytes and is what we actually need.
@@ -116,7 +116,7 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
       league: league.label,
       leagueKey: league.sport,
       date: ev.date,
-      opp: opp?.team?.abbreviation ?? "—",
+      opp: opp?.team?.abbreviation ?? "TBD",
       oppName: opp?.team?.displayName ?? "",
       home: det?.homeAway === "home",
       detScore,
@@ -141,7 +141,7 @@ export type Board = {
   live: BoardGame[];
   /** Each Detroit club's next game, so all four always show even out of season */
   nextByTeam: BoardGame[];
-  /** ISO timestamp the board was assembled — shown as "as of" on the rail */
+  /** ISO timestamp the board was assembled, shown as "as of" on the rail */
   builtAt: string;
   /** false when every league failed; lets the UI show an honest fallback */
   ok: boolean;
@@ -187,7 +187,7 @@ async function buildBoard(): Promise<Board> {
 }
 
 /**
- * Cache the *derived* board — small enough to store, unlike the raw feeds —
+ * Cache the *derived* board, small enough to store unlike the raw feeds,
  * for 15 minutes. This keeps the homepage statically rendered while the scores
  * still refresh on their own.
  */

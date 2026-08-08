@@ -2,13 +2,13 @@ import { getBoard, type BoardGame } from "@/lib/board";
 import { Eyebrow, Heading } from "@/components/ui";
 
 /**
- * The Board — styled like the odds board over a sportsbook counter: slate
+ * The Board, styled like the odds board over a sportsbook counter: slate
  * panel, amber LED numerals, chalk rules. Server-rendered from live ESPN data,
  * revalidated every 15 minutes.
  */
 export default async function Board() {
   const board = await getBoard();
-  if (!board.ok) return null; // every league failed — say nothing rather than lie
+  if (!board.ok) return null; // every league failed, so say nothing rather than lie
 
   const asOf = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Detroit",
@@ -64,7 +64,7 @@ export default async function Board() {
             ))}
           </Panel>
 
-          <Panel title="On the screens" note="Next up — we'll have it on">
+          <Panel title="On the screens" note="Next up. We'll have it on.">
             {board.upcoming.map((g) => (
               <Row key={g.id} g={g} />
             ))}
@@ -86,8 +86,7 @@ export default async function Board() {
         )}
 
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/50">
-          Every Detroit game goes up on the wall. Ask and we&apos;ll put your game on a screen too —
-          that&apos;s the whole point of the place.
+          Every Detroit game goes up on the wall. Ask and we&apos;ll put your game on a screen too.
         </p>
       </div>
     </section>

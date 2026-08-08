@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "The Copper Reserve | Private Event Space in Marshall, MI",
     description:
       "Seats 72 with its own bartender, four TVs and the NFL Sunday Ticket. $50 per hour. No setup, no cleanup, just show up.",
-    images: [{ url: "/img/reserve-wide.webp", width: 1027, height: 685, alt: "The Copper Reserve private event space" }],
+    images: [{ url: "/og/reserve.jpg", width: 1200, height: 630, alt: "The Copper Reserve private event space, seats 72 with its own bartender" }],
   },
 };
 

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Contact & Hours | Copper Athletic Club",
     description:
       "133 W. Michigan Ave., Marshall, MI. Call (269) 558-8222. Open Mon–Sat 11 AM to midnight, Sunday from 9 AM.",
-    images: [{ url: "/img/taps-square.webp", width: 1080, height: 1080, alt: "Beer taps at Copper Athletic Club" }],
+    images: [{ url: "/og/contact.jpg", width: 1200, height: 630, alt: "Copper Athletic Club, 133 W. Michigan Ave., Marshall, Michigan" }],
   },
 };
 

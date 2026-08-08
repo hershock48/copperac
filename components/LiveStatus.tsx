@@ -8,7 +8,7 @@ import { KITCHEN_NOTE } from "@/lib/site";
  *
  * Fixes the real problem the current site has: the page says one thing, the
  * Toast ordering page says another, and guests find out the kitchen closed by
- * showing up. Hours here mirror lib/site.ts — bar till midnight, kitchen till
+ * showing up. Hours here mirror lib/site.ts: bar till midnight, kitchen till
  * ten, Sunday opens at nine.
  *
  * Renders nothing on the server so the markup can't ship a stale "Open now",

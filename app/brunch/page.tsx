@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "Sunday Brunch | Copper Athletic Club",
     description:
       "Every Sunday, 9 AM to 2 PM in downtown Marshall. Peach cobbler french toast bake, breakfast nachos, mimosa flights.",
-    images: [{ url: "/img/interior-bar.webp", width: 1024, height: 683, alt: "The bar at Copper Athletic Club" }],
+    images: [{ url: "/og/brunch.jpg", width: 1200, height: 630, alt: "Sunday brunch at Copper Athletic Club, 9 AM to 2 PM every Sunday" }],
   },
 };
 
@@ -21,8 +21,8 @@ export default function BrunchPage() {
   return (
     <>
       <PageHero
-        title="Recovery"
-        subtitle="Sunday brunch, 9 AM to 2 PM. Walk in, bring the whole table, and start with a mimosa flight. Rest day earned."
+        title="Sunday Brunch"
+        subtitle="Every Sunday, 9 AM to 2 PM. Walk in, bring the whole table, and start with a mimosa flight."
         image="/img/interior-bar.webp"
         imageAlt="The Copper Athletic Club bar set for service on a Sunday morning"
       />

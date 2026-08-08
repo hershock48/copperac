@@ -14,7 +14,7 @@ export const SITE = {
     "https://www.google.com/maps/dir/?api=1&destination=133+W+Michigan+Ave,+Marshall,+MI+49068",
   // Canonical Toast ordering URL. The legacy /copper-pub/v3 link the current
   // site uses 301-redirects here, so every "Order Online" click pays for a
-  // needless hop — point straight at the destination instead.
+  // needless hop. Point straight at the destination instead.
   //
   // Toast blocks cross-origin iframes (x-frame-options: SAMEORIGIN), so true
   // on-page ordering isn't possible. The on-brand option is Toast Online
