@@ -37,8 +37,10 @@ export const HOURS = [
   { label: "Sunday Brunch", value: "9:00 AM – 2:00 PM" },
 ];
 
-// Kept separate on purpose: the kitchen closing before the bar is the mismatch
-// customers hit today between the site and the Toast ordering page.
+// Confirmed by the owner (Aug 2026): kitchen closes at 10 PM, the bar stays
+// open until midnight. Kept as its own field on purpose, because the live site
+// lists only the venue hours and never mentions the kitchen, so a guest reads
+// midnight while Toast separately shows a 10 PM cutoff.
 export const KITCHEN_NOTE = "Kitchen closes at 10:00 PM daily.";
 
 export const CONSUMER_ADVISORY =

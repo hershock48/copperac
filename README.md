@@ -48,7 +48,7 @@ Findings from an audit of the live WordPress/Elementor site.
 - Menu content is lifted from their live `schema.org` markup, so prices and descriptions match what they have today. Typos fixed: "Non-Alcoholic Opitions" and "Budlight".
 - Prices render as `$12` rather than `12.00`, and add-ons read `+ $5` rather than `~ 5`.
 - Consumer advisory added. The live menus asterisk the eggs and burgers with no advisory anywhere on the site.
-- Kitchen hours are stated separately from bar hours, which is the mismatch customers currently hit between the site (midnight) and the Toast ordering page (10 PM). **Confirm the real kitchen close time with the client.**
+- Kitchen hours are stated separately from bar hours. Confirmed with the owner (Aug 2026): the kitchen closes at 10 PM and the bar stays open until midnight. Both numbers are right, which is the problem on the live site: it lists only the venue hours and never mentions the kitchen, so a guest reads midnight while Toast separately shows a 10 PM cutoff and nothing reconciles them.
 
 ### Performance
 
@@ -98,7 +98,7 @@ order builder does.
 
 - [ ] **Confirm the club's real enquiry inbox** (`info@copperac.com` in `lib/site.ts` is a placeholder)
 - [ ] **Configure enquiry delivery**: verify `glazedweb.com` in Resend, then set `RESEND_API_KEY`, `INQUIRY_FROM` and `INQUIRY_TO` in Vercel. See `.env.example` and the section above
-- [ ] Confirm kitchen close time (`KITCHEN_NOTE` in `lib/site.ts`)
+- [x] Kitchen close time confirmed by the owner: kitchen closes at 10 PM, bar stays open until midnight (Aug 2026). `KITCHEN_NOTE` is correct
 - [ ] Confirm the accessibility wording with the owner
 - [ ] Verify the lat/lng pin
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
