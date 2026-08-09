@@ -117,19 +117,29 @@ the brand won over diverging quietly. Fixing it means fixing both proposals.
 
 **Delete this file and the rewrites once Copper signs or passes.**
 
-## The TV count is nine, and it has no public source
+## The TV count is seven, and it has no public source
 
-The homepage `h1` is **"9 TVs. 0 treadmills."** Kevin confirmed nine on 9
-August 2026, correcting the 14 I had invented and briefly shipped.
+The homepage `h1` is **"7 TVs. 0 treadmills."** Seven is Kevin's final answer,
+9 August 2026. It went 14 (mine, invented, and briefly shipped) to 9 to 7 in
+one evening, which is the whole argument for keeping it in one constant.
 
 Worth knowing that nothing published backs it up: copperac.com says only "TVs
 broadcasting the big game" with no number, and it is in neither their Google
 nor their Yelp listing. So there is no source to re-check this against, and if
 the bar renovates, nothing will tell us it went stale. It lives in one place,
 `SITE.tvCount` in `lib/site.ts`, and it is the largest type on the site. Do
-not write the number into copy anywhere else. It is consistent with the "Four
-screens" on `/reserve`, which is the upstairs Copper Reserve room: four up,
-five down.
+not write the number into copy anywhere else.
+
+Two places do not read that constant and have to be changed by hand, which is
+how the 14 survived its own correction for half a day: `public/og/home.jpg`,
+the share-preview image, rebuilt from `cop-og/gen.mjs`; and the Copper card in
+the glazedweb portfolio, in that repo's `app/page.jsx`. Both are updated. If
+the count changes again, those are the two to remember.
+
+Worth a second look: `/reserve` says "Four screens" for the upstairs Copper
+Reserve. Against seven total that leaves three downstairs, which is few for the
+main room, so one of the two numbers is probably wrong. Nobody has verified the
+four either; it is inherited copy.
 
 Still open: **what year did they open?** The hero used to say "Est. 2013",
 which is deleted rather than moved, because their own Facebook avatar reads
