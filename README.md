@@ -54,18 +54,26 @@ Findings from an audit of the live WordPress/Elementor site.
 
 Images converted to WebP and resized. The event flyer went from a 1.9MB PNG to 252KB, the hero from 1.4MB to 175KB. The live homepage loads 32 script tags and 33 stylesheets; this one ships about 100KB of JS total.
 
-## The pitch page
+## The proposal page
 
-`public/pitch/copper-athletic-club.html` is a standalone Glazed Web document. It
-is a single self-contained file with no build step, so it can be edited directly.
+`public/pitch/copper-athletic-club.html` is the Glazed Web proposal, and it is a
+single self-contained file with no build step so it can be hand-edited.
+
+Its stylesheet and all three animated donut marks are lifted **verbatim** from
+`pitch/griffin-claw/index.html` in the `griffin-claw-rebuild` repo. That is
+deliberate: an approximation of the brand drifts the next time the real brand
+changes. If the Glazed system changes, change it there and copy it across rather
+than editing tokens here. Griffin Claw's pricing calculator and price-box CSS
+were stripped rather than left unused, because this proposal has no prices in it
+by request.
 
 It is served on its own marketing host:
 
 | URL | Serves |
 | --- | --- |
-| `copperac.glazedweb.com` | the pitch |
+| `copperac.glazedweb.com` | the proposal |
 | `copperac.glazedweb.com/demo` | this site, the working rebuild |
-| `copperac.com` and `copperac.vercel.app` | this site at the root, no pitch anywhere |
+| `copperac.com` and `copperac.vercel.app` | this site at the root, no proposal anywhere |
 
 That split is three host-scoped rewrites in `next.config.ts`, and they live in
 `beforeFiles` for a reason: a plain `rewrites()` array is `afterFiles`, which
@@ -79,29 +87,25 @@ the day `copperac.com` goes live.
 One known wart, and it is acceptable: the app's links are root-relative, so a
 visitor who lands on `/demo` and clicks Menu ends up at `/menu`, not
 `/demo/menu`. Nothing 404s and they stay on the demo host; the prefix just drops
-off after the first click. Making it persist would require `basePath` and the
-trade above.
+off after the first click.
 
 Every path on `copperac.glazedweb.com` sends `X-Robots-Tag: noindex, nofollow`,
 because `/demo` is a full copy of the client's site and must never compete with
 `copperac.com` for their own name. `copperac.vercel.app` is still indexable and
 is the same duplicate-content risk; worth a noindex or deletion before launch.
 
-Every finding on it was verified against the live site on 8 August 2026 and
-carries the URL that proves it. Two things were deliberately left out because
-they could not be verified: any page-speed score for copperac.com (Google's
-PageSpeed API rate-limited every attempt) and any hex value for the Reserve
-page's palette (only the blue logo file name is provable). Do not add either
-back without checking them first. There are no prices on the page by request.
+Every claim in "What we found" was checked against the live site on 8 August
+2026 and links to the page that proves it. Two things were left out because they
+could not be verified: any page-speed score for copperac.com (Google's PageSpeed
+API rate-limited every attempt) and any hex value for the Reserve page's palette,
+where only the blue logo file name is provable. Do not add either back without
+checking them first.
 
-Content is static HTML on purpose. An earlier draft generated the findings with
-JavaScript and used a scroll-reveal animation, which meant the document had no
-findings on it with JS off and left elements invisible when the observer did not
-fire. JS now only enhances: filter chips, proof drawers, the live clock and the
-bar widths.
+Inherited AA issue: `--mute` (#8A7663) on the cream ground measures 4.03 and
+fails for body text, 25 instances. It is Griffin Claw's own token, so matching
+the brand won over diverging quietly. Fixing it means fixing both proposals.
 
-**Delete this file and the rewrite once Copper has signed or passed.** A sales
-page arguing with the client does not belong on the client's live site.
+**Delete this file and the rewrites once Copper signs or passes.**
 
 ## The enquiry form does not reach an inbox yet
 
