@@ -218,7 +218,7 @@ footer .gmark{height:78px;width:auto}
       <div class="k">The short version</div>
       <ul>
         <li><span class="n">01</span><div>The site never mentions <b>when the kitchen closes</b>, so people arrive expecting food after ten.</div></li>
-        <li><span class="n">02</span><div><b>Copper Bash 2023</b> is still on the events page, on a page that was edited nine days ago.</div></li>
+        <li><span class="n">02</span><div>Text anyone the events link and the preview still reads <b>Copper Bash 2023</b>, three years on.</div></li>
         <li><span class="n">03</span><div>The menu and the contact page have not been touched since <b>2023</b>.</div></li>
         <li><span class="n">04</span><div>None of that is neglect. It is a website that cannot tell what today is.</div></li>
         <li><span class="n">05</span><div>The rebuild is <b>already built and running</b>. It keeps their brand and fixes the plumbing.</div></li>
@@ -231,7 +231,7 @@ footer .gmark{height:78px;width:auto}
   <div class="k">Part one</div>
   <div class="rule"></div>
   <h2>What we found.</h2>
-  <p>Six things, in the order they cost the bar something. Every one has a link
+  <p>Seven things, in the order they cost the bar something. Every one has a link
   to the page it is on, so none of it has to be taken on trust.</p>
   <div class="claim">
     <h4>The site never says when the kitchen closes</h4>
@@ -239,9 +239,10 @@ footer .gmark{height:78px;width:auto}
     <a class="verify" href="https://copperac.com/contact/" target="_blank" rel="noopener">Their hours page ↗</a>
   </div>
   <div class="claim">
-    <h4>Copper Bash 2023 is still on the events page</h4>
-    <p>Sitting under the trivia night, three years after the party. It is not that nobody looks after the site either: their own sitemap says that page was edited on <b>30 July 2026</b>. The old event survived the edit, because nothing in the system knows a date has passed.</p>
-    <a class="verify" href="https://copperac.com/events/" target="_blank" rel="noopener">See it live ↗</a>
+    <h4>Google still thinks the events page is about Copper Bash 2023</h4>
+    <p>The page itself is current: the trivia night is on it and nothing else. But the description search engines and link previews read has never been updated. It still says <span class="mono">Copper Bash 2023 - Join us Saturday, September 23rd for our annual Copper Bash.</span> Text the events link to someone and that is the blurb that comes up, three years later. Somebody edited that page on <b>30 July 2026</b>, so this is not neglect. It is a part of the page nobody can see from inside the editor.</p>
+    <a class="verify" href="https://copperac.com/events/" target="_blank" rel="noopener">The events page ↗</a>
+    <a class="verify" href="https://www.google.com/search?q=site%3Acopperac.com%2Fevents" target="_blank" rel="noopener">Or search Google for it ↗</a>
   </div>
   <div class="claim">
     <h4>The menu has not changed since October 2023</h4>
@@ -259,6 +260,11 @@ footer .gmark{height:78px;width:auto}
     <a class="verify" href="https://copperac.com/wp-content/uploads/2021/02/CAC_Taps_web.jpg" target="_blank" rel="noopener">The actual file ↗</a>
   </div>
   <div class="claim">
+    <h4>A Yelp widget is bolted to the bottom of the homepage</h4>
+    <p>Below the hours, at the very end of the page, there is an embedded Yelp waitlist. It is the only interactive thing on the whole site, it is somebody else’s software wearing somebody else’s styling, and it is the last thing a visitor scrolls past. The same widget is on the events page.</p>
+    <a class="verify" href="https://copperac.com/" target="_blank" rel="noopener">Scroll to the bottom ↗</a>
+  </div>
+  <div class="claim">
     <h4>The Copper Reserve looks like a different business</h4>
     <p>That page loads a blue Reserve logo alongside the black-and-copper one, so the room upstairs reads as somebody else’s bar. Right-click the logo and pick Inspect if you want to see the file name.</p>
     <a class="verify" href="https://copperac.com/reserve/" target="_blank" rel="noopener">The Reserve page ↗</a>
@@ -272,18 +278,18 @@ footer .gmark{height:78px;width:auto}
   <div class="k">Part two</div>
   <div class="rule"></div>
   <h2>Why it happens.</h2>
-  <p>This is the part worth understanding, because it explains all six at once
+  <p>This is the part worth understanding, because it explains most of them at once
   and it is not about effort.</p>
-  <p>Their events page was edited on <strong>30 July 2026</strong>. Nine days
-  before we looked at it. Copper Bash 2023 was still on it afterwards. Somebody
-  is in there keeping the site going.</p>
-  <p>The problem is that the tool makes adding things easy and removing them
-  invisible, and nothing in it knows that September 2023 has been and gone. So
-  the new thing goes on top, the old thing stays underneath, and three years
-  later a page that was touched last week is still inviting people to a party
-  that already happened. The hours are the same story: someone typed them once,
-  correctly, and there was nowhere to put the fact that the kitchen stops
-  earlier.</p>
+  <p>Their events page was edited on <strong>30 July 2026</strong>, nine days
+  before we looked at it, and the visible page is fine. Somebody is in there
+  keeping it going. Yet the blurb Google and Facebook read off that same page
+  still describes Copper Bash 2023.</p>
+  <p>That is the whole thing in one example. The editor shows you the part of the
+  page you can see, and quietly keeps a second copy of it for search engines and
+  link previews that you have to go looking for. So the visible half gets
+  updated and the invisible half sits there for three years. The hours are the
+  same shape of problem: someone typed them once, correctly, and there was
+  nowhere to put the fact that the kitchen stops two hours earlier.</p>
   <p>You cannot fix that with more discipline. It has to be the site's job.</p>
 </div></section>
 
@@ -305,6 +311,7 @@ footer .gmark{height:78px;width:auto}
     <tr><td>Google</td><td>No hours, menu or ordering in the listing</td><td><span class="tick">✓</span> Full restaurant markup, so search can show hours, menu and an order button.</td></tr>
     <tr><td>Sharing</td><td>A 2021 photo of the taps</td><td><span class="tick">✓</span> Their room, their logo, their line, at the size every app crops to.</td></tr>
     <tr><td>Upstairs</td><td>A separate blue identity</td><td><span class="tick">✓</span> The Reserve runs the same copper-on-black as the bar.</td></tr>
+    <tr><td>Waitlist</td><td>A Yelp widget stuck under the hours</td><td><span class="tick">✓</span> Nothing bolted on. Live open and kitchen status is built in, and the Board is the interactive part.</td></tr>
     <tr><td>Speed</td><td>WordPress and a plugin stack</td><td><span class="tick">✓</span> Every page finished before the browser asks for it.</td></tr>
     </tbody>
   </table>
@@ -346,7 +353,7 @@ footer .gmark{height:78px;width:auto}
     <div><h4>Then a conversation</h4><p>Half an hour, screen to screen, and any question about how it is built or who owns it. Short answer on the second one: they do.</p></div>
   </div>
   <p class="note" style="margin-top:22px">No deadline on this page and nothing to
-  sign. If the answer is no, the six things above are still true and still worth
+  sign. If the answer is no, the seven things above are still true and still worth
   handing to whoever looks after the site today. Copper Athletic Club’s logo and
   photographs belong to them and are used here with permission, to show them
   their own site.</p>
