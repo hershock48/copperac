@@ -101,6 +101,16 @@ API rate-limited every attempt) and any hex value for the Reserve page's palette
 where only the blue logo file name is provable. Do not add either back without
 checking them first.
 
+**Check copperac.com in a real browser, not by fetching the HTML.** Two claims
+in this proposal were written wrong because the page source is not the page.
+The Copper Bash 2023 line was published as visible body copy when it only lives
+in the `<meta>` description, and the Facebook page plugin at the foot of the
+homepage was twice written off as not existing at all, because it and the Yelp
+waitlist are both injected by JavaScript and appear nowhere in the served HTML.
+Kevin found both on his phone. Anything to do with what a visitor actually sees,
+especially third-party embeds, gets loaded and scrolled before it gets written
+down.
+
 Inherited AA issue: `--mute` (#8A7663) on the cream ground measures 4.03 and
 fails for body text, 25 instances. It is Griffin Claw's own token, so matching
 the brand won over diverging quietly. Fixing it means fixing both proposals.
