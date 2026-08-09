@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   // Google truncates. Shorter, and it stops saying Copper three times.
   title: "The Copper Reserve",
   description:
-    "Marshall's private bar and event space. Seats 72, its own bartender, four TVs with the NFL Sunday Ticket. $50 per hour. Birthdays, drafts, showers, meetings.",
+    `Marshall's private bar and event space. Seats 72, its own bartender, ${SITE.tvCountReserve} TVs with the NFL Sunday Ticket. $50 per hour. Birthdays, drafts, showers, meetings.`,
   alternates: { canonical: "/reserve" },
   openGraph: {
     title: "The Copper Reserve | Private Event Space in Marshall, MI",
     description:
-      "Seats 72 with its own bartender, four TVs and the NFL Sunday Ticket. $50 per hour. No setup, no cleanup, just show up.",
+      `Seats 72 with its own bartender, ${SITE.tvCountReserve} TVs and the NFL Sunday Ticket. $50 per hour. No setup, no cleanup, just show up.`,
     images: [{ url: "/og/reserve.jpg", width: 1200, height: 630, alt: "The Copper Reserve private event space, seats 72 with its own bartender" }],
   },
 };
@@ -24,7 +24,10 @@ const SPECS = [
   { label: "Includes", value: "A personal bartender for your party" },
   { label: "Capacity", value: "Seating for up to 72 guests" },
   { label: "Food", value: "Buffet style, built around your group" },
-  { label: "TVs", value: "Four screens, DIRECTV Sports Package, NFL Sunday Ticket, pay-per-view on request" },
+  // From the constant, not spelled out. This number and the homepage's are
+  // different rooms and both are real, which is exactly the pair most likely to
+  // be "corrected" into agreement by someone who does not know that.
+  { label: "TVs", value: `${SITE.tvCountReserve} screens, DIRECTV Sports Package, NFL Sunday Ticket, pay-per-view on request` },
   { label: "Sound", value: "Entertainment system with music playable from Spotify" },
   { label: "Connectivity", value: "WiFi and casting to the TVs for meetings or fantasy drafts" },
 ];

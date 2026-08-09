@@ -35,7 +35,7 @@ export default function Home() {
                 title and meta description are still keyword-first. */}
             <Eyebrow>Sports bar · Downtown Marshall, Michigan</Eyebrow>
             <h1 className="mt-5 text-5xl uppercase leading-[0.95] text-cream sm:text-6xl lg:text-7xl">
-              {SITE.tvCount} TVs.
+              {SITE.tvCountMain} TVs.
               <br />
               <span className="text-copper">0 treadmills.</span>
             </h1>
@@ -99,7 +99,7 @@ export default function Home() {
           />
           <QuickCard
             title="Copper Reserve"
-            body="The private room upstairs seats 72 with its own bar, four TVs and the Sunday Ticket. $50 an hour."
+            body={`The private room upstairs seats 72 with its own bar, ${SITE.tvCountReserve} TVs and the Sunday Ticket. $50 an hour.`}
             href="/reserve"
             cta="Reserve the space"
           />

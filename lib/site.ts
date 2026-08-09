@@ -5,20 +5,24 @@ export const SITE = {
   // previews, and it is in the manifest and the page titles. It is no longer
   // the hero h1, which now runs the deadpan spec version of the same joke.
   tagline: "A sports bar. Not a gym.",
-  // Feeds the homepage h1, "7 TVs. 0 treadmills." Seven is Kevin's final
-  // answer, 9 Aug 2026, after 14 (mine, invented) and 9. Nothing published
-  // states it: copperac.com says only "TVs broadcasting the big game", and it
-  // is in neither their Google nor their Yelp listing, so it can only come
-  // from someone standing in the room and there is no source to check it
-  // against. Three values in one evening is the argument for the constant.
+  // Confirmed by Kevin, 9 Aug 2026: seven in the main bar, four upstairs in the
+  // Copper Reserve, eleven in the building. It took three passes to land here
+  // (14 was mine and invented, then 9, then 7 plus 4), which is the whole
+  // argument for these being constants and not typed into copy.
   //
-  // Stays a single constant because it is the largest type on the site and TV
-  // counts change when a bar renovates. Do not hardcode it into copy anywhere
-  // else. Note that /reserve claims "Four screens" for the upstairs Copper
-  // Reserve. Against seven total that leaves three for the main room, which is
-  // few, so one of the two numbers is probably wrong. The four is inherited
-  // copy and nobody has verified it either.
-  tvCount: 7,
+  // Nothing published states any of it. copperac.com says only "TVs
+  // broadcasting the big game" with no number, and it is in neither their
+  // Google nor their Yelp listing, so it can only come from someone standing in
+  // the room and there is no source to re-check it against. If the bar
+  // renovates, nothing will tell us these went stale.
+  //
+  // tvCountMain feeds the homepage h1, in the largest type on the site. That is
+  // the main bar rather than the building on purpose: it is the room you walk
+  // into. tvCountTotal is here for whenever the bigger number is the better
+  // brag, which for a sports bar it arguably is.
+  tvCountMain: 7,
+  tvCountReserve: 4,
+  tvCountTotal: 11,
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",

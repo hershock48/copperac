@@ -157,7 +157,7 @@ export default function EventsPage() {
           <Eyebrow>Want the room to yourself?</Eyebrow>
           <Heading className="mt-5">Host it in the Copper Reserve</Heading>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-            Seats 72, has its own bartender and four TVs with the Sunday Ticket. $50 an
+            Seats 72, has its own bartender and {SITE.tvCountReserve} TVs with the Sunday Ticket. $50 an
             hour.
           </p>
           <div className="mt-9 flex justify-center">

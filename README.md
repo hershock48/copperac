@@ -117,36 +117,38 @@ the brand won over diverging quietly. Fixing it means fixing both proposals.
 
 **Delete this file and the rewrites once Copper signs or passes.**
 
-## The TV count is seven, and it has no public source
+## The TV counts, and why there are three of them
 
-The homepage `h1` is **"7 TVs. 0 treadmills."** Seven is Kevin's final answer,
-9 August 2026. It went 14 (mine, invented, and briefly shipped) to 9 to 7 in
-one evening, which is the whole argument for keeping it in one constant.
+Confirmed by Kevin on 9 August 2026: **seven in the main bar, four upstairs in
+the Copper Reserve, eleven in the building.**
 
-Worth knowing that nothing published backs it up: copperac.com says only "TVs
-broadcasting the big game" with no number, and it is in neither their Google
-nor their Yelp listing. So there is no source to re-check this against, and if
-the bar renovates, nothing will tell us it went stale. It lives in one place,
-`SITE.tvCount` in `lib/site.ts`, and it is the largest type on the site. Do
-not write the number into copy anywhere else.
+It took three passes to get here. The homepage `h1` shipped as 14, which I
+invented, then 9, then 7 plus 4. Nothing published states any of it: copperac.com
+says only "TVs broadcasting the big game" with no number, and it is in neither
+their Google nor their Yelp listing. So it can only come from someone standing
+in the room, there is no source to re-check it against, and if the bar renovates
+nothing will tell us it went stale.
 
-Two places do not read that constant and have to be changed by hand, which is
-how the 14 survived its own correction for half a day: `public/og/home.jpg`,
-the share-preview image, rebuilt from `cop-og/gen.mjs`; and the Copper card in
-the glazedweb portfolio, in that repo's `app/page.jsx`. Both are updated. If
-the count changes again, those are the two to remember.
+All of it lives in `lib/site.ts` as `tvCountMain`, `tvCountReserve` and
+`tvCountTotal`. Every place in the app that names a number reads one of them:
+the `h1`, the Reserve card on the homepage, the Reserve spec table, the Reserve
+page's `metadata` and OG descriptions, and the Reserve paragraph on `/events`.
+Six surfaces that were six independent copies before.
 
-Worth a second look: `/reserve` says "Four screens" for the upstairs Copper
-Reserve. Against seven total that leaves three downstairs, which is few for the
-main room, so one of the two numbers is probably wrong. Nobody has verified the
-four either; it is inherited copy.
+The `h1` uses `tvCountMain`, the main bar rather than the building, because that
+is the room you walk into. `tvCountTotal` exists for whenever eleven is the
+better brag, which for a sports bar it arguably is; that is a one-word change.
 
-Still open: **what year did they open?** The hero used to say "Est. 2013",
-which is deleted rather than moved, because their own Facebook avatar reads
-"est. 2018" and nothing on their site states a year. If the real year turns up
-it would sit well in the small-caps line under the buttons, which currently
-carries the heritage in their own words from their homepage: inspired by the
-Lindell A.C., built on the Copper Bar.
+**Two places still cannot read the constants and have to be changed by hand.**
+This is how the 14 outlived its own correction by half a day, so they are named
+here rather than left to be rediscovered:
+
+- `public/og/home.jpg`, the share-preview image, rebuilt from `cop-og/gen.mjs`.
+  There is no way to grep a JPEG.
+- The Copper card in the glazedweb portfolio, in that repo's `app/page.jsx`.
+
+Both carry the main-bar number. If it changes again, those are the two to
+remember.
 
 ## The enquiry form does not reach an inbox yet
 
