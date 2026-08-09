@@ -5,17 +5,18 @@ export const SITE = {
   // previews, and it is in the manifest and the page titles. It is no longer
   // the hero h1, which now runs the deadpan spec version of the same joke.
   tagline: "A sports bar. Not a gym.",
-  // CONFIRM WITH THE CLUB BEFORE LAUNCH. This number is now the homepage h1,
-  // in the largest type on the site, and nobody has verified it. It is not on
-  // copperac.com, not in their Google or Yelp listings, and not findable by
-  // search: their site says only "TVs broadcasting the big game" with no
-  // count. Someone needs to stand in the room and count them.
+  // Feeds the homepage h1, "9 TVs. 0 treadmills." Confirmed by Kevin on 9
+  // August 2026, correcting the 14 I had invented. Nothing published states
+  // it: copperac.com says only "TVs broadcasting the big game", and it is in
+  // neither their Google nor their Yelp listing, so this came from someone who
+  // knows the room and there is no source to re-check it against.
   //
-  // Kept as one constant for exactly that reason: correcting it is a
-  // single-character edit here and the headline follows. Do not hardcode it
-  // into copy anywhere else. Unrelated to the "Four screens" on /reserve,
-  // which describes the upstairs Copper Reserve room, not the whole venue.
-  tvCount: 14,
+  // Stays a single constant because it is the largest type on the site and TV
+  // counts change when a bar renovates. Do not hardcode it into copy anywhere
+  // else. Unrelated to the "Four screens" on /reserve, which describes the
+  // upstairs Copper Reserve room rather than the whole venue, and which is
+  // consistent with this: four up, five down.
+  tvCount: 9,
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",

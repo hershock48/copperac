@@ -117,25 +117,26 @@ the brand won over diverging quietly. Fixing it means fixing both proposals.
 
 **Delete this file and the rewrites once Copper signs or passes.**
 
-## Count the TVs before launch
+## The TV count is nine, and it has no public source
 
-The homepage `h1` is **"14 TVs. 0 treadmills."** and nobody has verified the
-14. It is not stated on copperac.com, which says only "TVs broadcasting the
-big game"; it is not in their Google or Yelp listings; it is not findable by
-search. It was my number and it is now the largest type on the site, so it
-needs someone standing in the room counting.
+The homepage `h1` is **"9 TVs. 0 treadmills."** Kevin confirmed nine on 9
+August 2026, correcting the 14 I had invented and briefly shipped.
 
-It lives in one place, `SITE.tvCount` in `lib/site.ts`, so fixing it is a
-single-character edit and the headline follows. Do not write the number into
-copy anywhere else. It is unrelated to the "Four screens" on `/reserve`, which
-describes the upstairs Copper Reserve room rather than the whole venue.
+Worth knowing that nothing published backs it up: copperac.com says only "TVs
+broadcasting the big game" with no number, and it is in neither their Google
+nor their Yelp listing. So there is no source to re-check this against, and if
+the bar renovates, nothing will tell us it went stale. It lives in one place,
+`SITE.tvCount` in `lib/site.ts`, and it is the largest type on the site. Do
+not write the number into copy anywhere else. It is consistent with the "Four
+screens" on `/reserve`, which is the upstairs Copper Reserve room: four up,
+five down.
 
-While someone is asking: **what year did they open?** The hero used to say
-"Est. 2013", which is now deleted rather than moved, because their own
-Facebook avatar reads "est. 2018" and nothing on their site states a year. If
-the real year turns up it would sit well in that small-caps line under the
-buttons, which currently carries the heritage in their own words from their
-homepage: inspired by the Lindell A.C., built on the Copper Bar.
+Still open: **what year did they open?** The hero used to say "Est. 2013",
+which is deleted rather than moved, because their own Facebook avatar reads
+"est. 2018" and nothing on their site states a year. If the real year turns up
+it would sit well in the small-caps line under the buttons, which currently
+carries the heritage in their own words from their homepage: inspired by the
+Lindell A.C., built on the Copper Bar.
 
 ## The enquiry form does not reach an inbox yet
 
