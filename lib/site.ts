@@ -1,7 +1,21 @@
 export const SITE = {
   name: "Copper Athletic Club",
   shortName: "Copper AC",
+  // Still the tagline of record: it carries "sports bar" for search and link
+  // previews, and it is in the manifest and the page titles. It is no longer
+  // the hero h1, which now runs the deadpan spec version of the same joke.
   tagline: "A sports bar. Not a gym.",
+  // CONFIRM WITH THE CLUB BEFORE LAUNCH. This number is now the homepage h1,
+  // in the largest type on the site, and nobody has verified it. It is not on
+  // copperac.com, not in their Google or Yelp listings, and not findable by
+  // search: their site says only "TVs broadcasting the big game" with no
+  // count. Someone needs to stand in the room and count them.
+  //
+  // Kept as one constant for exactly that reason: correcting it is a
+  // single-character edit here and the headline follows. Do not hardcode it
+  // into copy anywhere else. Unrelated to the "Four screens" on /reserve,
+  // which describes the upstairs Copper Reserve room, not the whole venue.
+  tvCount: 14,
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",

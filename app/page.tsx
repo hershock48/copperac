@@ -28,11 +28,16 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/85 to-ink/55 lg:bg-gradient-to-r lg:via-ink/85 lg:to-ink/30" />
         <div className="relative mx-auto w-full max-w-7xl px-5 py-24 lg:px-8">
           <div className="max-w-2xl">
-            <Eyebrow>Downtown Marshall, Michigan</Eyebrow>
+            {/* "Sports bar" moves up into the eyebrow on purpose. The h1 below
+                is now a joke with no keywords in it, and this is a local
+                business whose entire search job is "sports bar marshall mi", so
+                those words have to survive near the top as real text. The page
+                title and meta description are still keyword-first. */}
+            <Eyebrow>Sports bar · Downtown Marshall, Michigan</Eyebrow>
             <h1 className="mt-5 text-5xl uppercase leading-[0.95] text-cream sm:text-6xl lg:text-7xl">
-              A sports bar.
+              {SITE.tvCount} TVs.
               <br />
-              <span className="text-copper">Not a gym.</span>
+              <span className="text-copper">0 treadmills.</span>
             </h1>
             <p className="mt-7 max-w-xl text-base leading-relaxed text-cream-dim sm:text-lg">
               Born from the spirit of Detroit sports and built on the bones of the beloved
@@ -47,8 +52,17 @@ export default function Home() {
                 See the Menu
               </Button>
             </div>
+            {/* Was "Est. 2013 · 14 screens · 0 treadmills". The joke moved up
+                to the h1, so this line would have repeated it, and both of its
+                numbers were unverified. "Est. 2013" is gone rather than
+                relocated: their own Facebook avatar reads "est. 2018", and
+                nothing on copperac.com states a founding year, so we were
+                probably publishing the wrong one. What replaces it is the one
+                part of their story they state themselves, in their own words on
+                their homepage: inspired by the Lindell A.C., built on the
+                foundation of the beloved Copper Bar. */}
             <p className="display mt-7 text-[11.5px] uppercase tracking-[0.22em] text-cream-dim/70">
-              Est. 2013 · 14 screens · 0 treadmills
+              Inspired by the Lindell A.C. · Built on the Copper Bar
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-cream-dim/70">
               <LiveStatus />
