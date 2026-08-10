@@ -38,16 +38,21 @@ export default async function Board() {
         {/* crawling ticker, like the rail under a book's board */}
         {tickerItems.length > 0 && (
           <div className="board-ticker mt-8" aria-hidden="true">
-            <div className="board-ticker-track">
+            {/* Duration comes from characters, not items. See the note in globals.css: with a
+                fixed duration this ticker ran at 27.8 px/s on five August games and 55.7 on a
+                ten-game October board — the same CSS, double the speed, purely because the
+                distance changed. */}
+            <div
+              className="board-ticker-track"
+              style={{ "--score-chars": runChars(tickerItems.map((g) => g.league + scoreLabel(g))) } as React.CSSProperties}
+            >
               {[0, 1].map((dup) => (
                 <span key={dup} className="board-ticker-run">
                   {tickerItems.map((g) => (
                     <span key={`${dup}-${g.id}`} className="board-ticker-item">
                       <b>{g.league}</b>
                       <span className="board-ticker-sep">·</span>
-                      {g.result
-                        ? `${g.result} ${g.detScore}–${g.oppScore} ${g.home ? "vs" : "@"} ${g.opp}`
-                        : `${g.home ? "vs" : "@"} ${g.opp} ${g.status}`}
+                      {scoreLabel(g)}
                       <span className="board-ticker-dot">◆</span>
                     </span>
                   ))}
@@ -119,6 +124,23 @@ export default async function Board() {
  *    where run one began. Any other distance shows a seam.
  */
 /**
+ * The score ticker's text for one game. Extracted so the character count that drives the
+ * crawl duration is computed from the SAME string that gets rendered — counting one thing and
+ * rendering another is how a calibrated speed silently stops being calibrated.
+ */
+function scoreLabel(g: BoardGame): string {
+  return g.result
+    ? `${g.result} ${g.detScore}\u2013${g.oppScore} ${g.home ? "vs" : "@"} ${g.opp}`
+    : `${g.home ? "vs" : "@"} ${g.opp} ${g.status}`;
+}
+
+/** Characters in a run, which is what the crawl actually has to travel. */
+function runChars(parts: string[]): number {
+  // +3 per item for the separator and the diamond, which occupy width too.
+  return parts.reduce((n, t) => n + t.length + 3, 0);
+}
+
+/**
  * How old a headline is, but only once that is worth saying.
  *
  * Nothing for anything inside 48 hours: on a crawl of current news "today" is the default and
@@ -140,11 +162,11 @@ function NewsCrawl({ items }: { items: NewsItem[] }) {
   return (
     <div
       className="news-crawl mt-3"
-      // How many headlines there are drives the crawl duration, so the SPEED stays constant
-      // instead of the lap time. The track is width:max-content translating -50%, so a fixed
-      // duration means fewer items crawl slower -- six Detroit stories in August would creep
-      // while twelve in February would race. See the note in globals.css.
-      style={{ "--news-count": items.length } as React.CSSProperties}
+      // Characters, not items, drive the duration -- so the SPEED stays constant rather than
+      // the lap time. Item count was the first attempt and it is a poor proxy: measured, these
+      // headlines run 405-600px each, a 1.5x spread, so five long ones travel much further than
+      // five short ones. Characters track width closely (6.7 px/char measured). See globals.css.
+      style={{ "--news-chars": runChars(items.map((n) => n.team + n.headline)) } as React.CSSProperties}
     >
       <span className="news-crawl-label" aria-hidden="true">
         Detroit

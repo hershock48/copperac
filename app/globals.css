@@ -206,7 +206,44 @@ h1, h2, h3, .display {
   padding: 11px 0;
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
-.board-ticker-track { display: flex; width: max-content; animation: boardCrawl 42s linear infinite; }
+.board-ticker-track {
+  display: flex;
+  width: max-content;
+  /* ── Crawl speed, for both tickers on this page ──────────────────────────────
+     Speed is px/s, and px/s is distance over time. The distance is the run's
+     width, which changes with the content, so a FIXED duration does not give a
+     fixed speed. Measured: at 42s this ticker ran 27.8 px/s on a five-game
+     August board and 55.7 px/s on a ten-game October one. Same CSS, double the
+     speed, entirely because the board filled up.
+
+     So duration comes from character count, which tracks width closely —
+     measured 8.66 px/char here and 6.70 px/char on the news crawl, the
+     difference being the display face in caps versus body text.
+
+       0.18 s/char  scores -> 46-51 px/s measured
+       0.115 s/char news   -> 57-58 px/s measured
+
+     Measured on both a five-item August board and a ten-game, twelve-headline
+     in-season one. The news side is very stable (6.64 and 6.70 px/char) because
+     sentence text averages out; the scores drift 46->51 px/s because their mix
+     changes — "Final" against "Fri 8/15, 7:00 PM" is a different characters-to-
+     pixels ratio, and short items carry proportionally more of the fixed
+     separator-and-diamond overhead. So the ratio lands between 1.13x and 1.22x
+     rather than on a single number. It never inverts, which is the property that
+     matters: the news crawl is always the faster of the two.
+
+     Kevin asked for "a little faster" on the news. Worth knowing it was ALREADY
+     faster before this, by 2.05x, because its items are sentences (456px average)
+     against the scores' short tokens (234px) over near-identical 40s and 42s
+     durations. Matching the durations is exactly what made the speeds mismatch.
+     The old fixed 42s also meant the scoreboard ran 27.8 px/s in August and
+     55.7 px/s in October — it would have overtaken the news crawl in season.
+     The fix was to stop setting durations at all.
+
+     Fallbacks are today's real counts, so a missing variable degrades to a
+     sensible speed rather than a 0s animation. */
+  animation: boardCrawl calc(var(--score-chars, 150) * 0.18s) linear infinite;
+}
 .board-ticker-run { display: flex; align-items: center; }
 .board-ticker-item {
   font-family: var(--font-display);
@@ -268,15 +305,9 @@ h1, h2, h3, .display {
 .news-crawl-track {
   display: flex;
   width: max-content;
-  /* 8s per headline rather than a fixed lap. The track's width scales with the number of
-     items, so a fixed duration would change the SPEED with the news cycle: six Detroit
-     stories in August crept, twelve in February would have raced. Per-item duration keeps
-     the reading speed constant, which is the thing that actually has to stay readable from
-     across a room. Falls back to 12 items if the count never arrives.
-
-     Still slower per item than the 42s score crawl above, deliberately -- these are
-     sentences, not scores. */
-  animation: newsCrawl calc(var(--news-count, 12) * 8s) linear infinite;
+  /* 58 px/s — a little faster than the scoreboard's 48. See the speed note on
+     .board-ticker-track above for why this is per-character and not per-item. */
+  animation: newsCrawl calc(var(--news-chars, 340) * 0.115s) linear infinite;
 }
 /* A link cannot be clicked if it is sliding out from under the cursor. */
 .news-crawl:hover .news-crawl-track,
