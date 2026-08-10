@@ -109,7 +109,7 @@ export default function Footer() {
           {/* Was "Site by Glazed Web" as plain text pointing at the NON-www host, which
               301s on every click. Now the shared component: warmer register, the mark beside
               it, and the canonical URL. */}
-          <GlazedCredit line="Double dipped by" />
+          <GlazedCredit line="Double Dipped by" />
         </div>
       </div>
     </footer>
