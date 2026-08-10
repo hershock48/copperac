@@ -33,6 +33,15 @@ import { unstable_cache } from "next/cache";
  * is measured by counting how many teams it is filed under -- a genuine team story names one or
  * two, a league sweep names a dozen or more.
  *
+ * CURRENCY IS THE POINT, so there is a hard age cutoff. Without one this happily served a
+ * month-old story as news: the sort takes the newest twelve regardless of age, and a club deep
+ * in its offseason has nothing recent, so its newest item might be from three weeks ago and
+ * would crawl past looking exactly like tonight's result. Kevin's framing settles what should
+ * happen instead — *"I don't expect pistons news when it's not bball season"* — so a club with
+ * nothing recent simply drops out of the crawl rather than padding it with old copy. That is
+ * why MAX_AGE_DAYS exists and why an item with no date at all is dropped: if its age cannot be
+ * established, its currency cannot be claimed.
+ *
  * EVERY FIELD IS OPTIONAL. This is an undocumented third-party endpoint with no contract, so
  * the normaliser treats the response as unknown shape and drops anything it cannot read.
  * A league that fails, changes shape, or returns nothing costs us that league and nothing
@@ -110,6 +119,16 @@ function teamCategoryCount(a: EspnArticle): number {
 /** Roundups tagged with a dozen teams are not team news, however they are categorised. */
 const ROUNDUP_TEAM_TAGS = 3;
 
+/**
+ * Older than this and it is not news any more, it is an archive.
+ *
+ * Ten days rather than a tighter number because the offseason is the case that matters: a real
+ * story out of season -- a GM resigning, a trade -- deserves to stay up for a while when it is
+ * the only thing that has happened. Tighter than a week and those vanish; looser than a
+ * fortnight and a quiet month starts reading as current.
+ */
+const MAX_AGE_DAYS = 10;
+
 function concernsClub(a: EspnArticle, club: Club): boolean {
   const text = `${a.headline ?? a.title ?? ""} ${a.description ?? ""}`.toLowerCase();
   // The real test: the story says who it is about. "Teddy Bridgewater leaves Lions to retire"
@@ -184,16 +203,21 @@ async function buildNews(): Promise<NewsFeed> {
     return true;
   });
 
-  unique.sort((a, b) => {
-    const at = a.published ? +new Date(a.published) : 0;
-    const bt = b.published ? +new Date(b.published) : 0;
-    return bt - at;
+  // Drop anything stale, and anything undateable. A crawl is a claim that this is what is
+  // happening now; an item whose age cannot be read cannot back that claim.
+  const cutoff = Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
+  const fresh = unique.filter((n) => {
+    if (!n.published) return false;
+    const t = +new Date(n.published);
+    return Number.isFinite(t) && t >= cutoff;
   });
+
+  fresh.sort((a, b) => +new Date(b.published!) - +new Date(a.published!));
 
   // Interleave by club so one team in mid-season does not fill the whole crawl. Round-robin
   // over the per-club queues, newest first within each, until we have enough.
   const queues = new Map<string, NewsItem[]>();
-  for (const n of unique) {
+  for (const n of fresh) {
     const q = queues.get(n.team) ?? [];
     q.push(n);
     queues.set(n.team, q);

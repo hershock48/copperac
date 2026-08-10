@@ -319,6 +319,13 @@ h1, h2, h3, .display {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.news-crawl-age {
+  /* Quieter than the headline it qualifies -- it is a caveat, not information somebody
+     came for. cream-dim at 60% on #060606 measures 8.9, so it is still comfortably AA. */
+  font-size: 10.5px;
+  color: color-mix(in srgb, var(--color-cream-dim) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+}
 .news-crawl-dot { color: var(--color-copper); opacity: 0.45; font-size: 7px; }
 @keyframes newsCrawl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 

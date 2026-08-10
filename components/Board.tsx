@@ -118,6 +118,24 @@ export default async function Board() {
  *    and translates by exactly -50%, so the moment it wraps, run two is sitting precisely
  *    where run one began. Any other distance shows a seam.
  */
+/**
+ * How old a headline is, but only once that is worth saying.
+ *
+ * Nothing for anything inside 48 hours: on a crawl of current news "today" is the default and
+ * stamping every item with it is noise. Past that the item wears its age, because a nine-day-old
+ * story sitting in a news crawl with no date on it is read as tonight's, and out of season that
+ * is exactly the item that survives to the top of the list. Fresh news stays clean; older news
+ * has to say so.
+ */
+function ageLabel(published: string | null): string | null {
+  if (!published) return null;
+  const t = +new Date(published);
+  if (!Number.isFinite(t)) return null;
+  const hours = (Date.now() - t) / 3_600_000;
+  if (hours < 48) return null;
+  return `${Math.floor(hours / 24)}d`;
+}
+
 function NewsCrawl({ items }: { items: NewsItem[] }) {
   return (
     <div
@@ -156,6 +174,13 @@ function NewsCrawl({ items }: { items: NewsItem[] }) {
                     </a>
                   ) : (
                     <span>{n.headline}</span>
+                  )}
+                  {/* A real <time> rather than a bare string, so the date is machine-readable
+                      even on the runs where no label is shown. */}
+                  {n.published && ageLabel(n.published) && (
+                    <time className="news-crawl-age" dateTime={n.published}>
+                      {ageLabel(n.published)}
+                    </time>
                   )}
                   <span className="news-crawl-dot" aria-hidden="true">
                     ◆
