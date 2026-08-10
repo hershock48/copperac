@@ -335,19 +335,17 @@ h1, h2, h3, .display {
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   The studio credit. See components/GlazedCredit.tsx for the four decisions;
-   this is just their CSS.
-
-   Everything here is scoped to .gw-credit and uses currentColor, so the whole
-   thing is one component file plus this block and it can be lifted into any
-   client repo without carrying a palette or an id namespace with it.
+   Glazed Web studio credit — pairs with components/GlazedCredit.
+   Everything is scoped to .gw-credit. The words inherit the footer's own colour
+   and size; the mark carries Glazed's own palette, because it is a logo and a
+   logo does not take on the host's colours.
    ─────────────────────────────────────────────────────────────────────────── */
 .gw-credit {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  /* Inherits the footer's own colour and size. A credit that sets its own is a
-     credit that stops matching the day the footer changes. */
+  gap: 0.45em;
+  /* A credit that sets its own colour is a credit that stops matching the day
+     the footer changes. */
   color: inherit;
   text-decoration: none;
 }
@@ -360,24 +358,35 @@ h1, h2, h3, .display {
   text-underline-offset: 0.2em;
 }
 .gw-credit-mark {
-  /* Sized in em so it tracks the text it sits beside rather than needing a number
-     per client. 2.1em against a 12px footer line is about 25px — and 25px is where
-     the redrawn glyph reads clearly. At the 19px the first version used, the hole
-     closed up and it looked like a map pin. */
-  height: 2.1em;
+  /* Sized in em so it tracks the text beside it rather than needing a number per
+     client. 2.15em against a 12px footer line is ~26px, which is where his real
+     mark reads: the hole lands at 4.7px and the disc at 19px. At 22px the hole
+     closes to 3px and it starts reading as a lollipop; at 30px+ it dominates the
+     bar. Measured across all five footers, not guessed. */
+  height: 2.15em;
   width: auto;
-  /* Optically centred on the text's x-height rather than its box. */
-  margin-top: -0.15em;
   flex: none;
+  /* This has to be here rather than only as the SVG attribute: the UA stylesheet
+     sets overflow:hidden on an outermost <svg>, and that beats a presentation
+     attribute. Without it the hover extension is clipped at the viewBox edge. */
+  overflow: visible;
 }
-.gw-credit-drip {
+.gw-credit-drips {
   transform-box: fill-box;
-  /* Grows downward from the ring rather than sliding away from it. */
+  /* Top centre of the drip group — where the glaze leaves the donut. Scaling from
+     anywhere else slides the drips off the donut instead of running them down. */
   transform-origin: 50% 0%;
-  transform: scaleY(0.55);
-  transition: transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1);
-}
-.gw-credit:hover .gw-credit-drip,
-.gw-credit:focus-visible .gw-credit-drip {
+  /* Resting is 1: the default state is his drawing at his lengths. */
   transform: scaleY(1);
+  transition: transform 340ms cubic-bezier(0.34, 1.32, 0.5, 1);
+}
+.gw-credit:hover .gw-credit-drips,
+.gw-credit:focus-visible .gw-credit-drips {
+  transform: scaleY(1.22);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing to suppress — there is no autoplay. The hover just stops easing. */
+  .gw-credit-drips {
+    transition-duration: 0s;
+  }
 }
