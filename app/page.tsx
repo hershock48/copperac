@@ -41,9 +41,7 @@ export default function Home() {
             </h1>
             <p className="mt-7 max-w-xl text-base leading-relaxed text-cream-dim sm:text-lg">
               Born from the spirit of Detroit sports and built on the bones of the beloved
-              Copper Bar. Every wall is memorabilia, there is a game on every screen, and
-              when Detroit has a big one it takes all {SITE.tvCountMain}. Kitchen runs
-              until 10.
+              Copper Bar. Every wall is memorabilia and every screen dedicated to sports.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Button href={SITE.orderUrl} external>
