@@ -41,8 +41,9 @@ export default function Home() {
             </h1>
             <p className="mt-7 max-w-xl text-base leading-relaxed text-cream-dim sm:text-lg">
               Born from the spirit of Detroit sports and built on the bones of the beloved
-              Copper Bar. Every wall is memorabilia, every TV has the game, and the kitchen
-              runs until 10.
+              Copper Bar. Every wall is memorabilia, there is a game on every screen, and
+              when Detroit has a big one it takes all {SITE.tvCountMain}. Kitchen runs
+              until 10.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Button href={SITE.orderUrl} external>
@@ -128,9 +129,10 @@ export default function Home() {
                 into one room.
               </p>
               <p>
-                Memorabilia covers every inch of the walls. The TVs have the game. Whether
-                you are repping the Tigers, Lions, Pistons, Red Wings or Wolverines, you
-                will find your team here.
+                Memorabilia covers every inch of the walls. Most nights there is more than
+                one game up and we will put yours on if you ask. When Detroit has a big one,
+                it takes every screen in the room. Whether you are repping the Tigers, Lions,
+                Pistons, Red Wings or Wolverines, you will find your team here.
               </p>
               <p>
                 Come for the game, stay for the food. Classic bar favorites and hometown

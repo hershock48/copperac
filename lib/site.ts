@@ -20,6 +20,20 @@ export const SITE = {
   // the main bar rather than the building on purpose: it is the room you walk
   // into. tvCountTotal is here for whenever the bigger number is the better
   // brag, which for a sports bar it arguably is.
+  // HOW THE SCREENS RUN, confirmed by Kevin 10 Aug 2026: both, depending on the night.
+  // Several games up on an ordinary night and staff will put a customer's game on; when
+  // Detroit has a marquee game it takes every screen in the room.
+  //
+  // This is written down because getting it wrong is not a typo, it is a false claim about
+  // the client's business, and the rebuild made it in three places at once. The hero said
+  // "every TV has the game" — one game, all seven — which was inherited from copperac.com's
+  // own "TVs broadcasting the big game" and contradicted both the About block's "you will
+  // find your team here" and the Board's "ask and we'll put your game on a screen too".
+  // It also undercut the h1: seven screens is only a brag if they are doing seven things.
+  //
+  // Any copy touching the screens has to hold both halves. There is no constant for this
+  // because it is prose, so this note is the only thing standing between the next edit and
+  // the same contradiction.
   tvCountMain: 7,
   tvCountReserve: 4,
   tvCountTotal: 11,

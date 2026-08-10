@@ -98,31 +98,14 @@ export default async function Board() {
         )}
 
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/70">
-          Every Detroit game goes up on the wall. Ask and we&apos;ll put your game on a screen too.
+          Every Detroit game goes up on the wall. Most nights we&apos;ll put yours on a screen
+          too &mdash; ask. When Detroit has a big one, it takes the room.
         </p>
       </div>
     </section>
   );
 }
 
-/**
- * The headline crawl. Three things here are not obvious.
- *
- * 1. IT IS A REAL LIST, NOT AN ARIA-HIDDEN DECORATION. The score ticker above is hidden from
- *    screen readers because every score in it is repeated in the panels below, so announcing
- *    it twice is noise. These headlines appear nowhere else on the page, so hiding them would
- *    delete content. The first run is a real <ul> of links; only the duplicate run — which
- *    exists purely so the crawl can loop seamlessly — is aria-hidden.
- *
- * 2. IT PAUSES ON HOVER AND ON FOCUS. These items are links, and a link that slides out from
- *    under the cursor cannot be clicked. Pausing is not a nicety here, it is what makes the
- *    feature usable. Focus matters for the same reason at the keyboard: tabbing to a headline
- *    that is drifting away is worse than no crawl at all.
- *
- * 3. THE DUPLICATE RUN IS WHAT MAKES THE LOOP SEAMLESS. The track holds the same items twice
- *    and translates by exactly -50%, so the moment it wraps, run two is sitting precisely
- *    where run one began. Any other distance shows a seam.
- */
 /**
  * The score ticker's text for one game. Extracted so the character count that drives the
  * crawl duration is computed from the SAME string that gets rendered — counting one thing and
@@ -158,6 +141,24 @@ function ageLabel(published: string | null): string | null {
   return `${Math.floor(hours / 24)}d`;
 }
 
+/**
+ * The headline crawl. Three things here are not obvious.
+ *
+ * 1. IT IS A REAL LIST, NOT AN ARIA-HIDDEN DECORATION. The score ticker above is hidden from
+ *    screen readers because every score in it is repeated in the panels below, so announcing
+ *    it twice is noise. These headlines appear nowhere else on the page, so hiding them would
+ *    delete content. The first run is a real <ul> of links; only the duplicate run — which
+ *    exists purely so the crawl can loop seamlessly — is aria-hidden.
+ *
+ * 2. IT PAUSES ON HOVER AND ON FOCUS. These items are links, and a link that slides out from
+ *    under the cursor cannot be clicked. Pausing is not a nicety here, it is what makes the
+ *    feature usable. Focus matters for the same reason at the keyboard: tabbing to a headline
+ *    that is drifting away is worse than no crawl at all.
+ *
+ * 3. THE DUPLICATE RUN IS WHAT MAKES THE LOOP SEAMLESS. The track holds the same items twice
+ *    and translates by exactly -50%, so the moment it wraps, run two is sitting precisely
+ *    where run one began. Any other distance shows a seam.
+ */
 function NewsCrawl({ items }: { items: NewsItem[] }) {
   return (
     <div
