@@ -16,11 +16,22 @@ import { unstable_cache } from "next/cache";
  * RSS build covers two clubs in one season each and goes quiet on the other two, which on a
  * sports bar's wall is worse than nothing. One API that covers all four wins.
  *
- * WHY THE FILTER IS ON OUR SIDE. ESPN's news endpoint is league-scoped, so a request for
- * NHL news is mostly not about Detroit. Each article carries a `categories` array that
- * usually names the teams it concerns, and that is the primary filter; a headline/description
- * match on the club name is the fallback for items that arrive uncategorised. Doing it this
- * way means we do not depend on a `team=` parameter being honoured, which is undocumented.
+ * WHY THE FILTER IS ON OUR SIDE. ESPN's news endpoint is league-scoped, so a request for NHL
+ * news is mostly not about Detroit, and there is no documented `team=` parameter to lean on.
+ *
+ * THE FIRST VERSION OF THIS FILTER WAS WRONG, and it is worth saying how, because the failure
+ * was invisible in code review and obvious the moment it ran. It trusted each article's
+ * `categories` array: if the categories named Detroit, the article was Detroit news. But ESPN
+ * tags a league-wide roundup with EVERY team in the league, so "2026 NFL training camp: Latest
+ * news, intel for all 32 teams" is categorised under the Lions, and "NHL rookie roundtable" is
+ * categorised under the Red Wings. Nine of the first twelve headlines it produced were not
+ * about Detroit at all -- a crawl labelled DETROIT carrying generic league copy, which is worse
+ * than an empty rail.
+ *
+ * So the test is now: is the club NAMED in the headline or description? That is what "about
+ * Detroit" means. A category tag alone is trusted only when the article is not a roundup, which
+ * is measured by counting how many teams it is filed under -- a genuine team story names one or
+ * two, a league sweep names a dozen or more.
  *
  * EVERY FIELD IS OPTIONAL. This is an undocumented third-party endpoint with no contract, so
  * the normaliser treats the response as unknown shape and drops anything it cannot read.
@@ -90,16 +101,26 @@ function categoryText(a: EspnArticle): string {
     .toLowerCase();
 }
 
+/** How many teams the article is filed under. A league roundup is filed under all of them. */
+function teamCategoryCount(a: EspnArticle): number {
+  const cats = Array.isArray(a.categories) ? a.categories : [];
+  return cats.filter((c) => c.type === "team" || c.teamId != null || c.team != null).length;
+}
+
+/** Roundups tagged with a dozen teams are not team news, however they are categorised. */
+const ROUNDUP_TEAM_TAGS = 3;
+
 function concernsClub(a: EspnArticle, club: Club): boolean {
-  const cats = categoryText(a);
-  // Primary: ESPN said which team this is about.
-  if (cats && club.needles.some((n) => cats.includes(n))) return true;
-  // Fallback for uncategorised items. Deliberately checks the full club name first so a
-  // "Lions" in a story about the Detroit Lions matches but a bare word in an unrelated
-  // headline is less likely to.
   const text = `${a.headline ?? a.title ?? ""} ${a.description ?? ""}`.toLowerCase();
-  if (!cats && text.includes(club.needles[0])) return true;
-  return false;
+  // The real test: the story says who it is about. "Teddy Bridgewater leaves Lions to retire"
+  // passes; "Latest intel for all 32 teams" does not, whatever it is tagged with.
+  if (club.needles.some((n) => text.includes(n))) return true;
+
+  // Tagged but not named. Trust the tag only if this is not a league sweep -- otherwise every
+  // roundup in the league arrives wearing Detroit's name. See the note at the top of the file.
+  const cats = categoryText(a);
+  const tagged = Boolean(cats) && club.needles.some((n) => cats.includes(n));
+  return tagged && teamCategoryCount(a) <= ROUNDUP_TEAM_TAGS;
 }
 
 async function fetchClubNews(club: Club): Promise<NewsItem[]> {
