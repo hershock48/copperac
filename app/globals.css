@@ -268,9 +268,15 @@ h1, h2, h3, .display {
 .news-crawl-track {
   display: flex;
   width: max-content;
-  /* Slower than the 42s score crawl: these are sentences, not scores, and they
-     have to be readable at a glance from across a room. */
-  animation: newsCrawl 96s linear infinite;
+  /* 8s per headline rather than a fixed lap. The track's width scales with the number of
+     items, so a fixed duration would change the SPEED with the news cycle: six Detroit
+     stories in August crept, twelve in February would have raced. Per-item duration keeps
+     the reading speed constant, which is the thing that actually has to stay readable from
+     across a room. Falls back to 12 items if the count never arrives.
+
+     Still slower per item than the 42s score crawl above, deliberately -- these are
+     sentences, not scores. */
+  animation: newsCrawl calc(var(--news-count, 12) * 8s) linear infinite;
 }
 /* A link cannot be clicked if it is sliding out from under the cursor. */
 .news-crawl:hover .news-crawl-track,

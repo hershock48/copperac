@@ -120,7 +120,14 @@ export default async function Board() {
  */
 function NewsCrawl({ items }: { items: NewsItem[] }) {
   return (
-    <div className="news-crawl mt-3">
+    <div
+      className="news-crawl mt-3"
+      // How many headlines there are drives the crawl duration, so the SPEED stays constant
+      // instead of the lap time. The track is width:max-content translating -50%, so a fixed
+      // duration means fewer items crawl slower -- six Detroit stories in August would creep
+      // while twelve in February would race. See the note in globals.css.
+      style={{ "--news-count": items.length } as React.CSSProperties}
+    >
       <span className="news-crawl-label" aria-hidden="true">
         Detroit
       </span>
