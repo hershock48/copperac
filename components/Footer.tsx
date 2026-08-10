@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HOURS, KITCHEN_NOTE, NAV, SITE } from "@/lib/site";
-import GlazedCredit from "@/components/GlazedCredit";
+import GlazedPlate from "@/components/GlazedPlate";
 
 export default function Footer() {
   return (
@@ -109,9 +109,11 @@ export default function Footer() {
           {/* Was "Site by Glazed Web" as plain text pointing at the NON-www host, which
               301s on every click. Now the shared component: warmer register, the mark beside
               it, and the canonical URL. */}
-          <GlazedCredit line="Double Dipped by" />
         </div>
       </div>
+
+      {/* Glazed Web signs off below the client's footer, not inside it. */}
+      <GlazedPlate line="Double Dipped by" />
     </footer>
   );
 }
