@@ -227,6 +227,102 @@ h1, h2, h3, .display {
 @keyframes boardCrawl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ============================================================
+   Detroit news crawl — the bottom line under the score ticker
+   ============================================================
+   Deliberately a rank below the score ticker: sentence case rather than the
+   display face in caps, a thinner rail, and a slower crawl. Scores are the
+   thing somebody walks in wanting; headlines are what they read while waiting
+   for a table. If both shouted, neither would be read. */
+.news-crawl {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-ink-line);
+  background: #060606;
+}
+.news-crawl-label {
+  font-family: var(--font-display);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  background: var(--color-copper);
+  color: var(--color-ink);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.news-crawl-window {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding: 9px 0;
+  /* Fade BOTH edges. The first version faded only the trailing one, on the theory
+     that the leading edge butts the copper label and needs no softening. Wrong:
+     a hard left cut slices the entering headline mid-letter, and a stray half
+     character sitting against the label reads as broken text, not as a crawl
+     arriving. 3% is enough to dissolve it and still keep the label tight. */
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 92%, transparent);
+}
+.news-crawl-track {
+  display: flex;
+  width: max-content;
+  /* Slower than the 42s score crawl: these are sentences, not scores, and they
+     have to be readable at a glance from across a room. */
+  animation: newsCrawl 96s linear infinite;
+}
+/* A link cannot be clicked if it is sliding out from under the cursor. */
+.news-crawl:hover .news-crawl-track,
+.news-crawl:focus-within .news-crawl-track {
+  animation-play-state: paused;
+}
+.news-crawl-run {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.news-crawl-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 15px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: var(--color-cream-dim);
+}
+.news-crawl-team {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* copper-light, not copper: copper measures 4.40 on ink-soft and fails AA.
+     See the contrast table at the top of this file. */
+  color: var(--color-copper-light);
+}
+.news-crawl-link {
+  color: inherit;
+  text-decoration: none;
+}
+.news-crawl-link:hover,
+.news-crawl-link:focus-visible {
+  color: var(--color-cream);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.news-crawl-dot { color: var(--color-copper); opacity: 0.45; font-size: 7px; }
+@keyframes newsCrawl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (max-width: 640px) {
+  /* The label eats a fifth of a phone screen; the crawl needs the room more. */
+  .news-crawl-label { display: none; }
+  .news-crawl-window { mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent); }
+}
+
+/* ============================================================
    Live open / kitchen status chip
    ============================================================ */
 .status-chip {
@@ -268,6 +364,7 @@ h1, h2, h3, .display {
 @media (prefers-reduced-motion: reduce) {
   /* the global reset squashes durations; an infinite crawl would jitter, so stop it */
   .board-ticker-track { animation: none !important; transform: none !important; }
+  .news-crawl-track { animation: none !important; transform: none !important; }
   .board-live-dot, .status-open .status-dot { animation: none !important; }
 }
 

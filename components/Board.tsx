@@ -1,4 +1,5 @@
 import { getBoard, type BoardGame } from "@/lib/board";
+import { getNews, type NewsItem } from "@/lib/news";
 import { Eyebrow, Heading } from "@/components/ui";
 
 /**
@@ -7,7 +8,9 @@ import { Eyebrow, Heading } from "@/components/ui";
  * revalidated every 15 minutes.
  */
 export default async function Board() {
-  const board = await getBoard();
+  // Both in flight together. The news strip is decoration on top of the scoreboard, so it
+  // must never add its latency to the board's — and if it fails it costs nothing.
+  const [board, news] = await Promise.all([getBoard(), getNews()]);
   if (!board.ok) return null; // every league failed, so say nothing rather than lie
 
   const asOf = new Intl.DateTimeFormat("en-US", {
@@ -54,6 +57,10 @@ export default async function Board() {
           </div>
         )}
 
+        {/* Second crawl: Detroit headlines, the way the bottom line runs under a broadcast.
+            Renders only if the feed returned something — an empty rail reads as broken. */}
+        {news.ok && <NewsCrawl items={news.items} />}
+
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
           <Panel
             title={board.live.length ? "On now" : "Last out"}
@@ -90,6 +97,69 @@ export default async function Board() {
         </p>
       </div>
     </section>
+  );
+}
+
+/**
+ * The headline crawl. Three things here are not obvious.
+ *
+ * 1. IT IS A REAL LIST, NOT AN ARIA-HIDDEN DECORATION. The score ticker above is hidden from
+ *    screen readers because every score in it is repeated in the panels below, so announcing
+ *    it twice is noise. These headlines appear nowhere else on the page, so hiding them would
+ *    delete content. The first run is a real <ul> of links; only the duplicate run — which
+ *    exists purely so the crawl can loop seamlessly — is aria-hidden.
+ *
+ * 2. IT PAUSES ON HOVER AND ON FOCUS. These items are links, and a link that slides out from
+ *    under the cursor cannot be clicked. Pausing is not a nicety here, it is what makes the
+ *    feature usable. Focus matters for the same reason at the keyboard: tabbing to a headline
+ *    that is drifting away is worse than no crawl at all.
+ *
+ * 3. THE DUPLICATE RUN IS WHAT MAKES THE LOOP SEAMLESS. The track holds the same items twice
+ *    and translates by exactly -50%, so the moment it wraps, run two is sitting precisely
+ *    where run one began. Any other distance shows a seam.
+ */
+function NewsCrawl({ items }: { items: NewsItem[] }) {
+  return (
+    <div className="news-crawl mt-3">
+      <span className="news-crawl-label" aria-hidden="true">
+        Detroit
+      </span>
+      <div className="news-crawl-window">
+        <div className="news-crawl-track">
+          {[0, 1].map((dup) => (
+            <ul
+              key={dup}
+              className="news-crawl-run"
+              // Run 1 is the readable one; run 2 only exists to make the wrap seamless.
+              aria-hidden={dup === 1 ? "true" : undefined}
+            >
+              {items.map((n) => (
+                <li key={`${dup}-${n.id}`} className="news-crawl-item">
+                  <b className="news-crawl-team">{n.team}</b>
+                  {n.href ? (
+                    <a
+                      href={n.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="news-crawl-link"
+                      // The duplicate run must not be a second tab stop for the same story.
+                      tabIndex={dup === 1 ? -1 : undefined}
+                    >
+                      {n.headline}
+                    </a>
+                  ) : (
+                    <span>{n.headline}</span>
+                  )}
+                  <span className="news-crawl-dot" aria-hidden="true">
+                    ◆
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

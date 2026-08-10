@@ -1,0 +1,207 @@
+import { unstable_cache } from "next/cache";
+
+/**
+ * Detroit sports headlines, for the news crawl under the score ticker.
+ *
+ * SOURCE. The same ESPN public site API the scoreboard already reads — no key, no account,
+ * no vendor, nothing to pay for. Using the source that is already in the build rather than
+ * adding a second one is the whole point: one thing to watch, one failure mode, and the
+ * board and the news can never disagree about who Detroit played.
+ *
+ * WHY NOT AN RSS FEED. That was the first instinct and it half works. The Lions and Tigers
+ * both publish real, current RSS on their official club sites
+ * (detroitlions.com/rss/news, mlb.com/tigers/feeds/news/rss.xml — both verified live).
+ * The problem is the other two: the NHL retired per-team RSS entirely
+ * (nhl.com/redwings/rss/news is a 404) and the NBA serves HTML at the old feed path. So an
+ * RSS build covers two clubs in one season each and goes quiet on the other two, which on a
+ * sports bar's wall is worse than nothing. One API that covers all four wins.
+ *
+ * WHY THE FILTER IS ON OUR SIDE. ESPN's news endpoint is league-scoped, so a request for
+ * NHL news is mostly not about Detroit. Each article carries a `categories` array that
+ * usually names the teams it concerns, and that is the primary filter; a headline/description
+ * match on the club name is the fallback for items that arrive uncategorised. Doing it this
+ * way means we do not depend on a `team=` parameter being honoured, which is undocumented.
+ *
+ * EVERY FIELD IS OPTIONAL. This is an undocumented third-party endpoint with no contract, so
+ * the normaliser treats the response as unknown shape and drops anything it cannot read.
+ * A league that fails, changes shape, or returns nothing costs us that league and nothing
+ * else. If all four fail the strip does not render at all — see `ok`.
+ */
+
+export type NewsItem = {
+  id: string;
+  /** TIGERS | LIONS | PISTONS | RED WINGS */
+  team: string;
+  /** MLB | NFL | NBA | NHL */
+  league: string;
+  headline: string;
+  href: string | null;
+  published: string | null;
+};
+
+type Club = {
+  /** ESPN's sport/league path segment */
+  path: string;
+  team: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS";
+  league: "MLB" | "NFL" | "NBA" | "NHL";
+  /** Matched against article categories and, failing that, the text */
+  needles: string[];
+};
+
+const CLUBS: Club[] = [
+  { path: "baseball/mlb", team: "TIGERS", league: "MLB", needles: ["detroit tigers", "tigers"] },
+  { path: "football/nfl", team: "LIONS", league: "NFL", needles: ["detroit lions", "lions"] },
+  { path: "basketball/nba", team: "PISTONS", league: "NBA", needles: ["detroit pistons", "pistons"] },
+  { path: "hockey/nhl", team: "RED WINGS", league: "NHL", needles: ["detroit red wings", "red wings"] },
+];
+
+/** The slice of ESPN's news payload we read. All optional, on purpose. */
+type EspnCategory = {
+  type?: string;
+  description?: string;
+  teamId?: number | string;
+  team?: { description?: string; displayName?: string };
+  athlete?: { description?: string };
+};
+
+type EspnArticle = {
+  id?: number | string;
+  headline?: string;
+  title?: string;
+  description?: string;
+  published?: string;
+  lastModified?: string;
+  categories?: EspnCategory[];
+  links?: { web?: { href?: string } };
+};
+
+type EspnNews = { articles?: EspnArticle[]; headlines?: EspnArticle[] };
+
+/** Text of every category on an article, lowercased, for needle matching. */
+function categoryText(a: EspnArticle): string {
+  const cats = Array.isArray(a.categories) ? a.categories : [];
+  return cats
+    .map((c) =>
+      [c.description, c.team?.description, c.team?.displayName, c.athlete?.description]
+        .filter(Boolean)
+        .join(" ")
+    )
+    .join(" ")
+    .toLowerCase();
+}
+
+function concernsClub(a: EspnArticle, club: Club): boolean {
+  const cats = categoryText(a);
+  // Primary: ESPN said which team this is about.
+  if (cats && club.needles.some((n) => cats.includes(n))) return true;
+  // Fallback for uncategorised items. Deliberately checks the full club name first so a
+  // "Lions" in a story about the Detroit Lions matches but a bare word in an unrelated
+  // headline is less likely to.
+  const text = `${a.headline ?? a.title ?? ""} ${a.description ?? ""}`.toLowerCase();
+  if (!cats && text.includes(club.needles[0])) return true;
+  return false;
+}
+
+async function fetchClubNews(club: Club): Promise<NewsItem[]> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/${club.path}/news?limit=50`;
+  let json: EspnNews;
+  try {
+    // no-store on the raw request, then the small derived list is cached below — the same
+    // arrangement lib/board.ts uses, and for the same reason: the raw payloads are large
+    // and the thing worth caching is the handful of strings we keep.
+    const res = await fetch(url, { cache: "no-store", headers: { accept: "application/json" } });
+    if (!res.ok) return [];
+    json = (await res.json()) as EspnNews;
+  } catch {
+    return [];
+  }
+
+  const raw = Array.isArray(json?.articles)
+    ? json.articles
+    : Array.isArray(json?.headlines)
+      ? json.headlines
+      : [];
+
+  const items: NewsItem[] = [];
+  for (const a of raw) {
+    const headline = (a.headline ?? a.title ?? "").trim();
+    if (!headline) continue;
+    if (!concernsClub(a, club)) continue;
+
+    const href = a.links?.web?.href ?? null;
+    items.push({
+      // Fall back to the headline as the key: ESPN sometimes omits the id, and two
+      // articles with the same headline are the same article for our purposes.
+      id: String(a.id ?? headline),
+      team: club.team,
+      league: club.league,
+      headline,
+      href,
+      published: a.published ?? a.lastModified ?? null,
+    });
+  }
+  return items;
+}
+
+export type NewsFeed = {
+  items: NewsItem[];
+  builtAt: string;
+  /** false when nothing came back; lets the strip render nothing rather than an empty rail */
+  ok: boolean;
+};
+
+async function buildNews(): Promise<NewsFeed> {
+  const all = (await Promise.all(CLUBS.map(fetchClubNews))).flat();
+
+  // Dedupe by id, then by headline — the same story can appear under two categories.
+  const seen = new Set<string>();
+  const unique = all.filter((n) => {
+    const k = n.headline.toLowerCase();
+    if (seen.has(n.id) || seen.has(k)) return false;
+    seen.add(n.id);
+    seen.add(k);
+    return true;
+  });
+
+  unique.sort((a, b) => {
+    const at = a.published ? +new Date(a.published) : 0;
+    const bt = b.published ? +new Date(b.published) : 0;
+    return bt - at;
+  });
+
+  // Interleave by club so one team in mid-season does not fill the whole crawl. Round-robin
+  // over the per-club queues, newest first within each, until we have enough.
+  const queues = new Map<string, NewsItem[]>();
+  for (const n of unique) {
+    const q = queues.get(n.team) ?? [];
+    q.push(n);
+    queues.set(n.team, q);
+  }
+  const order = ["TIGERS", "LIONS", "PISTONS", "RED WINGS"];
+  const woven: NewsItem[] = [];
+  const LIMIT = 12;
+  for (let round = 0; woven.length < LIMIT; round += 1) {
+    let added = false;
+    for (const team of order) {
+      const q = queues.get(team);
+      if (q && q[round]) {
+        woven.push(q[round]);
+        added = true;
+        if (woven.length >= LIMIT) break;
+      }
+    }
+    if (!added) break; // every queue exhausted
+  }
+
+  return { items: woven, builtAt: new Date().toISOString(), ok: woven.length > 0 };
+}
+
+/**
+ * Ten minutes. Headlines turn over faster than scores settle, but a bar's wall does not
+ * need to be a live wire and every revalidation is four upstream requests.
+ */
+const cachedNews = unstable_cache(buildNews, ["copper-detroit-news"], { revalidate: 600 });
+
+export async function getNews(): Promise<NewsFeed> {
+  return cachedNews();
+}
