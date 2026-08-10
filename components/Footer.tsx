@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HOURS, KITCHEN_NOTE, NAV, SITE } from "@/lib/site";
+import GlazedCredit from "@/components/GlazedCredit";
 
 export default function Footer() {
   return (
@@ -105,17 +106,10 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <p>
-            Site by{" "}
-            <a
-              href="https://glazedweb.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-copper-light transition-colors hover:text-copper"
-            >
-              Glazed Web
-            </a>
-          </p>
+          {/* Was "Site by Glazed Web" as plain text pointing at the NON-www host, which
+              301s on every click. Now the shared component: warmer register, the mark beside
+              it, and the canonical URL. */}
+          <GlazedCredit line="Double dipped by" />
         </div>
       </div>
     </footer>
