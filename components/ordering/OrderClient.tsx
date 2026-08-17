@@ -127,12 +127,28 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
           them, a pickup time and nothing to read. The fee is disclosed the way
           guests expect fees: a line of small print below the menu and a labeled
           line in the cart, both before anything is placed. The story of where
-          the fee goes is for the owner pitch, not the menu. */}
-      <div className="mb-10 rounded-sm border border-ink-line bg-ink-soft px-5 py-4 text-sm leading-relaxed text-cream-dim">
-        {live && !live.open ? (
-          <p className="text-copper-light">{live.reason}</p>
+          the fee goes is for the owner pitch, not the menu.
+
+          The pickup quote wears the site's own status chip, the same classes
+          LiveStatus renders in the header (Kevin's call: like the open-now
+          sign). Same pulsing dot, so a number that moves with the kitchen's
+          busy dial looks like a number that moves. Closed and paused keep the
+          quiet bordered note, because their copy runs a sentence long and a
+          pill chip is built for six words. */}
+      <div className="mb-10">
+        {!live ? (
+          <span className="status-chip status-chip-idle" aria-hidden="true" />
+        ) : !live.open ? (
+          <div className="rounded-sm border border-ink-line bg-ink-soft px-5 py-4 text-sm leading-relaxed text-copper-light">
+            {live.reason}
+          </div>
         ) : (
-          <p>Ready for pickup in about {live?.quoteMinutes ?? 15} minutes.</p>
+          <span className="status-chip status-open" role="status">
+            <span className="status-dot" aria-hidden="true" />
+            <b>Taking orders</b>
+            <span className="status-sep">·</span>
+            <span className="status-detail">ready in about {live.quoteMinutes} minutes</span>
+          </span>
         )}
       </div>
 
