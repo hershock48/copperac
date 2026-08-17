@@ -310,11 +310,11 @@ footer .gmark{height:78px;width:auto}
   </table>
 
   <div class="clock">
-    <div class="clockhead"><span class="k">What the bar earns</span><span class="ct" id="ordN">249 orders a month · your July</span></div>
+    <div class="clockhead"><span class="k">What switching is worth</span><span class="ct" id="ordN">249 orders a month · your July</span></div>
     <div class="cc">
-      <div class="cl good">The bar earns</div>
-      <div class="cb" id="earnMo">$125 a month · about $1,494 a year</div>
-      <div class="cs">Half of every order fee, settling into the bar's own account with the food money. Slide to a football month and watch it climb. Nothing else in the number.</div>
+      <div class="cl good">Against what online ordering costs and pays today, the bar comes out</div>
+      <div class="cb" id="swingMo">$207 a month ahead · about $2,480 a year</div>
+      <div class="cs" id="swingParts">$125 of that is the fee share, exact. The rest is what stops going to Toast: the ordering module (about $75) and a slightly lower card rate (about $7). The abouts come exact from your statement.</div>
     </div>
     <div class="cc" style="border-top:1px solid rgba(255,255,255,.1)">
       <div class="split"><span class="cl good" style="flex:0 0 auto">Slide your online orders</span>
@@ -323,14 +323,13 @@ footer .gmark{height:78px;width:auto}
     </div>
   </div>
 
-  <p style="margin-top:18px"><strong>On top of the earn, the savings, marked
-  honestly as estimates until your statement makes them exact:</strong> Toast's
-  online ordering module typically runs about $75 a month when billed as an
-  add-on, and Toast's online card rate typically runs about half a point above
-  the standard rate, worth roughly $15 to $20 a month at July volume. Call the
-  savings <b>about $90 a month, $1,100 a year</b>, pencilled. Three lines from
-  the Toast statement replace every "about" on this page: the online ordering
-  module line, the card-not-present rate, and the contract renewal date.</p>
+  <p style="margin-top:18px"><strong>Three lines from the Toast statement turn
+  the pencilled parts exact:</strong> the online ordering module line (about $75
+  a month is typical when billed as an add-on; if it is bundled, that part of
+  the number shrinks and the fee share carries more of it), the card-not-present
+  rate (typically about half a point above standard), and the contract renewal
+  date. The fee share needs no statement: it is orders times fifty cents,
+  every month, forever.</p>
   <p>The part to say straight, because it is the honest trade: guests pay a 99
   cent fee on this page that Toast's page does not charge them today. It is shown
   on the menu before checkout, never sprung at payment, and it is the smallest
@@ -432,15 +431,20 @@ footer .gmark{height:78px;width:auto}
 </div></footer>
 
 <script>
-/* The earn dial. Assumption-free: half of every 99 cent order fee stays with
-   the bar, so the number is exactly orders x 50 cents. Default is their own
-   July count. */
+/* The switching dial: the NET number, because a buyer weighs the difference,
+   not the ingredients. total = fee share (exact: orders x 50 cents)
+   + module estimate ($75/mo, pencilled) + rate-gap estimate (~2.9 cents an
+   order at their $29.90 July ticket, pencilled). The breakdown sentence keeps
+   exact and pencilled honestly separated. */
 var slider = document.getElementById("ordSlider");
 function paint() {
   var n = parseInt(slider.value, 10);
-  var mo = Math.round(n * 0.5);
+  var earn = Math.round(n * 0.5);
+  var rate = Math.round(n * 0.029);
+  var total = earn + 75 + rate;
   document.getElementById("ordN").textContent = n + " orders a month" + (n === 249 ? " · your July" : "");
-  document.getElementById("earnMo").textContent = "$" + mo + " a month · about $" + (mo * 12).toLocaleString() + " a year";
+  document.getElementById("swingMo").textContent = "$" + total + " a month ahead · about $" + (total * 12).toLocaleString() + " a year";
+  document.getElementById("swingParts").textContent = "$" + earn + " of that is the fee share, exact. The rest is what stops going to Toast: the ordering module (about $75) and a slightly lower card rate (about $" + rate + "). The abouts come exact from your statement.";
 }
 slider.addEventListener("input", paint);
 paint();
