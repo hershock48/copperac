@@ -33,7 +33,11 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   const [orders, setOrders] = useState<Order[]>([]);
   const [state, setState] = useState<KitchenState | null>(null);
   const [backend, setBackend] = useState<"postgres" | "memory" | null>(null);
-  const [tab, setTab] = useState<"orders" | "menu">("orders");
+  // The board opens on 86s and hours (Kevin's call): that is the tab staff
+  // reach for on their own; orders announce themselves with the chime and the
+  // badge, so they do not need to be the front page.
+  const [tab, setTab] = useState<"orders" | "menu">("menu");
+  const [filter, setFilter] = useState("");
   const audioRef = useRef<AudioContext | null>(null);
   const knownRef = useRef<Set<string>>(new Set());
 
@@ -195,11 +199,11 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
       )}
 
       {/* Tab rail */}
-      <div className="mb-8 flex gap-2">
+      <div className="mb-8 flex flex-wrap gap-2">
         {(
           [
+            ["menu", "86 Board & Hours"],
             ["orders", newCount > 0 ? `Orders · ${newCount} new` : "Orders"],
-            ["menu", "86 board and hours"],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -226,49 +230,6 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
 
       {tab === "orders" ? (
         <>
-          {/* Busy dial and pause: on the orders tab because that is where a
-              slammed bartender already is. */}
-          <div className="mb-8 flex flex-wrap items-center gap-2">
-            <span className="display mr-1 text-xs uppercase tracking-widest text-copper-light">Tonight</span>
-            {([0, 15, 30] as const).map((mins) => (
-              <button
-                key={mins}
-                type="button"
-                onClick={() => patchState({ busyMinutes: mins })}
-                className={`rounded-sm border px-4 py-2.5 text-sm transition-colors ${
-                  state?.busyMinutes === mins && !paused
-                    ? "border-copper bg-copper text-ink"
-                    : "border-ink-line text-cream-dim hover:border-copper-light"
-                }`}
-              >
-                {mins === 0 ? "Normal" : `Busy +${mins} min`}
-              </button>
-            ))}
-            {paused ? (
-              <button
-                type="button"
-                onClick={() => patchState({ pauseMinutes: 0 })}
-                className="rounded-sm border border-[#7dd18a]/50 bg-[#7dd18a]/10 px-4 py-2.5 text-sm text-[#7dd18a]"
-              >
-                Paused · resumes {Math.max(1, Math.ceil((state!.pausedUntil! - Date.now()) / 60000))} min · tap to resume now
-              </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-cream-dim/70">Pause:</span>
-                {[30, 60, 90].map((mins) => (
-                  <button
-                    key={mins}
-                    type="button"
-                    onClick={() => patchState({ pauseMinutes: mins })}
-                    className="rounded-sm border border-ink-line px-3 py-2.5 text-sm text-cream-dim transition-colors hover:border-[#d9736b] hover:text-[#d9736b]"
-                  >
-                    {mins}m
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {orders.length === 0 ? (
             <p className="rounded-sm border border-ink-line bg-ink-soft px-5 py-10 text-center text-sm text-cream-dim/70">
               No open orders. This screen checks every few seconds and rings when one lands.
@@ -339,36 +300,123 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         </>
       ) : (
         <div>
-          <p className="mb-6 max-w-xl text-sm leading-relaxed text-cream-dim/80">
-            Tap anything that ran out and it comes off the order page in seconds, marked sold out tonight.
-            Tap again when it is back. Ordering opens and closes itself from the posted hours; last online
-            order goes in at 9:30 PM.
-          </p>
-          {sections.map((section) => (
-            <section key={section.name} className="mb-8">
-              <h2 className="display mb-3 text-sm uppercase tracking-widest text-copper-light">{section.name}</h2>
+          {/* Tonight's dials live with the 86 board: this whole tab is "how is
+              the kitchen doing", the Orders tab is just the queue. */}
+          <div className="mb-6 rounded-sm border border-ink-line bg-ink-soft p-4">
+            <p className="display mb-3 text-xs uppercase tracking-widest text-copper-light">Tonight</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {([0, 15, 30] as const).map((mins) => (
+                <button
+                  key={mins}
+                  type="button"
+                  onClick={() => patchState({ busyMinutes: mins })}
+                  className={`rounded-sm border px-4 py-3 text-sm transition-colors ${
+                    state?.busyMinutes === mins && !paused
+                      ? "border-copper bg-copper text-ink"
+                      : "border-ink-line text-cream-dim hover:border-copper-light"
+                  }`}
+                >
+                  {mins === 0 ? "Normal" : `Busy +${mins} min`}
+                </button>
+              ))}
+              <span className="mx-1 h-6 w-px bg-ink-line" aria-hidden />
+              {paused ? (
+                <button
+                  type="button"
+                  onClick={() => patchState({ pauseMinutes: 0 })}
+                  className="rounded-sm border border-[#7dd18a]/50 bg-[#7dd18a]/10 px-4 py-3 text-sm text-[#7dd18a]"
+                >
+                  Paused · resumes in {Math.max(1, Math.ceil((state!.pausedUntil! - Date.now()) / 60000))} min · tap to resume now
+                </button>
+              ) : (
+                <>
+                  <span className="text-sm text-cream-dim/70">Pause ordering:</span>
+                  {[30, 60, 90].map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => patchState({ pauseMinutes: mins })}
+                      className="rounded-sm border border-ink-line px-4 py-3 text-sm text-cream-dim transition-colors hover:border-[#d9736b] hover:text-[#d9736b]"
+                    >
+                      {mins} min
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+            <p className="mt-3 text-xs text-cream-dim/60">
+              Every tap saves by itself and hits the order page within seconds. No save button, nothing to submit.
+              Ordering follows the posted hours; last online order 9:30 PM.
+            </p>
+          </div>
+
+          {/* What's off right now, one glance, one tap to bring back. */}
+          {(state?.unavailable.length ?? 0) > 0 && (
+            <div className="mb-6 rounded-sm border border-[#d9736b]/40 bg-[#d9736b]/5 p-4">
+              <p className="display mb-3 text-xs uppercase tracking-widest text-[#d9736b]">
+                86&apos;d tonight · tap to bring back
+              </p>
               <div className="flex flex-wrap gap-2">
-                {section.items.map((item) => {
-                  const off = state?.unavailable.includes(item.id) ?? false;
+                {state!.unavailable.map((id) => {
+                  const item = sections.flatMap((s) => s.items).find((i) => i.id === id);
+                  if (!item) return null;
                   return (
                     <button
-                      key={item.id}
+                      key={id}
                       type="button"
-                      onClick={() => patchState({ toggle86: item.id })}
-                      aria-pressed={off}
-                      className={`rounded-sm border px-4 py-3 text-sm transition-colors ${
-                        off
-                          ? "border-[#d9736b] bg-[#d9736b]/15 text-[#d9736b] line-through"
-                          : "border-ink-line text-cream-dim hover:border-copper-light"
-                      }`}
+                      onClick={() => patchState({ toggle86: id })}
+                      className="rounded-sm border border-[#d9736b] bg-[#d9736b]/15 px-4 py-3 text-sm text-[#d9736b] line-through"
                     >
                       {item.name}
                     </button>
                   );
                 })}
               </div>
-            </section>
-          ))}
+            </div>
+          )}
+
+          {/* 114 items need a filter more than they need scrolling. */}
+          <input
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Find an item to 86..."
+            aria-label="Filter menu items"
+            className="mb-6 w-full max-w-sm rounded-sm border border-ink-line bg-ink-soft px-4 py-3 text-sm text-cream outline-none placeholder:text-cream-dim/50 focus:border-copper-light"
+          />
+
+          {sections
+            .map((section) => ({
+              ...section,
+              items: filter
+                ? section.items.filter((i) => i.name.toLowerCase().includes(filter.toLowerCase()))
+                : section.items,
+            }))
+            .filter((section) => section.items.length > 0)
+            .map((section) => (
+              <section key={section.name} className="mb-8">
+                <h2 className="display mb-3 text-sm uppercase tracking-widest text-copper-light">{section.name}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {section.items.map((item) => {
+                    const off = state?.unavailable.includes(item.id) ?? false;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => patchState({ toggle86: item.id })}
+                        aria-pressed={off}
+                        className={`rounded-sm border px-4 py-3 text-sm transition-colors ${
+                          off
+                            ? "border-[#d9736b] bg-[#d9736b]/15 text-[#d9736b] line-through"
+                            : "border-ink-line text-cream-dim hover:border-copper-light"
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
         </div>
       )}
     </div>
