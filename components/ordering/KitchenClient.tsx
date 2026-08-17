@@ -12,6 +12,7 @@
 // no asset file and cannot 404.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import MenuEditor from "@/components/ordering/MenuEditor";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import type { KitchenState, Order } from "@/lib/ordering/store";
 
@@ -37,7 +38,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // The board opens on 86s and hours (Kevin's call): that is the tab staff
   // reach for on their own; orders announce themselves with the chime and the
   // badge, so they do not need to be the front page.
-  const [tab, setTab] = useState<"orders" | "menu">("menu");
+  const [tab, setTab] = useState<"orders" | "menu" | "editor">("menu");
   const [filter, setFilter] = useState("");
   // Two-tap refund: first tap arms, second tap fires. Arming clears when the
   // list refreshes so a stale armed button cannot refund the wrong ticket.
@@ -213,6 +214,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
           [
             ["menu", "86 Board & Hours"],
             ["orders", newCount > 0 ? `Orders · ${newCount} new` : "Orders"],
+            ["editor", "Edit Menu"],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -237,7 +239,9 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         )}
       </div>
 
-      {tab === "orders" ? (
+      {tab === "editor" ? (
+        <MenuEditor />
+      ) : tab === "orders" ? (
         <>
           {orders.length === 0 ? (
             <p className="rounded-sm border border-ink-line bg-ink-soft px-5 py-10 text-center text-sm text-cream-dim/70">

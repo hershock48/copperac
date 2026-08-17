@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { isKitchenAuthed } from "@/lib/ordering/auth";
-import { ITEM_INDEX } from "@/lib/ordering/menu";
+import { buildIndex, loadMenuDoc, toOrderable } from "@/lib/ordering/menu";
 import { effectiveState, getStore, type KitchenState } from "@/lib/ordering/store";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +56,8 @@ export async function PATCH(req: NextRequest) {
   const state: KitchenState = effectiveState(await store.getState());
 
   if (typeof patch.toggle86 === "string") {
-    if (!ITEM_INDEX.has(patch.toggle86)) {
+    const index = buildIndex(toOrderable(await loadMenuDoc(store), { includeHidden: true }));
+    if (!index.has(patch.toggle86)) {
       return NextResponse.json({ error: "No such item." }, { status: 400 });
     }
     state.unavailable = state.unavailable.includes(patch.toggle86)

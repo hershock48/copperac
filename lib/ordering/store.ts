@@ -101,6 +101,11 @@ export interface OrderStore {
   setPrintJobStatus(id: string, status: "printed" | "failed"): Promise<void>;
   printerSeen(printerId: string): Promise<void>;
   printerLastSeen(): Promise<Record<string, number>>;
+  // The editable menu document. null means never edited: callers seed from
+  // the bundled harvest. Stored whole -- it is one restaurant's menu, edits
+  // are rare, and whole-document writes cannot half-apply.
+  getMenuDoc(): Promise<unknown | null>;
+  setMenuDoc(doc: unknown): Promise<void>;
 }
 
 /* ------------------------------ memory ------------------------------ */
@@ -111,6 +116,7 @@ type MemoryBag = {
   ticket: number;
   printJobs: PrintJob[];
   printersSeen: Record<string, number>;
+  menuDoc: unknown | null;
 };
 
 function memoryBag(): MemoryBag {
@@ -122,6 +128,7 @@ function memoryBag(): MemoryBag {
       ticket: 0,
       printJobs: [],
       printersSeen: {},
+      menuDoc: null,
     };
   }
   return g.__copperOrdering;
@@ -178,6 +185,12 @@ const memoryStore: OrderStore = {
   async printerLastSeen() {
     return { ...memoryBag().printersSeen };
   },
+  async getMenuDoc() {
+    return memoryBag().menuDoc;
+  },
+  async setMenuDoc(doc) {
+    memoryBag().menuDoc = doc;
+  },
 };
 
 /* ----------------------------- postgres ----------------------------- */
@@ -221,6 +234,10 @@ async function pgPool(): Promise<Pool> {
         CREATE TABLE IF NOT EXISTS ordering_printers (
           id text PRIMARY KEY,
           last_seen bigint NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS ordering_menu (
+          id int PRIMARY KEY DEFAULT 1,
+          data jsonb NOT NULL
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
       `);
@@ -332,6 +349,19 @@ const postgresStore: OrderStore = {
     const pool = await pgPool();
     const r = await pool.query(`SELECT id, last_seen FROM ordering_printers`);
     return Object.fromEntries(r.rows.map((row) => [row.id, Number(row.last_seen)]));
+  },
+  async getMenuDoc() {
+    const pool = await pgPool();
+    const r = await pool.query(`SELECT data FROM ordering_menu WHERE id = 1`);
+    return r.rows[0] ? r.rows[0].data : null;
+  },
+  async setMenuDoc(doc) {
+    const pool = await pgPool();
+    await pool.query(
+      `INSERT INTO ordering_menu (id, data) VALUES (1, $1)
+       ON CONFLICT (id) DO UPDATE SET data = $1`,
+      [JSON.stringify(doc)]
+    );
   },
 };
 

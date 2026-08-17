@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import OrderClient from "@/components/ordering/OrderClient";
 import { PageHero, Section } from "@/components/ui";
-import { ORDERABLE_MENU } from "@/lib/ordering/menu";
+import { guestMenu } from "@/lib/ordering/menu";
+import { getStore } from "@/lib/ordering/store";
 import { CONSUMER_ADVISORY, KITCHEN_NOTE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function OrderPage() {
+// Per request, not per build: the menu is editable data now.
+export const dynamic = "force-dynamic";
+
+export default async function OrderPage() {
+  const { sections } = await guestMenu(getStore());
   return (
     <>
       {/* The subtitle says what a guest does, nothing about how the ordering
@@ -31,7 +36,7 @@ export default function OrderPage() {
         imageAlt="A Copper Athletic Club burger on a brioche bun with a side of natural cut fries"
       />
       <Section>
-        <OrderClient sections={ORDERABLE_MENU} />
+        <OrderClient sections={sections} />
         <div className="mt-4 space-y-3 border-t border-ink-line pt-8 text-xs leading-relaxed text-cream-dim/60">
           <p>A 99¢ order fee applies at checkout. {KITCHEN_NOTE} Cocktails to go leave sealed, per Michigan law, and the ID check happens at the counter.</p>
           <p>{CONSUMER_ADVISORY}</p>

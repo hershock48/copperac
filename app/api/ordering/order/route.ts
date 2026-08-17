@@ -22,7 +22,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { ORDERING } from "@/lib/ordering/config";
-import { ITEM_INDEX } from "@/lib/ordering/menu";
+import { guestMenu } from "@/lib/ordering/menu";
 import { orderingWindow } from "@/lib/ordering/time";
 import { effectiveState, getStore, type Order, type OrderLine } from "@/lib/ordering/store";
 
@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     return bad("The kitchen just paused online ordering. Give it a few minutes or call the bar.", 409);
   }
 
+  const { index: ITEM_INDEX } = await guestMenu(store);
   const lines: OrderLine[] = [];
   for (const raw of body.lines) {
     const item = ITEM_INDEX.get(String(raw.itemId));
