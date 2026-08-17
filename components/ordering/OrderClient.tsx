@@ -124,9 +124,8 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
       {/* The fee, said plainly before anything else. */}
       <div className="mb-10 rounded-sm border border-ink-line bg-ink-soft px-5 py-4 text-sm leading-relaxed text-cream-dim">
         <p>
-          <span className="text-cream">Pickup ordering, straight from our kitchen.</span>{" "}
-          Every order has a {live?.feeLabel ?? "99¢ order fee"}. {live?.feeExplainer ?? "Half of it stays right here at the bar."}{" "}
-          No markups, no delivery apps, no middleman menu prices.
+          <span className="text-cream">Every order has a {live?.feeLabel ?? "99¢ order fee"}.</span>{" "}
+          {live?.feeExplainer ?? "Half of it stays right here at the bar."} Same prices as the menu.
         </p>
         {live && !live.open && (
           <p className="mt-3 border-t border-ink-line pt-3 text-copper-light">{live.reason}</p>

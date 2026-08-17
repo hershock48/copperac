@@ -7,12 +7,12 @@ import { CONSUMER_ADVISORY, KITCHEN_NOTE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Order Online",
   description:
-    "Order Copper Athletic Club for pickup, straight from our kitchen in downtown Marshall. Burgers, wings, coneys, cocktails to go, no delivery apps.",
+    "Order ahead for pickup at Copper Athletic Club in downtown Marshall. Burgers, wings, coneys, and cocktails to go.",
   alternates: { canonical: "/order" },
   openGraph: {
     title: "Order Online | Copper Athletic Club",
     description:
-      "Pickup ordering straight from our kitchen in downtown Marshall. No delivery apps, no marked-up menu.",
+      "Order ahead for pickup in downtown Marshall. Burgers, wings, coneys, and cocktails to go.",
     images: [{ url: "/og/menu.jpg", width: 1200, height: 630, alt: "Copper Athletic Club burgers, coneys and wings, ready for pickup" }],
   },
 };
@@ -20,9 +20,13 @@ export const metadata: Metadata = {
 export default function OrderPage() {
   return (
     <>
+      {/* The subtitle says what a guest does, nothing about how the ordering
+          is built. "On our own website" shipped here briefly and Kevin killed
+          it: the customer already assumes that, so it read as the site talking
+          about itself. Who runs the ordering is pitch material, not menu copy. */}
       <PageHero
         title="Order Online"
-        subtitle="Straight from our kitchen, on our own website. Order ahead, pick it up at the bar."
+        subtitle="Order ahead, pick it up at the bar."
         image="/img/burger.webp"
         imageAlt="A Copper Athletic Club burger on a brioche bun with a side of natural cut fries"
       />
