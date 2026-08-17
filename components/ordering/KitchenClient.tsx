@@ -33,6 +33,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   const [orders, setOrders] = useState<Order[]>([]);
   const [state, setState] = useState<KitchenState | null>(null);
   const [backend, setBackend] = useState<"postgres" | "memory" | null>(null);
+  const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean }[]>([]);
   // The board opens on 86s and hours (Kevin's call): that is the tab staff
   // reach for on their own; orders announce themselves with the chime and the
   // badge, so they do not need to be the front page.
@@ -84,7 +85,9 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         knownRef.current = new Set((data.orders as Order[]).map((o) => o.id));
       }
       if (stateRes.ok) {
-        setState((await stateRes.json()).state);
+        const data = await stateRes.json();
+        setState(data.state);
+        setPrinters(data.printers ?? []);
       }
     } catch {
       /* next poll retries; the backend badge covers persistent trouble */
@@ -344,6 +347,22 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                 </>
               )}
             </div>
+            {printers.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-ink-line pt-3">
+                <span className="display text-xs uppercase tracking-widest text-copper-light">Printers</span>
+                {printers.map((p) => (
+                  <span
+                    key={p.id}
+                    className={`inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-xs ${
+                      p.online ? "border-[#7dd18a]/40 text-[#7dd18a]" : "border-[#d9736b] text-[#d9736b]"
+                    }`}
+                  >
+                    <span className={`h-2 w-2 rounded-full ${p.online ? "bg-[#7dd18a]" : "bg-[#d9736b]"}`} aria-hidden />
+                    {p.label} {p.online ? "" : "· OFFLINE"}
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="mt-3 text-xs text-cream-dim/60">
               Every tap saves by itself and hits the order page within seconds. No save button, nothing to submit.
               Ordering follows the posted hours; last online order 9:30 PM.

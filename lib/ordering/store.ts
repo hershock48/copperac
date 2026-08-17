@@ -50,9 +50,22 @@ export type Order = {
   // checkout and the kitchen ticket shows ID CHECK; the actual carding
   // happens at the counter, where it always has.
   hasAlcohol: boolean;
+  // False until Stripe is wired: demo orders are DUE AT PICKUP and the front
+  // slip prints tip and signature lines. Live orders are prepaid and print
+  // PAID ONLINE.
+  paid: boolean;
   status: OrderStatus;
   createdAt: number; // epoch ms
   acceptedAt: number | null;
+};
+
+export type PrintJob = {
+  id: string;
+  printerId: string;
+  orderId: string;
+  body: string; // rendered text, template already applied
+  status: "queued" | "printed" | "failed";
+  createdAt: number;
 };
 
 export type KitchenState = {
@@ -77,6 +90,14 @@ export interface OrderStore {
   nextTicketNumber(): Promise<number>;
   getState(): Promise<KitchenState>;
   setState(state: KitchenState): Promise<void>;
+  // Printing. Jobs are queued at order time and drained by each printer's
+  // polls; stale queued jobs are skipped at poll time via the TTL so a
+  // printer that was off for an hour does not print cold orders.
+  enqueuePrintJob(job: PrintJob): Promise<void>;
+  nextPrintJob(printerId: string, notOlderThanMs: number): Promise<PrintJob | null>;
+  setPrintJobStatus(id: string, status: "printed" | "failed"): Promise<void>;
+  printerSeen(printerId: string): Promise<void>;
+  printerLastSeen(): Promise<Record<string, number>>;
 }
 
 /* ------------------------------ memory ------------------------------ */
@@ -85,12 +106,20 @@ type MemoryBag = {
   orders: Map<string, Order>;
   state: KitchenState;
   ticket: number;
+  printJobs: PrintJob[];
+  printersSeen: Record<string, number>;
 };
 
 function memoryBag(): MemoryBag {
   const g = globalThis as unknown as { __copperOrdering?: MemoryBag };
   if (!g.__copperOrdering) {
-    g.__copperOrdering = { orders: new Map(), state: { ...DEFAULT_STATE }, ticket: 0 };
+    g.__copperOrdering = {
+      orders: new Map(),
+      state: { ...DEFAULT_STATE },
+      ticket: 0,
+      printJobs: [],
+      printersSeen: {},
+    };
   }
   return g.__copperOrdering;
 }
@@ -124,6 +153,28 @@ const memoryStore: OrderStore = {
   async setState(state) {
     memoryBag().state = state;
   },
+  async enqueuePrintJob(job) {
+    memoryBag().printJobs.push(job);
+  },
+  async nextPrintJob(printerId, notOlderThanMs) {
+    const cutoff = Date.now() - notOlderThanMs;
+    const bag = memoryBag();
+    // Expire stale queued jobs so an offline printer never prints cold food.
+    for (const j of bag.printJobs) {
+      if (j.status === "queued" && j.createdAt < cutoff) j.status = "failed";
+    }
+    return bag.printJobs.find((j) => j.printerId === printerId && j.status === "queued") ?? null;
+  },
+  async setPrintJobStatus(id, status) {
+    const j = memoryBag().printJobs.find((x) => x.id === id);
+    if (j) j.status = status;
+  },
+  async printerSeen(printerId) {
+    memoryBag().printersSeen[printerId] = Date.now();
+  },
+  async printerLastSeen() {
+    return { ...memoryBag().printersSeen };
+  },
 };
 
 /* ----------------------------- postgres ----------------------------- */
@@ -155,6 +206,18 @@ async function pgPool(): Promise<Pool> {
         CREATE TABLE IF NOT EXISTS ordering_state (
           id int PRIMARY KEY DEFAULT 1,
           data jsonb NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS ordering_print_jobs (
+          id text PRIMARY KEY,
+          printer_id text NOT NULL,
+          order_id text NOT NULL,
+          body text NOT NULL,
+          status text NOT NULL,
+          created_at bigint NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS ordering_printers (
+          id text PRIMARY KEY,
+          last_seen bigint NOT NULL
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
       `);
@@ -215,6 +278,57 @@ const postgresStore: OrderStore = {
        ON CONFLICT (id) DO UPDATE SET data = $1`,
       [JSON.stringify(state)]
     );
+  },
+  async enqueuePrintJob(job) {
+    const pool = await pgPool();
+    await pool.query(
+      `INSERT INTO ordering_print_jobs (id, printer_id, order_id, body, status, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [job.id, job.printerId, job.orderId, job.body, job.status, job.createdAt]
+    );
+  },
+  async nextPrintJob(printerId, notOlderThanMs) {
+    const pool = await pgPool();
+    const cutoff = Date.now() - notOlderThanMs;
+    await pool.query(
+      `UPDATE ordering_print_jobs SET status = 'failed'
+       WHERE status = 'queued' AND created_at < $1`,
+      [cutoff]
+    );
+    const r = await pool.query(
+      `SELECT id, printer_id, order_id, body, status, created_at
+       FROM ordering_print_jobs
+       WHERE printer_id = $1 AND status = 'queued'
+       ORDER BY created_at ASC LIMIT 1`,
+      [printerId]
+    );
+    if (!r.rows[0]) return null;
+    const row = r.rows[0];
+    return {
+      id: row.id,
+      printerId: row.printer_id,
+      orderId: row.order_id,
+      body: row.body,
+      status: row.status,
+      createdAt: Number(row.created_at),
+    };
+  },
+  async setPrintJobStatus(id, status) {
+    const pool = await pgPool();
+    await pool.query(`UPDATE ordering_print_jobs SET status = $2 WHERE id = $1`, [id, status]);
+  },
+  async printerSeen(printerId) {
+    const pool = await pgPool();
+    await pool.query(
+      `INSERT INTO ordering_printers (id, last_seen) VALUES ($1, $2)
+       ON CONFLICT (id) DO UPDATE SET last_seen = $2`,
+      [printerId, Date.now()]
+    );
+  },
+  async printerLastSeen() {
+    const pool = await pgPool();
+    const r = await pool.query(`SELECT id, last_seen FROM ordering_printers`);
+    return Object.fromEntries(r.rows.map((row) => [row.id, Number(row.last_seen)]));
   },
 };
 

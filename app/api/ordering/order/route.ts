@@ -139,13 +139,30 @@ export async function POST(req: NextRequest) {
     totalCents,
     quotedMinutes: ORDERING.basePickupMinutes + state.busyMinutes,
     hasAlcohol,
+    // PAYMENT SEAM: flips to true when Stripe confirms the charge. Until
+    // then the front-of-house slip prints DUE AT PICKUP with tip and
+    // signature lines.
+    paid: false,
     status: "new",
     createdAt: Date.now(),
     acceptedAt: null,
   };
 
-  // PAYMENT SEAM: demo mode records the order unpaid. See the header comment.
   await store.createOrder(order);
+
+  // Fan out one job per configured printer, each with its station's own
+  // template. No printers configured means no jobs: the chime path carries.
+  const { configuredPrinters, renderFor } = await import("@/lib/ordering/printing");
+  for (const printer of configuredPrinters()) {
+    await store.enqueuePrintJob({
+      id: crypto.randomUUID(),
+      printerId: printer.id,
+      orderId: order.id,
+      body: renderFor(printer.role, order),
+      status: "queued",
+      createdAt: Date.now(),
+    });
+  }
 
   return NextResponse.json({
     id: order.id,

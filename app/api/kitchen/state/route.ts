@@ -18,7 +18,18 @@ export async function GET() {
   }
   const store = getStore();
   const state = effectiveState(await store.getState());
-  return NextResponse.json({ state, backend: store.backend });
+  // Printer health rides along: a printer is online if it polled recently
+  // (polls run every few seconds; 60s of silence means unplugged, dead
+  // network, or powered off, and the board shows it red).
+  const { configuredPrinters } = await import("@/lib/ordering/printing");
+  const seen = await store.printerLastSeen();
+  const printers = configuredPrinters().map((p) => ({
+    id: p.id,
+    label: p.label,
+    role: p.role,
+    online: Date.now() - (seen[p.id] ?? 0) < 60_000,
+  }));
+  return NextResponse.json({ state, backend: store.backend, printers });
 }
 
 type Patch = {
