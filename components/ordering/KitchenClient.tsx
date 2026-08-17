@@ -39,6 +39,9 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // badge, so they do not need to be the front page.
   const [tab, setTab] = useState<"orders" | "menu">("menu");
   const [filter, setFilter] = useState("");
+  // Two-tap refund: first tap arms, second tap fires. Arming clears when the
+  // list refreshes so a stale armed button cannot refund the wrong ticket.
+  const [refundArm, setRefundArm] = useState<string | null>(null);
   const audioRef = useRef<AudioContext | null>(null);
   const knownRef = useRef<Set<string>>(new Set());
 
@@ -143,10 +146,13 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
     if (r.ok) setState((await r.json()).state);
   }
 
-  async function setOrderStatus(id: string, status: "accepted" | "done") {
+  async function setOrderStatus(id: string, status: "accepted" | "done" | "refunded") {
     // Optimistic: the tap has to feel instant behind a bar.
+    setRefundArm(null);
     setOrders((os) =>
-      status === "done" ? os.filter((o) => o.id !== id) : os.map((o) => (o.id === id ? { ...o, status } : o))
+      status === "done" || status === "refunded"
+        ? os.filter((o) => o.id !== id)
+        : os.map((o) => (o.id === id ? { ...o, status } : o))
     );
     await fetch("/api/kitchen/orders", {
       method: "PATCH",
@@ -295,6 +301,19 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                     >
                       Call
                     </a>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        refundArm === o.id ? setOrderStatus(o.id, "refunded") : setRefundArm(o.id)
+                      }
+                      className={`display rounded-sm border px-4 py-3.5 text-sm uppercase tracking-widest transition-colors ${
+                        refundArm === o.id
+                          ? "border-[#d9736b] bg-[#d9736b] text-ink"
+                          : "border-ink-line text-cream-dim/70 hover:border-[#d9736b] hover:text-[#d9736b]"
+                      }`}
+                    >
+                      {refundArm === o.id ? "Confirm refund" : "Refund"}
+                    </button>
                   </div>
                 </li>
               ))}

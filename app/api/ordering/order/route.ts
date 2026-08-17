@@ -32,6 +32,7 @@ type IncomingLine = { itemId: string; qty: number; options: string[] };
 type IncomingOrder = {
   guestName: string;
   guestPhone: string;
+  guestEmail?: string;
   note?: string;
   tipCents: number;
   lines: IncomingLine[];
@@ -53,6 +54,10 @@ export async function POST(req: NextRequest) {
   const guestName = String(body.guestName ?? "").trim().slice(0, 60);
   const guestPhone = String(body.guestPhone ?? "").trim().slice(0, 25);
   const note = String(body.note ?? "").trim().slice(0, 300);
+  const guestEmail = String(body.guestEmail ?? "").trim().slice(0, 120);
+  if (guestEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) {
+    return bad("That email does not look right. It is optional, so blank works too.");
+  }
   if (!guestName) return bad("A name for the order is required.");
   if (guestPhone.replace(/\D/g, "").length < 10) return bad("A phone number is required so the kitchen can reach you.");
   if (!Array.isArray(body.lines) || body.lines.length === 0) return bad("The cart is empty.");
@@ -130,6 +135,7 @@ export async function POST(req: NextRequest) {
     number: await store.nextTicketNumber(),
     guestName,
     guestPhone,
+    guestEmail,
     note,
     lines,
     subtotalCents,
@@ -163,6 +169,11 @@ export async function POST(req: NextRequest) {
       createdAt: Date.now(),
     });
   }
+
+  // Courtesy copy of what the confirmation screen shows. Best-effort by
+  // design: an email problem must never fail an order.
+  const { sendOrderConfirmation } = await import("@/lib/ordering/email");
+  sendOrderConfirmation(order).catch(() => {});
 
   return NextResponse.json({
     id: order.id,

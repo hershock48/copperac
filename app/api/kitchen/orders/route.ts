@@ -17,7 +17,7 @@ export async function GET() {
   return NextResponse.json({ orders, backend: store.backend });
 }
 
-const LEGAL: Record<string, OrderStatus> = { accepted: "accepted", done: "done" };
+const LEGAL: Record<string, OrderStatus> = { accepted: "accepted", done: "done", refunded: "refunded" };
 
 export async function PATCH(req: NextRequest) {
   if (!(await isKitchenAuthed())) {
@@ -33,6 +33,18 @@ export async function PATCH(req: NextRequest) {
   if (!body.id || !status) {
     return NextResponse.json({ error: "Malformed request." }, { status: 400 });
   }
-  await getStore().setOrderStatus(String(body.id), status);
+  const store = getStore();
+  await store.setOrderStatus(String(body.id), status);
+  if (status === "refunded") {
+    // PAYMENT SEAM: when Stripe is live this is where the actual refund is
+    // created on the bar's connected account (refund_application_fee: true --
+    // our 49 cents goes back too; keeping a fee on a refunded order is not
+    // who we are). Demo orders were never charged, so only the notice sends.
+    const order = await store.getOrder(String(body.id));
+    if (order) {
+      const { sendRefundNotice } = await import("@/lib/ordering/email");
+      sendRefundNotice(order).catch(() => {});
+    }
+  }
   return NextResponse.json({ ok: true });
 }

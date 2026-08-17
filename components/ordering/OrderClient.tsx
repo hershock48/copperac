@@ -43,7 +43,8 @@ type Confirmation = {
   number: number;
   quotedMinutes: number;
   totalCents: number;
-  status: "new" | "accepted" | "done";
+  emailedTo: string;
+  status: "new" | "accepted" | "done" | "refunded";
 };
 
 function money(cents: number): string {
@@ -77,7 +78,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   // Confirmation polling: the "Accepted" flip is the product moment, worth a
   // 5 second poll for the few minutes anyone watches this screen.
   useEffect(() => {
-    if (!confirmation || confirmation.status !== "new") return;
+    if (!confirmation || confirmation.status === "done" || confirmation.status === "refunded") return;
     const t = setInterval(async () => {
       try {
         const r = await fetch(`/api/ordering/order?id=${confirmation.id}`, { cache: "no-store" });
@@ -276,6 +277,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                 body: JSON.stringify({
                   guestName: form.name,
                   guestPhone: form.phone,
+                  guestEmail: form.email,
                   note: form.note,
                   tipCents: form.tipCents,
                   ageAcknowledged: form.ageAcknowledged,
@@ -292,6 +294,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                   number: data.number,
                   quotedMinutes: data.quotedMinutes,
                   totalCents: data.totals.totalCents,
+                  emailedTo: form.email,
                   status: "new",
                 });
                 setCart([]);
@@ -412,10 +415,11 @@ function Checkout({
   placing: boolean;
   error: string;
   onClose: () => void;
-  onPlace: (form: { name: string; phone: string; note: string; tipCents: number; ageAcknowledged: boolean }) => void;
+  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean }) => void;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [tipPct, setTipPct] = useState<number | null>(null);
   const [ageOk, setAgeOk] = useState(false);
@@ -552,6 +556,16 @@ function Checkout({
             />
           </label>
           <label className="block text-sm text-cream-dim">
+            Email for your confirmation <span className="text-cream-dim/60">(optional)</span>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              autoComplete="email"
+              className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
+            />
+          </label>
+          <label className="block text-sm text-cream-dim">
             Anything the kitchen should know <span className="text-cream-dim/60">(optional)</span>
             <input
               value={note}
@@ -584,7 +598,7 @@ function Checkout({
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, note, tipCents, ageAcknowledged: ageOk })}
+          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk })}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
         >
           {placing ? "Sending to the kitchen" : `Place order · ${money(total)}`}
@@ -600,6 +614,18 @@ function Checkout({
 /* -------------------------- confirmation -------------------------- */
 
 function Confirmed({ confirmation }: { confirmation: Confirmation }) {
+  if (confirmation.status === "refunded") {
+    return (
+      <div className="mx-auto max-w-lg py-10 text-center">
+        <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">Order #{confirmation.number}</p>
+        <p className="display mt-4 text-4xl uppercase text-cream">Refunded</p>
+        <p className="mt-6 text-base leading-relaxed text-cream-dim">
+          Your {money(confirmation.totalCents)} is on its way back. Card refunds usually show up in 5 to 10
+          business days, depending on your bank.{confirmation.emailedTo ? " A confirmation is in your email." : ""}
+        </p>
+      </div>
+    );
+  }
   const accepted = confirmation.status !== "new";
   return (
     <div className="mx-auto max-w-lg py-10 text-center">
@@ -610,6 +636,9 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
           ? `The kitchen has it. See you in about ${confirmation.quotedMinutes} minutes.`
           : `Sent to the kitchen. Ready in about ${confirmation.quotedMinutes} minutes.`}
       </p>
+      {confirmation.emailedTo && (
+        <p className="mt-2 text-sm text-cream-dim/70">Confirmation sent to {confirmation.emailedTo}.</p>
+      )}
       <div className="mx-auto mt-8 flex max-w-xs items-center justify-center gap-3 rounded-sm border border-ink-line bg-ink-soft px-4 py-3">
         <span
           className={`h-2.5 w-2.5 flex-none rounded-full ${accepted ? "bg-[#7dd18a]" : "bg-copper-light"}`}

@@ -22,7 +22,7 @@
 
 import type { Pool } from "pg";
 
-export type OrderStatus = "new" | "accepted" | "done";
+export type OrderStatus = "new" | "accepted" | "done" | "refunded";
 
 export type OrderLine = {
   itemId: string;
@@ -38,6 +38,9 @@ export type Order = {
   number: number; // short ticket number, resets daily in practice
   guestName: string;
   guestPhone: string;
+  // Optional; when present the guest gets a confirmation email and, if it
+  // comes to it, the refund notice with the 5-10 business day expectation.
+  guestEmail: string;
   note: string;
   lines: OrderLine[];
   subtotalCents: number;
@@ -134,7 +137,7 @@ const memoryStore: OrderStore = {
   },
   async listActiveOrders() {
     return [...memoryBag().orders.values()]
-      .filter((o) => o.status !== "done")
+      .filter((o) => o.status !== "done" && o.status !== "refunded")
       .sort((a, b) => a.createdAt - b.createdAt);
   },
   async setOrderStatus(id, status) {
@@ -244,7 +247,7 @@ const postgresStore: OrderStore = {
   async listActiveOrders() {
     const pool = await pgPool();
     const r = await pool.query(
-      `SELECT data FROM ordering_orders WHERE status != 'done' ORDER BY created_at ASC LIMIT 100`
+      `SELECT data FROM ordering_orders WHERE status NOT IN ('done', 'refunded') ORDER BY created_at ASC LIMIT 100`
     );
     return r.rows.map((row) => row.data as Order);
   },
