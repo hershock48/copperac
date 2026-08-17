@@ -281,14 +281,15 @@ footer .gmark{height:78px;width:auto}
   </table>
   <p>Both charge the same 15 cents a tap, so the whole difference is the rate:
   0.99 points lower means <strong>0.99 cents of every card dollar stays with
-  you</strong>, plus the $50 rent that ends. Put your monthly card sales on the
-  dial and that is the entire calculation, no other assumptions in it:</p>
+  you</strong>, plus the $50 rent that ends. Slide to your monthly card sales and
+  it shows what switching saves, nothing else in the math:</p>
 
   <div class="clock">
-    <div class="clockhead"><span class="k">What you keep</span><span class="ct" id="volN">$8,000 in card sales a month</span></div>
-    <div class="clockgrid">
-      <div class="cc"><div class="cl bad">Toast's cut, plus rent</div><div class="cb" id="toastMo">$345 a month</div><div class="cs">3.69% of the dial plus the $50 rental.</div></div>
-      <div class="cc"><div class="cl good">You keep the difference</div><div class="cb" id="keepMo">$129 a month</div><div class="cs" id="keepYr">About $1,550 a year, at your own rates.</div></div>
+    <div class="clockhead"><span class="k">What switching saves</span><span class="ct" id="volN">$8,000 in card sales a month</span></div>
+    <div class="cc">
+      <div class="cl good">Switching saves you</div>
+      <div class="cb" id="keepMo">$129 a month · about $1,550 a year</div>
+      <div class="cs">That is the 0.99% rate drop on your card sales, plus the $50 rent that ends. Nothing else in the number.</div>
     </div>
     <div class="cc" style="border-top:1px solid rgba(255,255,255,.1)">
       <div class="split"><span class="cl good" style="flex:0 0 auto">Slide your card sales</span>
@@ -392,9 +393,7 @@ function paint() {
   var v = parseInt(vol.value, 10);
   var mo = Math.round(v * 0.0099 + 50);
   document.getElementById("volN").textContent = "$" + v.toLocaleString() + " in card sales a month";
-  document.getElementById("toastMo").textContent = "$" + Math.round(v * 0.0369 + 50).toLocaleString() + " a month";
-  document.getElementById("keepMo").textContent = "$" + mo + " a month";
-  document.getElementById("keepYr").textContent = "About $" + (mo * 12).toLocaleString() + " a year, at your own rates.";
+  document.getElementById("keepMo").textContent = "$" + mo + " a month · about $" + (mo * 12).toLocaleString() + " a year";
 }
 vol.addEventListener("input", paint);
 paint();
