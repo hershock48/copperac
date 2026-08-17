@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glazed Web × Copper Athletic Club · Online Ordering Proposal</title>
+<meta name="description" content="Online ordering on the bar's own website: every Toast item, photo and modifier, at zero dollars a month, earning the bar fifty cents an order.">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Glazed Web">
+<meta property="og:title" content="Glazed Web × Copper Athletic Club · Online Ordering Proposal">
+<meta property="og:description" content="Ordering on the bar's own site, at zero dollars a month, earning the bar fifty cents an order.">
+<meta property="og:url" content="https://copperac.glazedweb.com/pitch/jelly">
+<meta property="og:image" content="https://copperac.glazedweb.com/og/menu.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Copper Athletic Club burgers, coneys and wings, ready for pickup.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://copperac.glazedweb.com/og/menu.jpg">
+<!--
+  Glazed Web ordering proposal for Copper Athletic Club. August 2026.
+
+  Separate from the website proposal at the pitch host root on purpose: that
+  one sells the rebuild, this one sells the ordering product. Stylesheet and
+  all three donut marks are lifted verbatim from pitch/copper-athletic-club.html
+  in this repo (which lifted them from griffin-claw), so the proposals cannot
+  drift apart.
+
+  PRODUCT NAME: "Jelly" is the working name (Kevin's direction: donut family,
+  "jelly filling or something"). If it changes, it appears in the title, the
+  hero, the money table, the footer, and this comment. Find and replace.
+
+  Every claim in "What we found" links to the page that proves it. The
+  register-vs-website numbers come from comparing copperac.com's menu against
+  the live Toast item pages on 2026-08-17; the full comparison lives in the
+  menu discrepancy report. Toast's own subscription pricing is quote-only and
+  is deliberately not stated as a number anywhere on this page.
+-->
+<style>
+:root{
+ --paper:#FDF6EC; --paper2:#FFF7EA; --card:#FFFDF8;
+ --ink:#2B1E16; --ink2:#201712; --body:#6B5747; --mute:#8A7663; --line:#E8DCC8;
+ --pink:#E84D8A; --pink-d:#CE3672; --pink-t:#FCE7F0;
+ --green:#BFE07A; --green-b:#A9D65C; --green-d:#55974A; --green-t:#F1F8DC;
+ --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--body);font-family:var(--sans);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+h1,h2,h3,h4,.k,.btn,nav,th,.num,.chip{font-family:var(--sans)}
+.k{font-size:12px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--green-d)}
+h2{font-size:clamp(30px,4.4vw,48px);font-weight:800;color:var(--ink);letter-spacing:-1.6px;line-height:1.08;margin:10px 0 14px}
+h3{font-size:19px;font-weight:800;color:var(--ink);margin:34px 0 10px;letter-spacing:-.4px}
+p{margin:0 0 14px}
+strong{color:var(--ink);font-weight:600}
+a{color:var(--pink-d)}
+.rule{height:3px;width:52px;background:var(--pink);border-radius:2px;margin:0 0 18px}
+section{padding:60px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+
+/* header */
+header{position:sticky;top:0;z-index:60;background:rgba(253,246,236,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand .gl{height:34px;width:auto;display:block}
+.brand .bw{font-family:var(--sans);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.6px;line-height:1.1}
+.brand .bw span{font-weight:350;color:var(--mute)}
+.brand span{font-size:.72rem;color:var(--mute);font-style:italic}
+nav{display:flex;gap:20px;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+nav a{color:var(--mute);text-decoration:none}
+nav a:hover{color:var(--pink-d)}
+@media(max-width:720px){nav{display:none}.brand span{display:none}}
+
+/* hero */
+.hero{padding:66px 0 54px;text-align:left}
+.hero .mark{height:92px;width:auto;margin-bottom:24px;display:block}
+.hero h1{font-family:var(--sans);font-size:clamp(38px,5.5vw,60px);font-weight:800;color:var(--ink);letter-spacing:-2px;line-height:1.04}
+.hero h1 em{font-style:normal;color:var(--pink)}
+.hero .sub{font-size:1.12rem;color:var(--body);margin-top:20px;max-width:31em}
+.forwho{margin-top:26px;font-family:var(--sans);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);line-height:1.9}
+.forwho b{color:var(--ink)}
+
+/* tldr */
+.tldr{background:var(--ink);color:#F6EFE4;border-radius:16px;padding:26px 26px 22px;margin-top:38px}
+.tldr .k{color:var(--green)}
+.demo .k{color:var(--green)}
+.tldr ul{list-style:none;margin:14px 0 0}
+.tldr li{display:flex;gap:12px;padding:9px 0;border-top:1px solid rgba(255,255,255,.1);font-size:.97rem;line-height:1.5}
+.tldr li:first-child{border-top:0}
+.tldr .n{font-family:var(--sans);font-weight:800;color:var(--green);flex:0 0 auto;font-size:.8rem;padding-top:3px}
+.tldr b{color:#fff}
+
+/* claim cards */
+.claim{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:12px 0;transition:border-color .16s,transform .16s}
+.claim:hover{border-color:var(--pink);transform:translateY(-1px)}
+.claim h4{font-family:var(--sans);font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:5px;letter-spacing:-.01em}
+.claim p{font-size:.95rem;margin:0}
+.claim .verify{display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-family:var(--sans);font-size:.71rem;font-weight:700;
+ letter-spacing:.1em;text-transform:uppercase;color:var(--pink-d);text-decoration:none;border:1.5px solid var(--pink);
+ padding:7px 13px;border-radius:999px;transition:all .16s}
+.claim .verify:hover{background:var(--pink);color:#fff}
+.claim .verify.plain{border-color:var(--line);color:var(--mute);cursor:default}
+.claim .verify.plain:hover{background:transparent;color:var(--mute)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:.83em;color:var(--mute)}
+
+/* compare table */
+.cmp{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93rem}
+.cmp th{font-family:var(--sans);text-align:left;font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+ padding:0 10px 9px 0;border-bottom:2px solid var(--ink);color:var(--ink);vertical-align:bottom}
+.cmp td{padding:12px 10px 12px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+.cmp td:first-child{font-weight:700;color:var(--ink);width:24%;font-family:var(--sans);font-size:.86rem}
+.cmp td:nth-child(2){width:36%;color:var(--mute)}
+.cmp td:nth-child(3){width:40%}
+.tick{color:var(--green-d);font-weight:800}
+
+/* demo cta */
+.demo{background:linear-gradient(135deg,#201712,#3A2416);color:#F6EFE4;border-radius:18px;padding:32px;margin:22px 0;text-align:center}
+.demo .k{color:var(--green)}
+.demo h3{color:#fff;margin:10px 0 8px;font-size:1.4rem}
+.demo p{color:#D8CBBA;font-size:.98rem;max-width:34em;margin:0 auto 20px}
+.demo a{display:inline-block;background:var(--pink);color:#fff;font-family:var(--sans);font-weight:700;font-size:.82rem;box-shadow:0 6px 16px -6px rgba(232,77,138,.55);
+ letter-spacing:.09em;text-transform:uppercase;padding:15px 30px;border-radius:999px;text-decoration:none;transition:all .18s}
+.demo a:hover{background:var(--green);color:var(--ink);transform:translateY(-2px)}
+
+/* steps */
+.step{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step .no{font-family:var(--sans);font-weight:800;font-size:.78rem;color:#fff;background:var(--pink);width:28px;height:28px;
+ border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.step h4{font-family:var(--sans);font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:4px}
+.step p{font-size:.95rem;margin:0}
+
+footer{background:var(--ink);color:#B9A894;padding:44px 0;font-size:.86rem;margin-top:20px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer .gl-foot{height:62px;width:auto;opacity:.95}
+footer b{color:#F6EFE4;display:block;font-family:var(--sans);font-size:.95rem;margin-bottom:4px}
+footer .bw{display:block;font-weight:800;color:#F6EFE4;letter-spacing:-.6px;margin-bottom:5px}
+footer .bw span{font-weight:350;color:#A6907F}
+footer a{color:var(--green)}
+.conf{font-size:.72rem;color:#7A6A58;margin-top:14px;letter-spacing:.04em}
+.note{font-size:.85rem;color:var(--mute);font-style:italic;line-height:1.5}
+
+/* --- the mark, and its drip, lifted from glazedweb.com --- */
+.gmark{display:block;overflow:visible}
+.gmark .goo{transform-box:fill-box;transform-origin:50% 0;animation:breathe 6s ease-in-out infinite}
+.gmark .wob1,.gmark .wob2,.gmark .wob3,.gmark .wobB{transform-box:fill-box;transform-origin:50% 0}
+.gmark .wob1{animation:sagg 3.8s ease-in-out -.6s infinite}
+.gmark .wob2{animation:sagg 4.9s ease-in-out -2.1s infinite}
+.gmark .wob3{animation:sagg 4.3s ease-in-out -1.3s infinite}
+.gmark .wobB{animation:sagg 5.6s ease-in-out -3s infinite}
+.gmark .string{transform-box:fill-box;transform-origin:50% 0;animation:stringy 3.4s cubic-bezier(.55,.1,.8,.5) infinite}
+.gmark .droplet{transform-box:fill-box;transform-origin:center;animation:fall 3.4s cubic-bezier(.5,.08,.85,.6) infinite}
+.gmark .droplet2{transform-box:fill-box;transform-origin:center;animation:fall2 5.1s cubic-bezier(.5,.08,.85,.6) -2.4s infinite}
+@keyframes breathe{0%,to{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+@keyframes sagg{0%,to{transform:scaleY(1) scaleX(1)}50%{transform:scaleY(1.07) scaleX(.98)}}
+@keyframes stringy{0%{transform:scaleY(.1);opacity:0}25%{transform:scaleY(.8);opacity:1}60%{transform:scaleY(1.7);opacity:.85}80%{transform:scaleY(2.4);opacity:0}to{transform:scaleY(.1);opacity:0}}
+@keyframes fall{0%{transform:translateY(-16px) scaleY(1.5) scaleX(.7);opacity:0}22%{transform:translateY(-8px) scaleY(1.2) scaleX(.85);opacity:1}60%{transform:translateY(10px) scale(1);opacity:1}to{transform:translateY(38px) scaleY(1.15) scaleX(.9);opacity:0}}
+@keyframes fall2{0%{transform:translateY(-10px) scaleY(1.4) scaleX(.75);opacity:0}25%{transform:translateY(-4px) scale(1);opacity:1}65%{transform:translateY(8px) scale(1);opacity:1}to{transform:translateY(26px) scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){
+ .gmark .goo,.gmark .wob1,.gmark .wob2,.gmark .wob3,.gmark .wobB,
+ .gmark .string,.gmark .droplet,.gmark .droplet2{animation:none}
+}
+.brand .gmark{height:38px;width:auto;margin-bottom:-6px}
+.hero .gmark{height:112px;width:auto;margin-bottom:26px}
+footer .gmark{height:78px;width:auto}
+
+/* live clock, in the same language as .tldr and .demo */
+.clock{background:var(--ink);color:#F6EFE4;border-radius:16px;overflow:hidden;margin:18px 0 6px}
+.clock .clockhead{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ flex-wrap:wrap;padding:15px 22px;border-bottom:1px solid rgba(255,255,255,.1)}
+.clock .clockhead .k{color:var(--green)}
+.clock .ct{font-family:ui-monospace,Menlo,monospace;font-size:.86rem;color:var(--green);font-weight:600}
+.clock .clockgrid{display:grid;grid-template-columns:1fr 1fr}
+.clock .cc{padding:20px 22px}
+.clock .cc+.cc{border-left:1px solid rgba(255,255,255,.1)}
+.clock .cl{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.clock .cl.bad{color:#E8869F}
+.clock .cl.good{color:var(--green)}
+.clock .cb{font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.15;margin-top:10px}
+.clock .cs{font-size:.88rem;color:#D8CBBA;margin-top:7px;line-height:1.5}
+@media(max-width:600px){.clock .clockgrid{grid-template-columns:1fr}
+ .clock .cc+.cc{border-left:0;border-top:1px solid rgba(255,255,255,.1)}}
+</style>
+<style>
+/* Jelly additions, in the same language as .clock */
+.split{display:flex;align-items:center;gap:14px;margin:6px 0 0;flex-wrap:wrap}
+.split input[type=range]{flex:1 1 220px;accent-color:#E84D8A;height:32px}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="brand" href="https://glazedweb.com">
+    <svg class="gmark gl" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+    <span class="bw">glazed<span>web</span></span>
+  </a>
+  <nav>
+    <a href="#changes">What changes</a>
+    <a href="#money">The money</a>
+    <a href="#found">What we found</a>
+    <a href="#next">Next</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <svg class="gmark mark" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+    <div class="k">Online ordering proposal · Copper Athletic Club</div>
+    <h1>Do you own your<br>online ordering<em>?</em></h1>
+    <p class="sub">Right now, tapping Order Online means leaving copperac.com for a
+    Toast page: their design, their fees, their copy of the customer list. We built
+    ordering into the bar's own site instead, matched item for item to what Toast
+    sells today, photos and all. It is live. And it pays the bar fifty cents an
+    order.</p>
+    <div class="forwho">
+      Prepared by <b>Glazed Web</b>, Marshall, Michigan<br>
+      August 2026 · Working name for the product: <b>Jelly</b>. The filling inside the website.
+    </div>
+
+    <div class="tldr">
+      <div class="k">The short version</div>
+      <ul>
+        <li><span class="n">01</span><div><b>Ordering moves onto copperac.com.</b> Every item, photo and modifier the Toast page has today, cocktails to go included. All 114 of them.</div></li>
+        <li><span class="n">02</span><div><b>Zero dollars a month to the bar.</b> Guests pay a 99 cent order fee, and half of it stays in the till.</div></li>
+        <li><span class="n">03</span><div>One kitchen screen behind the bar: orders <b>ring until accepted</b>, an 86 board, a busy dial, a pause button.</div></li>
+        <li><span class="n">04</span><div>Toast keeps the dine-in register. This replaces the <b>online channel only</b>.</div></li>
+        <li><span class="n">05</span><div>It is <b>already built and running</b>. You can order something before the end of this page.</div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section id="changes"><div class="wrap">
+  <div class="k">Part one</div>
+  <div class="rule"></div>
+  <h2>What changes.</h2>
+  <p>Nothing about the food, the register, or the dine-in flow. One thing changes:
+  where an online order happens and whose page it happens on.</p>
+  <div class="claim">
+    <h4>The order page, on the bar's own site</h4>
+    <p>The full menu as Toast sells it today: the burgers with their side choice and
+    egg styles, the wings with all seven sauces and the naked options, the taco
+    proteins including barbacoa, the thirty-line topping lists, the dessert, the
+    cocktails to go and the Faygo. Same prices, same photos, the bar's own brand
+    around all of it. Sold out tonight shows within seconds of the kitchen saying so.</p>
+  </div>
+  <div class="claim">
+    <h4>The kitchen board</h4>
+    <p>One PIN screen on any phone or tablet behind the bar. New orders land with a
+    chime that repeats until somebody taps Accept, and that tap tells the guest
+    their food is on. The 86 board takes a dish off the order page in one tap and
+    brings it back in one tap. A busy dial adds fifteen or thirty minutes to the
+    quoted time on a slammed night, and Pause stops ordering entirely, with a timer
+    so it can never be left off overnight by accident. Every tap saves itself.</p>
+  </div>
+  <div class="claim">
+    <h4>Cocktails to go, done properly</h4>
+    <p>Michigan made cocktails to go permanent, and the Toast page already sells
+    them. Ours does too, with a guardrail the Toast page does not show: an order
+    with drinks requires the guest to confirm 21 and over at checkout, and the
+    kitchen ticket carries an ID CHECK flag. The carding still happens at the
+    counter, where it always has.</p>
+  </div>
+  <div class="demo">
+    <div class="k">It is not a mockup</div>
+    <h3>Order something right now</h3>
+    <p>The whole menu, on a phone, with the fee shown before checkout. The demo
+    takes no payment and says so on the button.</p>
+    <a href="/order">Open the order page &#8599;</a>
+  </div>
+</div></section>
+
+<section id="money"><div class="wrap">
+  <div class="k">Part two</div>
+  <div class="rule"></div>
+  <h2>The money.</h2>
+  <p>This is the part that makes the page worth reading. Every online ordering
+  product charges the restaurant something: a subscription, a cut, or both. This
+  one charges the bar nothing and pays it instead.</p>
+  <table class="cmp">
+    <thead><tr><th></th><th>Toast online ordering</th><th>Jelly</th></tr></thead>
+    <tbody>
+    <tr><td>Where guests order</td><td>order.toasttab.com, Toast's page in Toast's design</td><td><span class="tick">✓</span> copperac.com, the bar's own site</td></tr>
+    <tr><td>Monthly cost</td><td>A software subscription, priced by quote</td><td><span class="tick">✓</span> <b>$0</b></td></tr>
+    <tr><td>Per order, the bar earns</td><td>Nothing</td><td><span class="tick">✓</span> <b>50 cents</b>, half of every 99 cent order fee</td></tr>
+    <tr><td>Card processing</td><td>Toast's online rate, priced by quote</td><td><span class="tick">✓</span> The standard published rate, 2.9% + 30&cent;</td></tr>
+    <tr><td>The customer list</td><td>Lives in Toast's system</td><td><span class="tick">✓</span> The bar's, and stays that way</td></tr>
+    <tr><td>The kitchen's side</td><td>Toast's tablet flow</td><td><span class="tick">✓</span> One PIN screen: ring till accepted, 86 board, busy dial, pause</td></tr>
+    </tbody>
+  </table>
+
+  <div class="clock">
+    <div class="clockhead"><span class="k">What the split is worth</span><span class="ct" id="ordN">300 orders a month</span></div>
+    <div class="clockgrid">
+      <div class="cc"><div class="cl bad">On Toast's channel, the bar earns</div><div class="cb">$0</div><div class="cs">Whatever the subscription and the rates cost, none of an order comes back.</div></div>
+      <div class="cc"><div class="cl good">On Jelly, the bar earns</div><div class="cb" id="jellyEarn">$150 a month</div><div class="cs">Half of every order fee, settling into the bar's own account with the food money. No check, nothing to reconcile.</div></div>
+    </div>
+    <div class="cc" style="border-top:1px solid rgba(255,255,255,.1)">
+      <div class="split"><span class="cl good" style="flex:0 0 auto">Slide it</span>
+      <input type="range" id="ordSlider" min="50" max="600" step="25" value="300" aria-label="Online orders per month">
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:18px">The part to say straight, because it is the honest
+  trade: guests pay a 99 cent fee on this page that Toast's page does not charge
+  them today. It is shown on the menu before checkout, never sprung at payment,
+  and it is the smallest fee in this industry. Menufy charges guests $1.75 an
+  order. Owner.com charges 5 percent, which is $1.75 on a $35 ticket. Toast
+  itself tried 99 cents in 2023 and kept every penny of it. Here, half stays at
+  the bar, and the bar chose it.</p>
+</div></section>
+
+<section id="found"><div class="wrap">
+  <div class="k">Part three</div>
+  <div class="rule"></div>
+  <h2>What we found.</h2>
+  <p>Found while building the parity menu, checked against the live pages, each
+  one linked so none of it has to be taken on trust.</p>
+  <div class="claim">
+    <h4>Ordering means leaving the website</h4>
+    <p>The Order Online button hands guests to <span class="mono">order.toasttab.com</span>.
+    Different fonts, different layout, no Copper in the address bar. The most
+    valuable click on the site is the one that exits it.</p>
+    <a class="verify" href="https://order.toasttab.com/online/copper-pub" target="_blank" rel="noopener">Where the button goes &#8599;</a>
+  </div>
+  <div class="claim">
+    <h4>The register and the website disagree on prices</h4>
+    <p>Nachos are <b>$16 on the website and $12 on Toast</b>. The Greek Salad is $11
+    against $12. The Curse of Bobby Layne is $7 against $5. Whichever number is
+    right, a guest has seen the wrong one.</p>
+    <a class="verify" href="https://copperac.com/menus/" target="_blank" rel="noopener">The website menu &#8599;</a>
+    <a class="verify" href="https://order.toasttab.com/online/copper-pub/item-nachos_0a5f063e-f4c9-40b8-9148-b2a23608dd40" target="_blank" rel="noopener">Nachos on Toast &#8599;</a>
+  </div>
+  <div class="claim">
+    <h4>Eighteen dishes sell online that the website never mentions</h4>
+    <p>The Quesadilla, the Double Smash Burger, the Spicy Peach Wings, the Caramel
+    Peach Crumble Pie, the singles menu, the $2.50 taco special. The website has no
+    dessert section at all. Guests reading copperac.com see a shorter menu than the
+    kitchen sells.</p>
+    <a class="verify" href="https://order.toasttab.com/online/copper-pub" target="_blank" rel="noopener">The Toast menu &#8599;</a>
+  </div>
+  <div class="claim">
+    <h4>The order button pays for a detour</h4>
+    <p>The website's ordering link still points at a retired Toast address, so every
+    click takes a redirect hop before the menu appears. Small, but it is the first
+    thing a hungry guest waits on.</p>
+    <a class="verify" href="https://order.toasttab.com/online/copper-pub/v3" target="_blank" rel="noopener">The old link, redirecting &#8599;</a>
+  </div>
+  <p class="note">The full register-versus-website comparison, all 114 items, is a
+  separate page of its own. Ask and it is yours.</p>
+</div></section>
+
+<section id="cost"><div class="wrap">
+  <div class="k">Part four</div>
+  <div class="rule"></div>
+  <h2>What it costs.</h2>
+  <p><strong>Zero dollars a month.</strong> Guests pay the 99 cent order fee. Fifty
+  cents of it stays with the bar, 49 goes to Glazed Web, and that split is locked
+  for Copper permanently as the founding house. Setup is on the house for the same
+  reason.</p>
+  <p>Card processing runs at the standard published rate, 2.9% + 30 cents, on the
+  bar's own account with next-day settlement. If order volume ever earns it, a
+  kitchen printer is about $310, once, at cost: orders print like a call-in ticket
+  with no screen to watch. Until then a tablet behind the bar is plenty.</p>
+  <p class="note">The demo takes no payment today. Turning real payments on is a
+  fifteen minute signup with the bar's bank details, and it is the one thing on
+  this page we cannot do without you.</p>
+</div></section>
+
+<section id="next"><div class="wrap">
+  <div class="k">Part five</div>
+  <div class="rule"></div>
+  <h2>What happens next.</h2>
+  <div class="step">
+    <div class="no">1</div>
+    <div><h4>Order something</h4><p>On a phone, at the bar: <a href="/order">the order page</a>. Build a burger with the side choice and the egg. Check the prices against the register.</p></div>
+  </div>
+  <div class="step">
+    <div class="no">2</div>
+    <div><h4>Watch the kitchen side ring</h4><p>Open <a href="/kitchen">the kitchen board</a> on a second screen, PIN <span class="mono">0133</span>. The order lands with a chime, Accept flips the guest's screen, and the 86 board takes the wings off the menu in one tap.</p></div>
+  </div>
+  <div class="step">
+    <div class="no">3</div>
+    <div><h4>Say go</h4><p>Fifteen minutes for the payment signup, the Order Online button points home, and the next online order is the first one that pays the bar.</p></div>
+  </div>
+  <p class="note" style="margin-top:22px">No deadline and nothing to sign today.
+  Toast keeps the dine-in register either way. Copper Athletic Club's menu, logo
+  and photographs belong to them and are used here with permission, to show them
+  their own food.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <div>
+    <span class="bw" style="font-size:21px">glazed<span>web</span></span>
+    Kevin Hershock · Marshall, Michigan<br>
+    <a href="https://glazedweb.com" target="_blank" rel="noopener">glazedweb.com</a>
+    <div class="conf">Prepared for Copper Athletic Club · August 2026 · Jelly is a Glazed Web product</div>
+  </div>
+  <svg class="gmark gl-foot" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#201712"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+</div></footer>
+
+<script>
+/* The split, live. Fifty cents of every order fee stays with the bar; the
+   slider is the only input and the arithmetic is the whole point. */
+var slider = document.getElementById("ordSlider");
+function paint() {
+  var n = parseInt(slider.value, 10);
+  document.getElementById("ordN").textContent = n + " orders a month";
+  document.getElementById("jellyEarn").textContent = "$" + Math.round(n * 0.5) + " a month";
+}
+slider.addEventListener("input", paint);
+paint();
+</script>
+</body>
+</html>

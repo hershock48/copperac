@@ -56,6 +56,9 @@ const nextConfig: NextConfig = {
           source: "/pitch/copper-athletic-club",
           destination: "/pitch/copper-athletic-club.html",
         },
+        // The ordering proposal (working product name: Jelly). Separate page
+        // from the website pitch on purpose: different ask, different meeting.
+        { source: "/pitch/jelly", destination: "/pitch/jelly.html" },
       ],
       fallback: [],
     };
