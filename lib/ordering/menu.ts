@@ -16,6 +16,13 @@ import { FOOD_MENU } from "@/lib/menu";
 export type OrderOption = {
   name: string; // e.g. "Sauce"
   required: boolean;
+  // Toast-style modifier groups come in two shapes: pick exactly one (sauce,
+  // protein, side) and pick any number (toppings, add-ons). multi covers the
+  // second. Their Toast page has real modifier groups loaded per item (Kevin,
+  // Aug 2026); this overlay currently carries only what the printed menu
+  // states, and grows to match Toast item by item as the bar's real modifier
+  // lists come over from the back office.
+  multi?: boolean;
   choices: { name: string; priceCents: number }[];
 };
 
@@ -27,6 +34,9 @@ export type OrderableItem = {
   priceCents: number;
   options: OrderOption[];
   ageRestricted: boolean;
+  // Path under /public, e.g. "/img/menu/copper-burger.webp". Absent means the
+  // card renders text-only, which is deliberate: no gray placeholder boxes.
+  image?: string;
 };
 
 export type OrderableSection = { name: string; items: OrderableItem[]; ageRestricted: boolean };
@@ -80,6 +90,19 @@ const OPTIONS: Record<string, OrderOption[]> = {
   ],
 };
 
+// Item photos, keyed by exact FOOD_MENU item name. Their Toast page has a
+// photo on every item (Kevin, standing in front of it, Aug 2026 — an earlier
+// markup-only fetch of that page missed them because Toast renders the menu
+// client side). Parity means every entry here eventually gets a real photo of
+// the real dish: the bar's own uploads from the Toast back office, or fresh
+// shots. NO stock photos, ever — the wings in the picture must be the wings
+// in the bag. Files go in public/img/menu/, webp, roughly square.
+const PHOTOS: Record<string, string> = {
+  // PLACEHOLDER: empty until the bar's item photos come over from Toast.
+  // The one burger shot in /img is the page hero, not verifiably the Copper
+  // Burger as plated, so it does not get promoted to an item card.
+};
+
 function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
@@ -106,6 +129,7 @@ export const ORDERABLE_MENU: OrderableSection[] = FOOD_MENU.filter(
     options:
       s.name === "Sides" ? [] : (OPTIONS[i.name] ?? []),
     ageRestricted: AGE_RESTRICTED_SECTIONS.has(s.name),
+    image: PHOTOS[i.name],
   })),
 }));
 

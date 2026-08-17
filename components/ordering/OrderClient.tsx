@@ -12,6 +12,7 @@
 // whole compliance posture (surprise fees are the sin, small fees are not),
 // and it is also the pitch, so it is written in the bar's voice, not buried.
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrderableSection } from "@/lib/ordering/menu";
 
@@ -166,8 +167,20 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
               const isOpen = openItem === item.id;
               return (
                 <li key={item.id} className="py-4">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <div className={soldOut ? "opacity-45" : ""}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className={`flex min-w-0 gap-4 ${soldOut ? "opacity-45" : ""}`}>
+                      {/* Photo only when a real one exists; no placeholder
+                          boxes. Coverage grows via PHOTOS in lib/ordering/menu.ts. */}
+                      {item.image && (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={72}
+                          height={72}
+                          className="mt-1 h-18 w-18 flex-none rounded-sm object-cover"
+                        />
+                      )}
+                      <div>
                       <p className="text-base text-cream">
                         {item.name}
                         {soldOut && (
@@ -179,6 +192,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                       {item.desc && (
                         <p className="mt-1 max-w-xl text-sm leading-relaxed text-cream-dim/80">{item.desc}</p>
                       )}
+                      </div>
                     </div>
                     <div className="flex flex-none items-center gap-4">
                       <span className="text-sm text-cream-dim tabular-nums">{money(item.priceCents)}</span>
@@ -311,7 +325,9 @@ function OptionPicker({
     .flatMap((g) => g.choices)
     .filter((c) => chosen.includes(c.name))
     .reduce((s, c) => s + c.priceCents, 0);
-  const ready = item.options.every((g) => !g.required || (picked[g.name]?.length ?? 0) === 1);
+  const ready = item.options.every(
+    (g) => !g.required || (picked[g.name]?.length ?? 0) >= 1
+  );
 
   return (
     <div className="mt-4 rounded-sm border border-ink-line bg-ink-soft p-4">
@@ -334,14 +350,24 @@ function OptionPicker({
                   }`}
                 >
                   <input
-                    type={group.required ? "radio" : "checkbox"}
+                    type={group.required && !group.multi ? "radio" : "checkbox"}
                     name={`${item.id}-${group.name}`}
                     checked={on}
                     onChange={() =>
-                      setPicked((p) => ({
-                        ...p,
-                        [group.name]: group.required ? [choice.name] : on ? [] : [choice.name],
-                      }))
+                      setPicked((p) => {
+                        const current = p[group.name] ?? [];
+                        if (group.multi) {
+                          // Toppings-style: toggle in and out of the set.
+                          return {
+                            ...p,
+                            [group.name]: on ? current.filter((n) => n !== choice.name) : [...current, choice.name],
+                          };
+                        }
+                        return {
+                          ...p,
+                          [group.name]: group.required ? [choice.name] : on ? [] : [choice.name],
+                        };
+                      })
                     }
                     className="sr-only"
                   />

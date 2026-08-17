@@ -81,10 +81,17 @@ export async function POST(req: NextRequest) {
     let optionCents = 0;
     for (const group of item.options) {
       const inGroup = group.choices.filter((c) => chosen.includes(c.name));
-      if (group.required && inGroup.length !== 1) {
-        return bad(`${item.name} needs a ${group.name.toLowerCase()} picked.`);
+      if (group.multi) {
+        // Any number; required multi means at least one.
+        if (group.required && inGroup.length === 0) {
+          return bad(`${item.name} needs at least one ${group.name.toLowerCase()}.`);
+        }
+      } else {
+        if (group.required && inGroup.length !== 1) {
+          return bad(`${item.name} needs a ${group.name.toLowerCase()} picked.`);
+        }
+        if (!group.required && inGroup.length > 1) return bad("Malformed options.");
       }
-      if (!group.required && inGroup.length > 1) return bad("Malformed options.");
       optionCents += inGroup.reduce((sum, c) => sum + c.priceCents, 0);
     }
     // Reject names that match no group: silence here would misprice quietly.
