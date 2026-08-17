@@ -72,7 +72,7 @@
         "priceCents": 0
        },
        {
-        "name": "Hoisen On Side",
+        "name": "Hoisin On Side",
         "priceCents": 0
        },
        {
@@ -96,7 +96,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 100
        },
        {
@@ -104,15 +104,15 @@
         "priceCents": 0
        },
        {
-        "name": "Add 2 Oz. Chopped Bacon",
+        "name": "Add 2 oz. Chopped Bacon",
         "priceCents": 200
        },
        {
-        "name": "Add 5 Oz. Pulled Pork",
+        "name": "Add 5 oz. Pulled Pork",
         "priceCents": 500
        },
        {
-        "name": "Add 5oz. Shredded Chix",
+        "name": "Add 5 oz. Shredded Chix",
         "priceCents": 500
        },
        {
@@ -208,19 +208,19 @@
         "priceCents": 0
        },
        {
-        "name": "Naked w/ 2 Oz. Maple Chili",
+        "name": "Naked w/ 2 oz. Maple Chili",
         "priceCents": 0
        },
        {
-        "name": "Naked w/2 Oz. Mango Habanero",
+        "name": "Naked w/2 oz. Mango Habanero",
         "priceCents": 0
        },
        {
-        "name": "Naked w/ 2 oz. Honey Siracha",
+        "name": "Naked w/ 2 oz. Honey Sriracha",
         "priceCents": 0
        },
        {
-        "name": "Naked w/2oz. Garlic Parm",
+        "name": "Naked w/2 oz. Garlic Parm",
         "priceCents": 0
        },
        {
@@ -228,7 +228,7 @@
         "priceCents": 0
        },
        {
-        "name": "Naked w/2oz. Sweet Baby Ray BBQ",
+        "name": "Naked w/2 oz. Sweet Baby Ray BBQ",
         "priceCents": 0
        }
       ]
@@ -348,15 +348,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -368,7 +368,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -384,11 +384,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -396,31 +396,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -484,15 +484,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -504,7 +504,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -520,11 +520,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -532,31 +532,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -588,15 +588,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -608,7 +608,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -624,11 +624,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -636,31 +636,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -729,15 +729,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -749,7 +749,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -765,11 +765,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -777,31 +777,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -976,7 +976,7 @@
         "priceCents": 400
        },
        {
-        "name": "5 Oz. Guac",
+        "name": "5 oz. Guac",
         "priceCents": 400
        },
        {
@@ -1030,15 +1030,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -1050,7 +1050,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -1066,11 +1066,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -1078,31 +1078,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -1264,15 +1264,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -1284,7 +1284,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -1300,11 +1300,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -1312,31 +1312,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -1399,15 +1399,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -1419,7 +1419,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -1435,11 +1435,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -1447,31 +1447,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -1534,7 +1534,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 75
        },
        {
@@ -1593,15 +1593,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -1613,7 +1613,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -1629,11 +1629,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -1641,19 +1641,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -1661,11 +1661,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -1728,7 +1728,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 75
        },
        {
@@ -1834,15 +1834,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -1854,7 +1854,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -1870,11 +1870,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -1882,31 +1882,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -1997,15 +1997,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2017,7 +2017,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2033,11 +2033,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2045,31 +2045,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -2101,15 +2101,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2121,7 +2121,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2137,11 +2137,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2149,31 +2149,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -2205,15 +2205,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2225,7 +2225,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2241,11 +2241,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2253,31 +2253,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -2335,7 +2335,7 @@
         "priceCents": 0
        },
        {
-        "name": "Add 2 Oz. Feta Cheese",
+        "name": "Add 2 oz. Feta Cheese",
         "priceCents": 150
        },
        {
@@ -2406,15 +2406,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2426,7 +2426,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2442,11 +2442,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2454,31 +2454,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -2590,7 +2590,7 @@
         "priceCents": 100
        },
        {
-        "name": "Add 2 Oz. Feta Cheese",
+        "name": "Add 2 oz. Feta Cheese",
         "priceCents": 150
        },
        {
@@ -2652,15 +2652,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2672,7 +2672,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2688,11 +2688,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2700,31 +2700,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -2878,15 +2878,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -2898,7 +2898,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -2914,11 +2914,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -2926,19 +2926,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -2946,11 +2946,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -3114,7 +3114,7 @@
         "priceCents": 0
        },
        {
-        "name": "ADD CARAMALIZED ONIONS",
+        "name": "ADD CARAMELIZED ONIONS",
         "priceCents": 100
        },
        {
@@ -3256,15 +3256,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -3276,7 +3276,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -3292,11 +3292,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -3304,31 +3304,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -3536,15 +3536,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -3556,7 +3556,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -3572,11 +3572,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -3584,19 +3584,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -3604,11 +3604,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -3789,15 +3789,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -3809,7 +3809,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -3825,11 +3825,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -3837,31 +3837,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -4022,15 +4022,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -4042,7 +4042,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -4058,11 +4058,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -4070,31 +4070,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -4196,15 +4196,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -4216,7 +4216,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -4232,11 +4232,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -4244,31 +4244,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -4424,15 +4424,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -4444,7 +4444,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -4460,11 +4460,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -4472,31 +4472,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -4614,15 +4614,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -4634,7 +4634,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -4650,11 +4650,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -4662,19 +4662,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -4682,11 +4682,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -4824,15 +4824,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -4844,7 +4844,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -4860,11 +4860,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -4872,31 +4872,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -5085,15 +5085,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -5105,7 +5105,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -5121,11 +5121,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -5133,31 +5133,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -5249,7 +5249,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 200
        },
        {
@@ -5343,15 +5343,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -5363,7 +5363,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -5379,11 +5379,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -5391,31 +5391,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -5588,15 +5588,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -5608,7 +5608,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -5624,11 +5624,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -5636,31 +5636,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -5755,7 +5755,7 @@
         "priceCents": 100
        },
        {
-        "name": "Add Diced Jalapanos",
+        "name": "Add Diced Jalapenos",
         "priceCents": 50
        },
        {
@@ -5861,15 +5861,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -5881,7 +5881,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -5897,11 +5897,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -5909,31 +5909,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -6029,7 +6029,7 @@
         "priceCents": 100
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 100
        },
        {
@@ -6107,15 +6107,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -6127,7 +6127,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -6143,11 +6143,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -6155,19 +6155,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -6175,11 +6175,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -6329,15 +6329,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -6349,7 +6349,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -6365,11 +6365,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -6377,31 +6377,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -6614,15 +6614,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -6634,7 +6634,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -6650,11 +6650,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -6662,31 +6662,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -6769,15 +6769,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -6789,7 +6789,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -6805,11 +6805,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -6817,31 +6817,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -7014,15 +7014,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -7034,7 +7034,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -7050,11 +7050,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -7062,31 +7062,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -7256,15 +7256,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -7276,7 +7276,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -7292,11 +7292,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -7304,31 +7304,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -7509,15 +7509,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -7529,7 +7529,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -7545,11 +7545,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -7557,31 +7557,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -7758,15 +7758,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -7778,7 +7778,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -7794,11 +7794,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -7806,31 +7806,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -7949,15 +7949,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -7969,7 +7969,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -7985,11 +7985,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -7997,31 +7997,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -8085,7 +8085,7 @@
         "priceCents": 100
        },
        {
-        "name": "Add Diced Jalapanos",
+        "name": "Add Diced Jalapenos",
         "priceCents": 50
        },
        {
@@ -8140,15 +8140,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -8160,7 +8160,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -8176,11 +8176,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -8188,31 +8188,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -8299,7 +8299,7 @@
         "priceCents": 200
        },
        {
-        "name": "Add Jalapanos",
+        "name": "Add Jalapenos",
         "priceCents": 50
        },
        {
@@ -8327,7 +8327,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add 1 Oz. Feta Cheese",
+        "name": "Add 1 oz. Feta Cheese",
         "priceCents": 75
        },
        {
@@ -8355,15 +8355,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -8375,7 +8375,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -8391,11 +8391,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -8403,31 +8403,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -8478,15 +8478,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -8498,7 +8498,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -8514,11 +8514,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -8526,31 +8526,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -8725,15 +8725,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -8745,7 +8745,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -8761,11 +8761,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -8773,31 +8773,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -8954,15 +8954,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -8974,7 +8974,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -8990,11 +8990,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9002,31 +9002,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -9183,15 +9183,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -9203,7 +9203,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -9219,11 +9219,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9231,31 +9231,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -9293,15 +9293,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -9313,7 +9313,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -9329,11 +9329,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9341,31 +9341,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -9437,15 +9437,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -9457,7 +9457,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -9473,11 +9473,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9485,31 +9485,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -9561,7 +9561,7 @@
         "priceCents": 0
        },
        {
-        "name": "Add 2 Oz. Feta Cheese",
+        "name": "Add 2 oz. Feta Cheese",
         "priceCents": 150
        },
        {
@@ -9632,15 +9632,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -9652,7 +9652,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -9668,11 +9668,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinaigrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9680,31 +9680,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -9858,15 +9858,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -9878,7 +9878,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -9894,11 +9894,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -9906,31 +9906,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -10005,15 +10005,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10025,7 +10025,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10041,11 +10041,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10053,19 +10053,19 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -10073,11 +10073,11 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -10156,11 +10156,11 @@
         "priceCents": 0
        },
        {
-        "name": "Add 2 Oz. Crumbled Bacon",
+        "name": "Add 2 oz. Crumbled Bacon",
         "priceCents": 100
        },
        {
-        "name": "Add 1 Oz. Feta Cheese",
+        "name": "Add 1 oz. Feta Cheese",
         "priceCents": 75
        },
        {
@@ -10184,15 +10184,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10204,7 +10204,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10220,11 +10220,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10232,31 +10232,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -10288,15 +10288,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10308,7 +10308,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10324,11 +10324,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10336,31 +10336,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -10407,15 +10407,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10427,7 +10427,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10443,11 +10443,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10455,31 +10455,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
@@ -10511,15 +10511,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10531,7 +10531,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10543,23 +10543,23 @@
         "priceCents": 200
        },
        {
-        "name": "5 Oz. Guac",
+        "name": "5 oz. Guac",
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Greek Dressing",
+        "name": "2 oz. Greek Dressing",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Italian Dressing",
+        "name": "2 oz. Italian Dressing",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10571,27 +10571,27 @@
         "priceCents": 300
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Crema",
+        "name": "2 oz. Crema",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
@@ -10599,59 +10599,59 @@
         "priceCents": 75
        },
        {
-        "name": "2 Oz. Caesar",
+        "name": "2 oz. Caesar",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. A1",
+        "name": "2 oz. A1",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Shredded Cheese",
+        "name": "2 oz. Shredded Cheese",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Mango Habanero",
+        "name": "2 oz. Mango Habanero",
         "priceCents": 100
        },
        {
-        "name": "2 Oz Honey Sriracha",
+        "name": "2 oz. Honey Sriracha",
         "priceCents": 100
        },
        {
-        "name": "2 Oz Maple Chili",
+        "name": "2 oz. Maple Chili",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Jalapanos",
+        "name": "2 oz. Jalapenos",
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Garlic Parm",
+        "name": "2 oz. Garlic Parm",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Hoisen",
+        "name": "2 oz. Hoisin",
         "priceCents": 50
        },
        {
-        "name": "2 Oz Hot Honey",
+        "name": "2 oz. Hot Honey",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Whiskey Glaze",
+        "name": "2 oz. Whiskey Glaze",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Cilantro",
+        "name": "2 oz. Cilantro",
         "priceCents": 75
        },
        {
-        "name": "2 Oz. Coney Sauce",
+        "name": "2 oz. Coney Sauce",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Diced Onion",
+        "name": "2 oz. Diced Onion",
         "priceCents": 50
        },
        {
@@ -10665,10 +10665,6 @@
        {
         "name": "2 oz. Sweet Baby Rays",
         "priceCents": 75
-       },
-       {
-        "name": "2 Oz. whiskey glaze",
-        "priceCents": 100
        },
        {
         "name": "2 oz. Peanut Butter",
@@ -10697,15 +10693,15 @@
       "multi": true,
       "choices": [
        {
-        "name": "2 Oz. Ranch",
+        "name": "2 oz. Ranch",
         "priceCents": 50
        },
        {
-        "name": "5 Oz. Ranch",
+        "name": "5 oz. Ranch",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Spicy Ranch",
+        "name": "2 oz. Spicy Ranch",
         "priceCents": 50
        },
        {
@@ -10717,7 +10713,7 @@
         "priceCents": 200
        },
        {
-        "name": "2 Oz. Queso",
+        "name": "2 oz. Queso",
         "priceCents": 200
        },
        {
@@ -10733,11 +10729,11 @@
         "priceCents": 400
        },
        {
-        "name": "2 Oz. Blue Cheese",
+        "name": "2 oz. Blue Cheese",
         "priceCents": 50
        },
        {
-        "name": "2 Oz. Lime Vinagrette",
+        "name": "2 oz. Lime Vinaigrette",
         "priceCents": 100
        },
        {
@@ -10745,31 +10741,31 @@
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Carolina BBQ",
+        "name": "2 oz. Carolina BBQ",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Ketchup",
+        "name": "2 oz. Ketchup",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mustard",
+        "name": "2 oz. Mustard",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Mayo",
+        "name": "2 oz. Mayo",
         "priceCents": 0
        },
        {
-        "name": "2 Oz. Garlic Mayo",
+        "name": "2 oz. Garlic Mayo",
         "priceCents": 100
        },
        {
-        "name": "2 Oz. Greek",
+        "name": "2 oz. Greek",
         "priceCents": 50
        },
        {
-        "name": "2oz Italian",
+        "name": "2 oz. Italian",
         "priceCents": 50
        },
        {
