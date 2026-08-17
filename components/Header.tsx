@@ -52,14 +52,15 @@ export default function Header() {
             <PhoneIcon />
             {SITE.phone}
           </a>
-          <a
-            href={SITE.orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* ordering branch: the button points at our own /order instead of
+              Toast's page. SITE.orderUrl still holds the Toast link; whether
+              production flips is the merge decision, not this branch's. */}
+          <Link
+            href="/order"
             className="display hidden rounded-sm bg-copper px-5 py-3 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light sm:inline-block"
           >
             Order Online
-          </a>
+          </Link>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -90,14 +91,12 @@ export default function Header() {
               </Link>
             ))}
             <div className="mt-5 grid gap-3">
-              <a
-                href={SITE.orderUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/order"
                 className="display rounded-sm bg-copper px-5 py-4 text-center text-sm uppercase tracking-widest text-ink"
               >
                 Order Online
-              </a>
+              </Link>
               <a
                 href={SITE.phoneHref}
                 className="display rounded-sm border border-copper px-5 py-4 text-center text-sm uppercase tracking-widest text-copper-light"

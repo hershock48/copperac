@@ -46,9 +46,8 @@ export default function MenuPage() {
 
       <Section>
         <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Button href={SITE.orderUrl} external>
-            Order Online
-          </Button>
+          {/* ordering branch: points at /order, not Toast. */}
+          <Button href="/order">Order Online</Button>
           <Button href="/brunch" variant="outline">
             Sunday Brunch Menu
           </Button>

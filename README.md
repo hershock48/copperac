@@ -202,6 +202,59 @@ order builder does.
 - [ ] Confirm the Toast plan includes Online Ordering Pro, then set up `order.copperac.com` and update `SITE.orderUrl`
 - [ ] Decide on Next 16: three high-severity advisories in `postcss` and `sharp` only clear with the major bump
 
+## The ordering demo (branch `ordering`)
+
+Glazed Web's online ordering, built into this site as a working demo. Guests
+order the full menu, cocktails to go included, at `/order` for pickup, with a
+99¢ order fee shown on the menu before checkout. Orders land on the staff
+board at `/kitchen`: accept tap, an 86 board that grays items out on the
+order page within seconds, and a busy dial that sets the quoted pickup time.
+This is the channel that replaces Toast online ordering; Toast the POS is
+untouched.
+
+**This branch is the demo and it is deliberately not public.** It deploys as
+a Vercel preview only, `main` and the live demo at copperac.glazedweb.com do
+not carry it, and both routes are `noindex`.
+
+### What the demo fakes, and what production adds
+
+- **State is one warm serverless instance's memory** (`app/api/ordering/route.ts`,
+  the comment at the top is the contract). Orders survive minutes of quiet,
+  not a redeploy or a cold start. Production: a real database, same actions,
+  same JSON.
+- **No payment.** Checkout stops before the card. Production: Stripe Checkout
+  on the restaurant's own Stripe account, the 49¢ platform fee riding as
+  `application_fee_amount`, tips passing through whole.
+- **No PIN on `/kitchen`.** Fine only while the demo is an unlinked preview.
+  Production: PIN gate before anything else.
+- **Prep time is a 20-minute demo default** (`BASE_PREP_MIN` in
+  `lib/ordering.ts`). Real per-item times come from the kitchen. Ask, do not
+  infer.
+- **Hours are not enforced.** The demo takes orders at 3 AM so it can be
+  looked at at 3 AM. Production: ordering closes ahead of the 10 PM kitchen
+  close, from the hours in `lib/site.ts`.
+- **Pause is a toggle.** Production pause carries a forced auto-resume timer
+  so a Friday-rush pause cannot silently kill Saturday.
+- **No SMS, no phone-call fallback, no printer.** Production stages those in
+  (tablet + alerts first, cloud printer at volume).
+
+### Before this ships for real
+
+- [ ] Michigan sales-tax consult (marketplace facilitator question, fee
+      taxability). The one true blocker, per the business plan.
+- [ ] Stripe Connect: restaurant onboarded on its own account, split verified
+      end to end in test mode.
+- [ ] Real prep times and the 86/busy workflow walked through with staff.
+- [ ] PIN on `/kitchen`, persistent store, hours enforcement, pause
+      auto-resume.
+- [ ] Decide the production entry points. On this branch the header, footer
+      and menu-page Order Online buttons point at `/order`; `SITE.orderUrl`
+      still holds the Toast link and `layout.tsx`'s `OrderAction` schema still
+      points at it, both on purpose, so merging is a decision and not an
+      accident.
+- [ ] Cocktails to go: confirm the carryout rules ("sealed, 21+, ID at
+      pickup" wording is on `/order`) match how the bar actually runs it.
+
 ## Structure
 
 ```

@@ -89,14 +89,10 @@ export default function Footer() {
                 </li>
               ))}
               <li>
-                <a
-                  href={SITE.orderUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-colors hover:text-copper-light"
-                >
+                {/* ordering branch: points at /order, not Toast. */}
+                <Link href="/order" className="transition-colors hover:text-copper-light">
                   Order Online
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
