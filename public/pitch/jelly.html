@@ -30,6 +30,13 @@
   "jelly filling or something"). If it changes, it appears in the title, the
   hero, the money table, the footer, and this comment. Find and replace.
 
+  REVISED after the Beans playbook (Aug 17, late session): the money section
+  now leads with Copper's own July (249 orders, $7,445.60, from the owner),
+  the dial is single-answer on the earn (assumption-free), savings are marked
+  as estimates until the Toast statement supplies the module line, the CNP
+  rate, and the renewal date. Printer parity claim added; founding terms in
+  the cost section.
+
   Every claim in "What we found" links to the page that proves it. The
   register-vs-website numbers come from comparing copperac.com's menu against
   the live Toast item pages on 2026-08-17; the full comparison lives in the
@@ -263,6 +270,15 @@ footer .gmark{height:78px;width:auto}
     kitchen ticket carries an ID CHECK flag. The carding still happens at the
     counter, where it always has.</p>
   </div>
+  <div class="claim">
+    <h4>Tickets print exactly where they print today</h4>
+    <p>Two printers, front of house and kitchen, and they are different documents,
+    matching how Toast prints for you now: the kitchen gets the pass ticket, big
+    type and no prices, and the front gets the handoff slip with totals and paid
+    status. A successful kitchen print marks the order accepted by itself, and if
+    a printer ever goes quiet, the system notices within a minute. Nobody watches
+    a tablet unless they want to.</p>
+  </div>
   <div class="demo">
     <div class="k">It is not a mockup</div>
     <h3>Order something right now</h3>
@@ -276,41 +292,47 @@ footer .gmark{height:78px;width:auto}
   <div class="k">Part two</div>
   <div class="rule"></div>
   <h2>The money.</h2>
-  <p>This is the part that makes the page worth reading. Every online ordering
-  product charges the restaurant something: a subscription, a cut, or both. This
-  one charges the bar nothing and pays it instead.</p>
+  <p>Your own July: <strong>249 online orders, $7,445.60</strong>. Here is what
+  changes about every one of them.</p>
   <table class="cmp">
     <thead><tr><th></th><th>Toast online ordering</th><th>Jelly</th></tr></thead>
     <tbody>
-    <tr><td>Where guests order</td><td>order.toasttab.com, Toast's page in Toast's design</td><td><span class="tick">✓</span> copperac.com, the bar's own site</td></tr>
-    <tr><td>Monthly cost</td><td>A software subscription, priced by quote</td><td><span class="tick">✓</span> <b>$0</b></td></tr>
-    <tr><td>Per order, the bar earns</td><td>Nothing</td><td><span class="tick">✓</span> <b>50 cents</b>, half of every 99 cent order fee</td></tr>
-    <tr><td>Card processing</td><td>Toast's online rate, priced by quote</td><td><span class="tick">✓</span> The standard published rate, 2.9% + 30&cent;</td></tr>
-    <tr><td>The customer list</td><td>Lives in Toast's system</td><td><span class="tick">✓</span> The bar's, and stays that way</td></tr>
-    <tr><td>The kitchen's side</td><td>Toast's tablet flow</td><td><span class="tick">✓</span> One PIN screen: ring till accepted, 86 board, busy dial, pause</td></tr>
+    <tr><td>Where guests order</td><td>order.toasttab.com</td><td><span class="tick">✓</span> copperac.com</td></tr>
+    <tr><td>Monthly software</td><td>The ordering module, priced by quote</td><td><span class="tick">✓</span> <b>$0</b></td></tr>
+    <tr><td>Per online order, the bar earns</td><td>Nothing</td><td><span class="tick">✓</span> <b>50 cents</b>, half of the 99 cent order fee guests pay</td></tr>
+    <tr><td>Card rate on online orders</td><td>Your statement's online rate</td><td><span class="tick">✓</span> The standard published rate, 2.9% + 30&cent;</td></tr>
+    <tr><td>The customer list</td><td>Toast's</td><td><span class="tick">✓</span> The bar's</td></tr>
     </tbody>
   </table>
 
   <div class="clock">
-    <div class="clockhead"><span class="k">What the split is worth</span><span class="ct" id="ordN">300 orders a month</span></div>
-    <div class="clockgrid">
-      <div class="cc"><div class="cl bad">On Toast's channel, the bar earns</div><div class="cb">$0</div><div class="cs">Whatever the subscription and the rates cost, none of an order comes back.</div></div>
-      <div class="cc"><div class="cl good">On Jelly, the bar earns</div><div class="cb" id="jellyEarn">$150 a month</div><div class="cs">Half of every order fee, settling into the bar's own account with the food money. No check, nothing to reconcile.</div></div>
+    <div class="clockhead"><span class="k">What the bar earns</span><span class="ct" id="ordN">249 orders a month · your July</span></div>
+    <div class="cc">
+      <div class="cl good">The bar earns</div>
+      <div class="cb" id="earnMo">$125 a month · about $1,494 a year</div>
+      <div class="cs">Half of every order fee, settling into the bar's own account with the food money. Slide to a football month and watch it climb. Nothing else in the number.</div>
     </div>
     <div class="cc" style="border-top:1px solid rgba(255,255,255,.1)">
-      <div class="split"><span class="cl good" style="flex:0 0 auto">Slide it</span>
-      <input type="range" id="ordSlider" min="50" max="600" step="25" value="300" aria-label="Online orders per month">
+      <div class="split"><span class="cl good" style="flex:0 0 auto">Slide your online orders</span>
+      <input type="range" id="ordSlider" min="100" max="600" step="25" value="249" aria-label="Online orders per month">
       </div>
     </div>
   </div>
 
-  <p style="margin-top:18px">The part to say straight, because it is the honest
-  trade: guests pay a 99 cent fee on this page that Toast's page does not charge
-  them today. It is shown on the menu before checkout, never sprung at payment,
-  and it is the smallest fee in this industry. Menufy charges guests $1.75 an
-  order. Owner.com charges 5 percent, which is $1.75 on a $35 ticket. Toast
-  itself tried 99 cents in 2023 and kept every penny of it. Here, half stays at
-  the bar, and the bar chose it.</p>
+  <p style="margin-top:18px"><strong>On top of the earn, the savings, marked
+  honestly as estimates until your statement makes them exact:</strong> Toast's
+  online ordering module typically runs about $75 a month when billed as an
+  add-on, and Toast's online card rate typically runs about half a point above
+  the standard rate, worth roughly $15 to $20 a month at July volume. Call the
+  savings <b>about $90 a month, $1,100 a year</b>, pencilled. Three lines from
+  the Toast statement replace every "about" on this page: the online ordering
+  module line, the card-not-present rate, and the contract renewal date.</p>
+  <p>The part to say straight, because it is the honest trade: guests pay a 99
+  cent fee on this page that Toast's page does not charge them today. It is shown
+  on the menu before checkout, never sprung at payment, and it is the smallest
+  fee in the industry. Menufy charges guests $1.75 an order. Owner.com charges 5
+  percent. Toast itself tried 99 cents in 2023 and kept every penny. Here, half
+  stays at the bar, and the bar chose it.</p>
 </div></section>
 
 <section id="found"><div class="wrap">
@@ -357,14 +379,15 @@ footer .gmark{height:78px;width:auto}
   <div class="k">Part four</div>
   <div class="rule"></div>
   <h2>What it costs.</h2>
-  <p><strong>Zero dollars a month.</strong> Guests pay the 99 cent order fee. Fifty
-  cents of it stays with the bar, 49 goes to Glazed Web, and that split is locked
-  for Copper permanently as the founding house. Setup is on the house for the same
-  reason.</p>
-  <p>Card processing runs at the standard published rate, 2.9% + 30 cents, on the
-  bar's own account with next-day settlement. If order volume ever earns it, a
-  kitchen printer is about $310, once, at cost: orders print like a call-in ticket
-  with no screen to watch. Until then a tablet behind the bar is plenty.</p>
+  <p><strong>Zero dollars a month, and setup is on the house.</strong> Copper is
+  the founding house, and the 50/50 split on the order fee is locked
+  permanently. Guests pay the 99 cents; half stays in the till; the other half
+  is what keeps this free.</p>
+  <p>Card processing runs at the standard published rate, 2.9% + 30 cents, on
+  the bar's own account with next-day settlement. The two printers, front and
+  kitchen to match how tickets print today, are about $310 each, once, at cost,
+  and they can pay themselves off out of the bar's half of the fee before a
+  dollar changes hands.</p>
   <p class="note">The demo takes no payment today. Turning real payments on is a
   fifteen minute signup with the bar's bank details, and it is the one thing on
   this page we cannot do without you.</p>
@@ -403,13 +426,15 @@ footer .gmark{height:78px;width:auto}
 </div></footer>
 
 <script>
-/* The split, live. Fifty cents of every order fee stays with the bar; the
-   slider is the only input and the arithmetic is the whole point. */
+/* The earn dial. Assumption-free: half of every 99 cent order fee stays with
+   the bar, so the number is exactly orders x 50 cents. Default is their own
+   July count. */
 var slider = document.getElementById("ordSlider");
 function paint() {
   var n = parseInt(slider.value, 10);
-  document.getElementById("ordN").textContent = n + " orders a month";
-  document.getElementById("jellyEarn").textContent = "$" + Math.round(n * 0.5) + " a month";
+  var mo = Math.round(n * 0.5);
+  document.getElementById("ordN").textContent = n + " orders a month" + (n === 249 ? " · your July" : "");
+  document.getElementById("earnMo").textContent = "$" + mo + " a month · about $" + (mo * 12).toLocaleString() + " a year";
 }
 slider.addEventListener("input", paint);
 paint();
