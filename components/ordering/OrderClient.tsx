@@ -448,10 +448,12 @@ function Checkout({
             <dt>Subtotal</dt>
             <dd className="tabular-nums">{money(subtotal)}</dd>
           </div>
+          {/* Just the fee, labeled and priced, like every checkout a guest has
+              ever seen. The where-it-goes story was here once and Kevin cut
+              it: "nobody gives a shit." He is right about guests. The split is
+              for owners, in the pitch. */}
           <div className="flex justify-between text-cream-dim">
-            <dt>
-              Order fee <span className="text-cream-dim/60">· {live.feeExplainer.toLowerCase().replace(/\.$/, "")}</span>
-            </dt>
+            <dt>Order fee</dt>
             <dd className="tabular-nums">{money(live.feeCents)}</dd>
           </div>
           <div className="flex justify-between text-cream-dim">
