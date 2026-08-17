@@ -33,7 +33,7 @@ export default function OrderPage() {
       <Section>
         <OrderClient sections={ORDERABLE_MENU} />
         <div className="mt-4 space-y-3 border-t border-ink-line pt-8 text-xs leading-relaxed text-cream-dim/60">
-          <p>{KITCHEN_NOTE} Cocktails to go leave sealed, per Michigan law, and the ID check happens at the counter.</p>
+          <p>A 99¢ order fee applies at checkout. {KITCHEN_NOTE} Cocktails to go leave sealed, per Michigan law, and the ID check happens at the counter.</p>
           <p>{CONSUMER_ADVISORY}</p>
         </div>
       </Section>

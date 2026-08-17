@@ -121,19 +121,18 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
 
   return (
     <div className="pb-28">
-      {/* The fee, said plainly before anything else. */}
+      {/* Functional status only. This banner briefly carried a paragraph about
+          the fee and the no-delivery-apps model, and Kevin killed it: "it reads
+          more client facing." Guests get what a Toast or Menufy page would give
+          them, a pickup time and nothing to read. The fee is disclosed the way
+          guests expect fees: a line of small print below the menu and a labeled
+          line in the cart, both before anything is placed. The story of where
+          the fee goes is for the owner pitch, not the menu. */}
       <div className="mb-10 rounded-sm border border-ink-line bg-ink-soft px-5 py-4 text-sm leading-relaxed text-cream-dim">
-        <p>
-          <span className="text-cream">Every order has a {live?.feeLabel ?? "99¢ order fee"}.</span>{" "}
-          {live?.feeExplainer ?? "Half of it stays right here at the bar."} Same prices as the menu.
-        </p>
-        {live && !live.open && (
-          <p className="mt-3 border-t border-ink-line pt-3 text-copper-light">{live.reason}</p>
-        )}
-        {live?.open && (
-          <p className="mt-2 text-cream-dim/70">
-            Ready in about {live.quoteMinutes} minutes tonight.
-          </p>
+        {live && !live.open ? (
+          <p className="text-copper-light">{live.reason}</p>
+        ) : (
+          <p>Ready for pickup in about {live?.quoteMinutes ?? 15} minutes.</p>
         )}
       </div>
 

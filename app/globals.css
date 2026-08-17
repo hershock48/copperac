@@ -60,6 +60,16 @@ h1, h2, h3, .display {
   outline-offset: 3px;
 }
 
+/* Tailwind 4's preflight leaves <button> on the default arrow cursor (a
+   deliberate upstream change to match native platform behavior). On a page
+   full of Add and Accept buttons that reads as "not clickable", and Kevin hit
+   it on the order page's ADD immediately. One rule here beats a cursor-pointer
+   utility on every button in the repo. Disabled buttons keep their own cursor:
+   the not-allowed styling on sold-out items is doing its job. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
