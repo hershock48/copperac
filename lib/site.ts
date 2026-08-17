@@ -16,18 +16,18 @@ export const SITE = {
   // the room and there is no source to re-check it against. If the bar
   // renovates, nothing will tell us these went stale.
   //
-  // tvCountMain feeds the homepage h1, in the largest type on the site. That is
-  // the main bar rather than the building on purpose: it is the room you walk
-  // into. tvCountTotal is here for whenever the bigger number is the better
-  // brag, which for a sports bar it arguably is.
+  // tvCountMain and tvCountTotal are gone. tvCountMain fed the homepage h1
+  // ("7 TVs. 0 treadmills.") and that line is retired at the owner's request;
+  // tvCountTotal never had a consumer. Both were counts nobody could re-check,
+  // so leaving them sitting here unused was an invitation to publish an
+  // unverified number somewhere new. tvCountReserve stays because four pages
+  // quote it and the private room is a countable, askable thing.
   // HOW THE SCREENS RUN, confirmed by Kevin 10 Aug 2026: both, depending on the night.
   // Several games up on an ordinary night and staff will put a customer's game on; when
   // Detroit has a marquee game it takes every screen. The hero deliberately says neither --
   // "every screen dedicated to sports" is Kevin's line and it is about sports rather than
   // not-sports, which is the claim that is true on every night of the year.
-  tvCountMain: 7,
   tvCountReserve: 4,
-  tvCountTotal: 11,
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",

@@ -28,18 +28,55 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/85 to-ink/55 lg:bg-gradient-to-r lg:via-ink/85 lg:to-ink/30" />
         <div className="relative mx-auto w-full max-w-7xl px-5 py-24 lg:px-8">
           <div className="max-w-2xl">
-            {/* "Sports bar" moves up into the eyebrow on purpose. The h1 below
-                is now a joke with no keywords in it, and this is a local
-                business whose entire search job is "sports bar marshall mi", so
-                those words have to survive near the top as real text. The page
-                title and meta description are still keyword-first. */}
-            <Eyebrow>Sports bar · Downtown Marshall, Michigan</Eyebrow>
-            <h1 className="mt-5 text-5xl uppercase leading-[0.95] text-cream sm:text-6xl lg:text-7xl">
-              {SITE.tvCountMain} TVs.
-              <br />
-              <span className="text-copper">0 treadmills.</span>
+            {/* THE QUOTE LEADS AND THE H1 SITS UNDER IT, which looks like a
+                demotion and is the opposite.
+
+                What was here was "7 TVs. 0 treadmills." as the h1, a joke with
+                no keywords in it, and an eyebrow reading "Sports bar · Downtown
+                Marshall, Michigan" that existed only to smuggle the search terms
+                back in above it. The owner does not like the treadmills line, so
+                the joke goes, and the workaround goes with it: the h1 can now
+                say what the business is, in the words somebody types into a
+                phone, which is what an h1 is for.
+
+                The quote is a blockquote in a figure, not a heading. It is
+                somebody else's sentence, so making it the page's h1 would tell
+                a screen reader and a search engine that a 1950s locker room
+                anecdote is what this page is about. Marked up properly it can
+                be the biggest thing on the screen and still not claim to be the
+                heading, which is exactly the arrangement we want.
+
+                SOURCED, not remembered. Yale Lary, Lions safety and Layne's
+                team-mate on the 1952, 1953 and 1957 championship sides. The
+                newspaper setting runs "When Bobby said, 'Block,' you blocked,"
+                Lary said. "And when Bobby said, 'Drink,' you drank." Only the
+                comma after "said" and the capitals on Block and Drink differ
+                here, which is compositor's punctuation from the sentence being
+                split around an attribution that we are not printing.
+
+                One thing NOT to add later: the Lindell A.C. line lower down is
+                about the room's inspiration and has nothing to do with Layne.
+                The bar took the "A.C." name in 1963, five years after Layne was
+                traded, and he is not among the regulars its histories name. The
+                quote earns its place as Detroit football, not as bar lore. */}
+            <figure className="max-w-2xl">
+              <blockquote className="display text-[1.75rem] leading-[1.15] text-cream sm:text-4xl lg:text-[2.6rem]">
+                <span className="text-copper">&ldquo;</span>When Bobby said{" "}
+                <span className="text-copper">&lsquo;block,&rsquo;</span> you blocked. And
+                when Bobby said <span className="text-copper">&lsquo;drink,&rsquo;</span>{" "}
+                you drank.<span className="text-copper">&rdquo;</span>
+              </blockquote>
+              <figcaption className="display mt-5 text-[11.5px] uppercase tracking-[0.22em] text-copper-light">
+                Yale Lary, on playing with Bobby Layne
+              </figcaption>
+            </figure>
+
+            {/* text-balance so the last word does not orphan. Without it desktop broke
+                as "...DOWNTOWN MARSHALL," / "MICHIGAN". */}
+            <h1 className="mt-9 max-w-xl text-balance text-2xl uppercase leading-[1.15] text-cream sm:text-3xl">
+              A Detroit sports bar in downtown Marshall, Michigan
             </h1>
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-cream-dim sm:text-lg">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-cream-dim sm:text-lg">
               Born from the spirit of Detroit sports and built on the bones of the beloved
               Copper Bar. Every wall is memorabilia and every screen dedicated to sports.
             </p>
@@ -51,15 +88,15 @@ export default function Home() {
                 See the Menu
               </Button>
             </div>
-            {/* Was "Est. 2013 · 14 screens · 0 treadmills". The joke moved up
-                to the h1, so this line would have repeated it, and both of its
-                numbers were unverified. "Est. 2013" is gone rather than
-                relocated: their own Facebook avatar reads "est. 2018", and
-                nothing on copperac.com states a founding year, so we were
-                probably publishing the wrong one. What replaces it is the one
-                part of their story they state themselves, in their own words on
-                their homepage: inspired by the Lindell A.C., built on the
-                foundation of the beloved Copper Bar. */}
+            {/* Was "Est. 2013 · 14 screens · 0 treadmills", and every part of
+                that came out for a different reason. The screen count and the
+                founding year were both unverified, and the year was probably
+                wrong: their own Facebook avatar reads "est. 2018" and nothing
+                on copperac.com states one. The treadmills line is retired at
+                the owner's request. What is left is the one part of their story
+                they tell themselves, in their own words on their homepage:
+                inspired by the Lindell A.C., built on the foundation of the
+                beloved Copper Bar. */}
             <p className="display mt-7 text-[11.5px] uppercase tracking-[0.22em] text-cream-dim/70">
               Inspired by the Lindell A.C. · Built on the Copper Bar
             </p>
