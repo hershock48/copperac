@@ -211,10 +211,14 @@ nothing is charged, and the pay button says so.
 
 Decisions worth knowing before touching it:
 
-- **The orderable menu is derived from `lib/menu.ts`**, never retyped. Options
-  (wing sauces, taco proteins, priced add-ons) live in an overlay in
-  `lib/ordering/menu.ts` keyed by item name; a rename in `lib/menu.ts` without
-  updating the overlay fails the build on purpose.
+- **The orderable menu is Copper's live Toast menu**, harvested item by item
+  from Toast's server-rendered share pages into `lib/ordering/toast-menu.json`
+  (114 items, real modifier groups, 50 item photos): see the header comment in
+  `lib/ordering/menu.ts` for the harvesting method and the re-harvest note.
+  Photos hot-link to Toast's public CDN (the bar's own uploads). **Mirror them
+  into `public/img/menu/` before the bar ever leaves Toast**, or they vanish.
+  The site's display menu (`lib/menu.ts`) disagrees with Toast on items and
+  some prices (Nachos $12 vs $16); reconciling the two is a client question.
 - **The server is the till.** Client prices are display only; the order API
   recomputes everything from the menu, revalidates 86s and hours, and rejects
   with a human sentence, not a code.

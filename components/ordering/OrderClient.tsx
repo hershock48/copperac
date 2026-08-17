@@ -170,7 +170,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                   <div className="flex items-start justify-between gap-4">
                     <div className={`flex min-w-0 gap-4 ${soldOut ? "opacity-45" : ""}`}>
                       {/* Photo only when a real one exists; no placeholder
-                          boxes. Coverage grows via PHOTOS in lib/ordering/menu.ts. */}
+                          boxes. Photos are the club's own Toast uploads via toast-menu.json. */}
                       {item.image && (
                         <Image
                           src={item.image}

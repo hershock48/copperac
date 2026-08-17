@@ -1,0 +1,5165 @@
+[
+{
+"slug": "item-mushroom-swiss-burger_337471eb-0b11-46ed-8aa9-774192dad199",
+"name": "Mushroom Swiss Burger",
+"priceCents": 1400,
+"desc": "1/3 lb. beef patty topped with Swiss cheese, caramelized mushrooms, onions, and mayonnaise on a brioche bun.",
+"image": "https://d1w7312wesee68.cloudfront.net/KWESAttRCjNHLf1CwkUy1qlRnYU2LrfPslNgVBzgq4Y/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/6/item-200000042777544366_1719336963.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Mushroom Swiss Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Add Crispy Bacon",
+"priceCents": 200
+},
+{
+"name": "no mayo",
+"priceCents": 0
+},
+{
+"name": "Sub Impossible Patty",
+"priceCents": 400
+},
+{
+"name": "Add Pepperjack Cheese",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-peanut-butter-burger_b113c090-8fb0-4228-badf-b2c099cf92c8",
+"name": "Peanut Butter Burger",
+"priceCents": 1400,
+"desc": "1/3 pound of beef, peanut butter, spicy jelly, jalapenos, bacon, and cheddar cheese on a brioche bun. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/xM3RW5ZgjaG-NC5s8-lgYhOqNn1JhJc_DMLu9l2-jW4/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/8/item-200000000666873188_1599232588.jpg",
+"groups": [
+{
+"name": "PBB Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Extra Beef Patty",
+"priceCents": 300
+},
+{
+"name": "Sub Impossible Patty",
+"priceCents": 400
+},
+{
+"name": "No Peanut Butter",
+"priceCents": 0
+},
+{
+"name": "No Spicy Jelly",
+"priceCents": 0
+},
+{
+"name": "No Bacon",
+"priceCents": 0
+},
+{
+"name": "No Jalapenos",
+"priceCents": 0
+},
+{
+"name": "No Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "Extra Peanut Butter",
+"priceCents": 50
+},
+{
+"name": "Extra Spicy Jelly",
+"priceCents": 50
+},
+{
+"name": "Extra Bacon",
+"priceCents": 200
+},
+{
+"name": "Extra Jalape\u00f1os",
+"priceCents": 100
+},
+{
+"name": "Extra Cheddar Cheese",
+"priceCents": 50
+},
+{
+"name": "Jalapeno On Side",
+"priceCents": 0
+},
+{
+"name": "Jelly On Side",
+"priceCents": 0
+},
+{
+"name": "PB On Side",
+"priceCents": 0
+},
+{
+"name": "Sub Gouda Cheese",
+"priceCents": 100
+},
+{
+"name": "Extra Spicy Jelly on Side",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz.Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-whiskey-burger_7c8341f2-9540-4b78-8d2b-040b5a741e50",
+"name": "Whiskey Burger",
+"priceCents": 1400,
+"desc": "1/3 pound of beef, caramelized onions, lettuce, bleu cheese crumbles, whiskey glaze, and smoked Gouda cheese on a brioche bun. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/pYqoVR-zlWlGTSYyjtnhWm37_oTaqRN0I2qw-KVwwCI/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/2/item-200000000666873192_1588953086.jpg",
+"groups": [
+{
+"name": "Whiskey Burger Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Extra Beef Patty",
+"priceCents": 400
+},
+{
+"name": "Sub Impossible Patty",
+"priceCents": 400
+},
+{
+"name": "No Blue Cheese",
+"priceCents": 0
+},
+{
+"name": "No Caramelized Onions",
+"priceCents": 0
+},
+{
+"name": "No Smoked Gouda",
+"priceCents": 0
+},
+{
+"name": "No Whiskey Glaze",
+"priceCents": 0
+},
+{
+"name": "No Lettuce",
+"priceCents": 0
+},
+{
+"name": "Extra Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "Extra Onions",
+"priceCents": 50
+},
+{
+"name": "Extra Gouda",
+"priceCents": 100
+},
+{
+"name": "Extra Whiskey On Side",
+"priceCents": 75
+},
+{
+"name": "Add Mayo",
+"priceCents": 25
+},
+{
+"name": "Add Bacon",
+"priceCents": 200
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Light Bleu Cheese",
+"priceCents": 0
+},
+{
+"name": "Glaze On Side",
+"priceCents": 0
+},
+{
+"name": "Bleu Cheese On Side",
+"priceCents": 0
+},
+{
+"name": "Add Jalapenos",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-impossible-burger_647fd293-bbc8-4332-aa9f-7fb667698788",
+"name": "Impossible Burger",
+"priceCents": 1500,
+"desc": "Vegan patty with lettuce, tomato, grilled onions, pickle, and garlic mayo on a brioche bun. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/ot02bAhkZvls382hbHoVWAtynffYNamuKy_CS3q9i0E/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/4/item-200000000666873194_1680631250.jpg",
+"groups": [
+{
+"name": "Impossible Burger Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Pickles",
+"priceCents": 0
+},
+{
+"name": "No Tomato",
+"priceCents": 0
+},
+{
+"name": "No Lettuce",
+"priceCents": 0
+},
+{
+"name": "No Grilled Onion",
+"priceCents": 0
+},
+{
+"name": "No Garlic Mayo",
+"priceCents": 0
+},
+{
+"name": "Extra Garlic Mayo",
+"priceCents": 0
+},
+{
+"name": "Extra Impossible Patty",
+"priceCents": 400
+},
+{
+"name": "Add Velveeta",
+"priceCents": 0
+},
+{
+"name": "Add Cheddar Cheese",
+"priceCents": 50
+},
+{
+"name": "Add White Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add Pepperjack Cheese",
+"priceCents": 75
+},
+{
+"name": "Add Gouda",
+"priceCents": 75
+},
+{
+"name": "Add American Cheese",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-double-smash-burger_7fec9260-a128-4736-bb1f-b513d1162fae",
+"name": "Double Smash Burger",
+"priceCents": 1300,
+"desc": "Double patty smash burger on a Brioche Bun. Topped with shredded lettuce, onion, tomato, cheddar cheese, and a smash burger sauce.",
+"image": "https://d1w7312wesee68.cloudfront.net/AJlh-UrD0EYNDpp065bOiyjbj6VmzriW39t6-DOMXF8/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/3/item-200000051650064283_1770577513.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Smash Burger Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Shredded Lettuce",
+"priceCents": 0
+},
+{
+"name": "No Tomato",
+"priceCents": 0
+},
+{
+"name": "No Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "No Smash Burger Sauce",
+"priceCents": 0
+},
+{
+"name": "Extra Smash Burger Sauce on the Side",
+"priceCents": 100
+},
+{
+"name": "Add Bacon",
+"priceCents": 200
+},
+{
+"name": "No Onions",
+"priceCents": 0
+},
+{
+"name": "Smash Burger Sauce on the Side",
+"priceCents": 0
+},
+{
+"name": "Sub Gouda Cheese",
+"priceCents": 200
+},
+{
+"name": "Sub White Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub American Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub Pepperjack Cheese",
+"priceCents": 200
+},
+{
+"name": "Add Pickle",
+"priceCents": 50
+},
+{
+"name": "Add Jalapano",
+"priceCents": 100
+},
+{
+"name": "Add Mustard",
+"priceCents": 0
+}
+]
+}
+]
+},
+{
+"slug": "item-meatball-sub_65107369-b24d-4d87-921c-a7db6ae8b4c1",
+"name": "Meatball Sub",
+"priceCents": 1500,
+"desc": "5 homemade Italian style meatballs topped with an in-house marinara sauce and mozzarella cheese. Toasted on a baguette. Served with Better Made Chips.",
+"image": "https://d1w7312wesee68.cloudfront.net/XR3cwk-r2yKDRA1wIybbEpl-otXd2N-f-P-waW1HoCo/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/1/item-200000039032866271_1709574108.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz.Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Meatball Sub Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Sub Pepperjack Cheese",
+"priceCents": 0
+},
+{
+"name": "Extra Mozz Cheese",
+"priceCents": 200
+},
+{
+"name": "Sub White Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub Gouda Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Lettuce",
+"priceCents": 100
+},
+{
+"name": "Add Black Olives",
+"priceCents": 50
+},
+{
+"name": "Add Yellow Peppers",
+"priceCents": 100
+},
+{
+"name": "Add Jalapeno",
+"priceCents": 100
+},
+{
+"name": "Add Onion",
+"priceCents": 50
+},
+{
+"name": "Light Sauce",
+"priceCents": 0
+},
+{
+"name": "Extra marinara on side",
+"priceCents": 200
+}
+]
+}
+]
+},
+{
+"slug": "item-chicago-dog_e84641e9-a9d9-42e7-8c11-ec6013e2f926",
+"name": "Chicago Dog",
+"priceCents": 1200,
+"desc": "One Dearborn brand natural casing hot dog in a poppy seed bun. Topped with yellow mustard, sweet relish, tomatoes, diced onion, pickle spear, and sport peppers.",
+"image": "https://d1w7312wesee68.cloudfront.net/SVxOCmMgVC26lsI2ClThnDeht4zYM3IagOzghXpPeUs/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/6/item-200000033705751716_1695136478.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Chicago Dog Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Add Second Chicago Dog",
+"priceCents": 600
+},
+{
+"name": "no poppyseed bun",
+"priceCents": 0
+},
+{
+"name": "no yellow mustard",
+"priceCents": 0
+},
+{
+"name": "no sweet relish",
+"priceCents": 0
+},
+{
+"name": "no diced white onion",
+"priceCents": 0
+},
+{
+"name": "no tomato",
+"priceCents": 0
+},
+{
+"name": "no pickle",
+"priceCents": 0
+},
+{
+"name": "No Celery Salt",
+"priceCents": 0
+}
+]
+}
+]
+},
+{
+"slug": "item-cuban_5815e670-a93f-4d32-99b8-51fafc884b13",
+"name": "Cuban",
+"priceCents": 1500,
+"desc": "Slow roasted pork, sliced ham, mozzarella cheese, pickles, and mustard on ciabatta bread. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/1l7LyK_KCk9kRu-PtmGws89W4DDZ8bvOWrVdbsCGwx0/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/3/item-200000000666869603_1586876922.jpg",
+"groups": [
+{
+"name": "Cuban Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Roasted Pork",
+"priceCents": 0
+},
+{
+"name": "No Sliced Ham",
+"priceCents": 0
+},
+{
+"name": "No Mozzarella Cheese",
+"priceCents": 0
+},
+{
+"name": "No Pickles",
+"priceCents": 0
+},
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Pork",
+"priceCents": 100
+},
+{
+"name": "Extra Ham",
+"priceCents": 100
+},
+{
+"name": "Extra Cheese",
+"priceCents": 100
+},
+{
+"name": "Extra Pickles",
+"priceCents": 25
+},
+{
+"name": "Extra Mustard",
+"priceCents": 0
+},
+{
+"name": "Mustard On Side",
+"priceCents": 0
+},
+{
+"name": "Pickles On Side",
+"priceCents": 0
+},
+{
+"name": "Add Mayo",
+"priceCents": 0
+},
+{
+"name": "Add Jalapenos",
+"priceCents": 100
+},
+{
+"name": "add onions",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-cheesesteak_0b6349f6-4d51-409f-b064-a91f7f416f08",
+"name": "Cheesesteak",
+"priceCents": 1500,
+"desc": "Shaved ribeye, onions, mild peppers, American cheese, A1 sauce, served on ciabatta bread. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/FaHG2tCJvrxnGIco511MzNSMUhdQQ-vZno7p8yPmyPE/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000000666868849_1588951136.jpg",
+"groups": [
+{
+"name": "Cheese Steak Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Steak",
+"priceCents": 0
+},
+{
+"name": "No Onions",
+"priceCents": 0
+},
+{
+"name": "No Mild Peppers",
+"priceCents": 0
+},
+{
+"name": "No American Cheese",
+"priceCents": 0
+},
+{
+"name": "No A1",
+"priceCents": 0
+},
+{
+"name": "No Bun",
+"priceCents": 0
+},
+{
+"name": "A1 On Side",
+"priceCents": 0
+},
+{
+"name": "Extra A1 On Side",
+"priceCents": 50
+},
+{
+"name": "Extra Cheese",
+"priceCents": 100
+},
+{
+"name": "Extra Steak",
+"priceCents": 400
+},
+{
+"name": "Extra A1",
+"priceCents": 50
+},
+{
+"name": "Extra Mild Peppers",
+"priceCents": 100
+},
+{
+"name": "Extra Onions",
+"priceCents": 50
+},
+{
+"name": "Add Mayo",
+"priceCents": 25
+},
+{
+"name": "Add Garlic Mayo",
+"priceCents": 50
+},
+{
+"name": "Add Jalapanos",
+"priceCents": 200
+},
+{
+"name": "Add Tomato",
+"priceCents": 25
+},
+{
+"name": "Add Lettuce",
+"priceCents": 25
+},
+{
+"name": "Sub Cheddar Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub Gouda",
+"priceCents": 100
+},
+{
+"name": "Sub White Cheddar",
+"priceCents": 0
+},
+{
+"name": "Sub Velveeta Cheese",
+"priceCents": 0
+},
+{
+"name": "Sub Pepperjack Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Diced Jalapenos",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Egg Over Easy",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Medium",
+"priceCents": 200
+},
+{
+"name": "Add Egg Over Hard",
+"priceCents": 200
+}
+]
+}
+]
+},
+{
+"slug": "item-gouda-blt_1fa642a4-059b-41fb-a12d-c578866ff5d5",
+"name": "Gouda BLT",
+"priceCents": 1200,
+"desc": "Gouda cheese, garlic mayo, bacon, lettuce, tomato, on toasted sourdough bread. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/oD3H0xjwc2WQRLRYyTZrl1EbHFPGYBtyu0MYB_BCCVA/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000007398927159_1591368442.jpg",
+"groups": [
+{
+"name": "Gouda BLT Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Gouda",
+"priceCents": 0
+},
+{
+"name": "No Bacon",
+"priceCents": 0
+},
+{
+"name": "No Lettuce",
+"priceCents": 0
+},
+{
+"name": "No Tomato",
+"priceCents": 0
+},
+{
+"name": "No Garlic Mayo",
+"priceCents": 0
+},
+{
+"name": "Extra Bacon",
+"priceCents": 200
+},
+{
+"name": "Extra Lettuce",
+"priceCents": 25
+},
+{
+"name": "Extra Tomatos",
+"priceCents": 25
+},
+{
+"name": "Extra Garlic Mayo",
+"priceCents": 25
+},
+{
+"name": "Extra Crispy Bacon",
+"priceCents": 0
+},
+{
+"name": "Extra Cheese",
+"priceCents": 100
+},
+{
+"name": "Garlic Mayo on the Side",
+"priceCents": 0
+},
+{
+"name": "Sub Regular Mayo",
+"priceCents": 0
+},
+{
+"name": "Add Chicken To BLT",
+"priceCents": 500
+},
+{
+"name": "Add Fried Chicken",
+"priceCents": 500
+},
+{
+"name": "Add Fried Bologna",
+"priceCents": 200
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Add Egg Style",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Add Over Easy Egg",
+"priceCents": 200
+},
+{
+"name": "Add Over Medium Egg",
+"priceCents": 200
+},
+{
+"name": "Add Over Hard Egg",
+"priceCents": 200
+},
+{
+"name": "Add Scrambled Egg",
+"priceCents": 200
+},
+{
+"name": "No Egg",
+"priceCents": 0
+},
+{
+"name": "Add Sunny Side Up Egg",
+"priceCents": 200
+}
+]
+}
+]
+},
+{
+"slug": "item-copper-coneys_9ac7e4c8-07a9-4bd2-b1b8-5054b92ffe2b",
+"name": "Copper Coneys",
+"priceCents": 1200,
+"desc": "Two Dearborn brand natural casing hot dogs, coney sauce, onions, and mustard on a toasted hot dog bun. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/I5MWHywxsm2fmeet9foMDrS0ezRXfMkd5nt5ww55Rao/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000000666869609_1599232322.jpg",
+"groups": [
+{
+"name": "Copper Coneys Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "No Onions",
+"priceCents": 0
+},
+{
+"name": "No Coney Sauce",
+"priceCents": 0
+},
+{
+"name": "No Hot Dog",
+"priceCents": 0
+},
+{
+"name": "Extra Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Onion",
+"priceCents": 50
+},
+{
+"name": "Extra Coney Sauce",
+"priceCents": 100
+},
+{
+"name": "Add Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Diced Jalapanos",
+"priceCents": 50
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+},
+{
+"name": "Add Ketchup",
+"priceCents": 0
+},
+{
+"name": "Light Onion",
+"priceCents": 0
+},
+{
+"name": "Light Mustard",
+"priceCents": 0
+},
+{
+"name": "Coney Sauce On Side",
+"priceCents": 0
+},
+{
+"name": "Add Queso",
+"priceCents": 75
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Diced Tomsto",
+"priceCents": 50
+},
+{
+"name": "Onions On Side",
+"priceCents": 0
+},
+{
+"name": "no bun",
+"priceCents": 0
+},
+{
+"name": "add relissh",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-copper-chicken_0e938879-6509-4241-a203-4d2f8e746910",
+"name": "Copper Chicken",
+"priceCents": 1300,
+"desc": "Grilled chicken breast marinated in olive oil, garlic, and rosemary. With lettuce, tomato, onion, and garlic mayo on a pretzel bun. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/elVuNdw5U_QXmZJPhTbH1Ay44wF7XQVUni0o9ydE7Po/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/1/item-200000000666869601_1704743489.jpg",
+"groups": [
+{
+"name": "Copper Chicken Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Lettuce",
+"priceCents": 0
+},
+{
+"name": "No Tomato",
+"priceCents": 0
+},
+{
+"name": "No Red Onion",
+"priceCents": 0
+},
+{
+"name": "No Garlic Mayo",
+"priceCents": 0
+},
+{
+"name": "No Pretzel Bun",
+"priceCents": 0
+},
+{
+"name": "Extra Lettuce",
+"priceCents": 0
+},
+{
+"name": "Extra Tomato",
+"priceCents": 0
+},
+{
+"name": "Extra Red Onion",
+"priceCents": 0
+},
+{
+"name": "Extra Garlic Mayo",
+"priceCents": 50
+},
+{
+"name": "Extra Garlic Mayo On Side",
+"priceCents": 50
+},
+{
+"name": "Add Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add White Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add American Cheese",
+"priceCents": 50
+},
+{
+"name": "Add Pepperjack Cheese",
+"priceCents": 75
+},
+{
+"name": "Add Gouda",
+"priceCents": 75
+},
+{
+"name": "Add Bacon",
+"priceCents": 100
+},
+{
+"name": "Add Jalapanos",
+"priceCents": 100
+},
+{
+"name": "Garlic Mayo On Side",
+"priceCents": 0
+},
+{
+"name": "Sub Regular Mayo",
+"priceCents": 0
+},
+{
+"name": "Sub Fried Chicken",
+"priceCents": 0
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz.Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-fried-bologna_8155f630-e09c-450a-8018-2a8df04885d4",
+"name": "Fried Bologna",
+"priceCents": 900,
+"desc": "Thin sliced bologna, grilled onions, mayo, mustard, and American cheese on a brioche bun.",
+"image": "https://d1w7312wesee68.cloudfront.net/jw5EJ4dth2DhnbIbB-yoW2nWdkXI_PsbrfaQmgFRZsQ/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/7/item-200000000666869607_1599232364.jpg",
+"groups": [
+{
+"name": "Fried Bologna Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Bologna",
+"priceCents": 0
+},
+{
+"name": "No Cheese",
+"priceCents": 0
+},
+{
+"name": "No Grilled Onions",
+"priceCents": 0
+},
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "No Mayo",
+"priceCents": 0
+},
+{
+"name": "Extra Bologna",
+"priceCents": 200
+},
+{
+"name": "Extra Cheese",
+"priceCents": 50
+},
+{
+"name": "Extra Onion",
+"priceCents": 25
+},
+{
+"name": "Extra Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Mayo",
+"priceCents": 0
+},
+{
+"name": "Light Mustard",
+"priceCents": 0
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Mayo on Side",
+"priceCents": 0
+},
+{
+"name": "Just cheese",
+"priceCents": 0
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Eggs Over Easy",
+"priceCents": 200
+},
+{
+"name": "Eggs Over Medium",
+"priceCents": 200
+},
+{
+"name": "Eggs Over Hard",
+"priceCents": 100
+},
+{
+"name": "Eggs Scrambled",
+"priceCents": 100
+},
+{
+"name": "Sunny Side Up",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-italian_e46dee23-d75f-4089-99ef-7fc9415d73e5",
+"name": "Italian",
+"priceCents": 1500,
+"desc": "Capicola, mortadella, ham, salami, lettuce, tomato, mild peppers, Italian dressing, and mozzarella cheese on ciabatta bread. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/gi4kUIUzXqI0BoOYmN3lcfvZu_WUgZqaPlHCMigwJW4/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/5/item-200000000666869605_1599232284.jpg",
+"groups": [
+{
+"name": "Italian Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Mild Peppers",
+"priceCents": 0
+},
+{
+"name": "No Lettuce",
+"priceCents": 0
+},
+{
+"name": "No Tomato",
+"priceCents": 0
+},
+{
+"name": "No Dressing",
+"priceCents": 0
+},
+{
+"name": "No Mozzarella Cheese",
+"priceCents": 0
+},
+{
+"name": "No Ham",
+"priceCents": 0
+},
+{
+"name": "No Mortadella",
+"priceCents": 0
+},
+{
+"name": "No Salami",
+"priceCents": 0
+},
+{
+"name": "No Capicola",
+"priceCents": 0
+},
+{
+"name": "Double Meat",
+"priceCents": 500
+},
+{
+"name": "Extra Cheese",
+"priceCents": 100
+},
+{
+"name": "Extra Dressing",
+"priceCents": 0
+},
+{
+"name": "Extra Lettuce",
+"priceCents": 0
+},
+{
+"name": "Extra Mild Peppers",
+"priceCents": 100
+},
+{
+"name": "Extra Tomato",
+"priceCents": 0
+},
+{
+"name": "Add Jalapenos",
+"priceCents": 100
+},
+{
+"name": "Add Onions",
+"priceCents": 0
+},
+{
+"name": "Dressing On Side",
+"priceCents": 0
+},
+{
+"name": "Add Mayo",
+"priceCents": 0
+},
+{
+"name": "Add Pickles",
+"priceCents": 25
+},
+{
+"name": "Add Bacon",
+"priceCents": 200
+},
+{
+"name": "Add Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Italian On Side",
+"priceCents": 50
+},
+{
+"name": "Add Garlic Mayo",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-bbq-pork-sandwich_5b98c84f-e44c-4ab3-9369-c15f444c49bc",
+"name": "BBQ Pork Sandwich",
+"priceCents": 1100,
+"desc": "Slow roasted pork shoulder with homemade coleslaw, bbq sauce, and pickles on a toasted",
+"image": "https://d1w7312wesee68.cloudfront.net/5i5ojhaKNwisFT1MMhbfNyVQjHwVwl3Q7WBa-t24MSA/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/3/item-200000007149622513_1586014761.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "BBQ Pork Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Coleslaw",
+"priceCents": 0
+},
+{
+"name": "No Pickles",
+"priceCents": 0
+},
+{
+"name": "No Bun",
+"priceCents": 0
+},
+{
+"name": "No BBQ",
+"priceCents": 0
+},
+{
+"name": "Add Cheese",
+"priceCents": 50
+},
+{
+"name": "Add Bacon",
+"priceCents": 100
+},
+{
+"name": "Slaw On Side",
+"priceCents": 0
+},
+{
+"name": "Pickles On Side",
+"priceCents": 0
+},
+{
+"name": "BBQ on Side",
+"priceCents": 0
+},
+{
+"name": "Extra BBQ Sauce",
+"priceCents": 25
+},
+{
+"name": "Extra BBQ Sauce On Side",
+"priceCents": 50
+},
+{
+"name": "Extra Pickles",
+"priceCents": 50
+},
+{
+"name": "Extra Coleslaw",
+"priceCents": 50
+},
+{
+"name": "Add Jalapeno",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Egg Option",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Eggs Over Easy",
+"priceCents": 200
+},
+{
+"name": "Eggs Over Medium",
+"priceCents": 200
+},
+{
+"name": "Eggs Over Hard",
+"priceCents": 100
+},
+{
+"name": "Eggs Scrambled",
+"priceCents": 100
+},
+{
+"name": "Sunny Side Up",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-fried-chicken-sandwich_d1f8a672-0e7e-46cd-9c01-174364b3a5a4",
+"name": "Fried Chicken Sandwich",
+"priceCents": 1200,
+"desc": "Hand battered fried chicken thigh, with spicy syrup and pickles on a brioche bun.",
+"image": "https://d1w7312wesee68.cloudfront.net/yucbcDzRmzRG4cixr8nMZgBDl8yvPRgfm_akXaj74vI/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/3/item-200000010357691043_1680631288.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Fried Chicken Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Pickles",
+"priceCents": 0
+},
+{
+"name": "No Hot Honey",
+"priceCents": 0
+},
+{
+"name": "Extra Pickles",
+"priceCents": 50
+},
+{
+"name": "Extra Hot Honey",
+"priceCents": 50
+},
+{
+"name": "Hot Honey on Side",
+"priceCents": 0
+},
+{
+"name": "Extra Hot Honey on Side",
+"priceCents": 50
+},
+{
+"name": "Add Garlic Mayo",
+"priceCents": 50
+},
+{
+"name": "Add Mayo",
+"priceCents": 50
+},
+{
+"name": "Add Bacon",
+"priceCents": 100
+},
+{
+"name": "Add American",
+"priceCents": 50
+},
+{
+"name": "Add Pepperjack",
+"priceCents": 75
+},
+{
+"name": "Add Gouda",
+"priceCents": 100
+},
+{
+"name": "Add Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add White Cheddar",
+"priceCents": 50
+},
+{
+"name": "Pickles on Side",
+"priceCents": 0
+},
+{
+"name": "Add Coleslaw",
+"priceCents": 100
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Garlic Mayo on Side",
+"priceCents": 0
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Add Onions",
+"priceCents": 50
+}
+]
+}
+]
+},
+{
+"slug": "item-corn-dog_b225076c-13b6-4677-a825-6b5090243a6d",
+"name": "Corn Dog",
+"priceCents": 700,
+"desc": "Dearborn Brand dog, hand battered and fried to golden brown. Add a second corn dog for $3. Served with a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/gxpCH3gEjXXm8nFeUa-pvWKhRThu-1St_gf0G53y-iY/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/8/item-200000007246972838_1599233441.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Corn Dog Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Add Second Corn Dog",
+"priceCents": 300
+},
+{
+"name": "Side of Mustard",
+"priceCents": 0
+},
+{
+"name": "Side of Ketchup",
+"priceCents": 0
+}
+]
+}
+]
+},
+{
+"slug": "item-loose-burgers_35c905e5-bde2-42c3-ba4e-4e93a681eb0f",
+"name": "Loose Burgers",
+"priceCents": 1300,
+"desc": "Seasoned loose hamburger meat in two hot dog buns, topped with coney sauce, mustard, and onions. Served w/ a side choice.",
+"image": "https://d1w7312wesee68.cloudfront.net/FyQ0elZr2WUbZh29yU02E7y4VyhdcTJwS5O4aZlc4PE/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/2/item-200000027977188442_1680643739.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and Cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Loose Burger Mods",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Coney Sauce",
+"priceCents": 0
+},
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "No Onion",
+"priceCents": 0
+},
+{
+"name": "No Buns",
+"priceCents": 0
+},
+{
+"name": "Add Shredded Cheese",
+"priceCents": 200
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+},
+{
+"name": "Add Jalape\u00f1os",
+"priceCents": 100
+},
+{
+"name": "Add Ketchup",
+"priceCents": 0
+},
+{
+"name": "Add Mayo",
+"priceCents": 0
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Add Bacon",
+"priceCents": 200
+},
+{
+"name": "Add Caramelized Onions",
+"priceCents": 100
+},
+{
+"name": "Add Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "Add Whiskey Glaze",
+"priceCents": 100
+},
+{
+"name": "Add BBQ Sauce",
+"priceCents": 100
+},
+{
+"name": "Add Queso",
+"priceCents": 100
+},
+{
+"name": "Extra Onions",
+"priceCents": 50
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-handbreaded-chicken-tenders_c3bcc44b-9937-48fd-842d-42eb8c120529",
+"name": "Hand-breaded Chicken Tenders",
+"priceCents": 1200,
+"desc": "Hand breaded chicken strips served with a side and ranch dipping sauce and either Carolina BBQ or Honey Mustard dipping sauce.",
+"image": "https://d1w7312wesee68.cloudfront.net/BArcHFkf7uCHtBjDbquymZMY2xh0bdRlYOc_cAB9yOw/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/8/item-200000015846406208_1722525344.jpg",
+"groups": [
+{
+"name": "Side Choice",
+"rule": "required-1",
+"choices": [
+{
+"name": "Chips",
+"priceCents": 0
+},
+{
+"name": "Soup - Loaded Baked Potato",
+"priceCents": 300
+},
+{
+"name": "Fries",
+"priceCents": 0
+},
+{
+"name": "No Side",
+"priceCents": 0
+},
+{
+"name": "Side Caesar",
+"priceCents": 100
+},
+{
+"name": "Side Salad",
+"priceCents": 100
+},
+{
+"name": "Side Greek Salad",
+"priceCents": 200
+},
+{
+"name": "Onion Ring Side",
+"priceCents": 300
+},
+{
+"name": "Chili Cheese Fry Side",
+"priceCents": 300
+},
+{
+"name": "Coleslaw",
+"priceCents": 0
+},
+{
+"name": "Mac and cheese",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Extra Wing Sauce and Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Extra 2 oz. Sweet Baby Ray BBQ",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Side of Garlic Parmesan",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Side of Maple Chili",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Side of Mango Habanero",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Side of Honey Sriracha",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Side of Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "Extra 2 oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "Extra 2 oz. Bleu Cheese",
+"priceCents": 50
+},
+{
+"name": "All Flats (If possible, no guarantee)",
+"priceCents": 0
+},
+{
+"name": "All Drummies (If possible, no guarantee)",
+"priceCents": 0
+},
+{
+"name": "Extra Crispy",
+"priceCents": 0
+},
+{
+"name": "Light Butter",
+"priceCents": 0
+}
+]
+},
+{
+"name": "Strip Sauce Included",
+"rule": "required-1",
+"choices": [
+{
+"name": "Ranch and Carolina BBQ",
+"priceCents": 0
+},
+{
+"name": "Ranch and Honey Mustard",
+"priceCents": 0
+},
+{
+"name": "No Sauce",
+"priceCents": 0
+},
+{
+"name": "Only Ranch",
+"priceCents": 0
+},
+{
+"name": "Ranch and Sweet Baby Ray BBQ",
+"priceCents": 0
+},
+{
+"name": "Only Honey Mustard",
+"priceCents": 0
+},
+{
+"name": "Honey Mustard and Sweet Baby Rays",
+"priceCents": 0
+},
+{
+"name": "Only Sweet Baby Rays",
+"priceCents": 0
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-single-coney-dog_2f3a5edb-d6f0-453e-8913-fb453cb8193a",
+"name": "Single Coney Dog",
+"priceCents": 400,
+"desc": "Dearborn Brand dog, Detroit style coney sauce, mustard, and onion on a toasted hot dog bun.",
+"image": "https://d1w7312wesee68.cloudfront.net/Twf74BruH0FKfVVDe00ZGulyit1BoEZj0Hu9HAbfOkQ/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/0/item-200000007481189170_1680631385.jpg",
+"groups": [
+{
+"name": "Copper Coneys Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "No Onions",
+"priceCents": 0
+},
+{
+"name": "No Coney Sauce",
+"priceCents": 0
+},
+{
+"name": "No Hot Dog",
+"priceCents": 0
+},
+{
+"name": "Extra Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Onion",
+"priceCents": 50
+},
+{
+"name": "Extra Coney Sauce",
+"priceCents": 100
+},
+{
+"name": "Add Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Diced Jalapenos",
+"priceCents": 50
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+},
+{
+"name": "Add Ketchup",
+"priceCents": 0
+},
+{
+"name": "Light Onion",
+"priceCents": 0
+},
+{
+"name": "Light Mustard",
+"priceCents": 0
+},
+{
+"name": "Coney Sauce On Side",
+"priceCents": 0
+},
+{
+"name": "Add Queso",
+"priceCents": 75
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Diced Tomato",
+"priceCents": 50
+},
+{
+"name": "Onions On Side",
+"priceCents": 0
+},
+{
+"name": "No Bun",
+"priceCents": 0
+},
+{
+"name": "Add Relish",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinaigrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. Crema",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-single-loose-burger_85999acc-2f57-40e4-8f45-469db984a3a5",
+"name": "Single Loose Burger",
+"priceCents": 500,
+"desc": "Seasoned loose hamburger meat in a hot dog bun, topped with coney sauce, mustard, and onions.",
+"image": "https://d1w7312wesee68.cloudfront.net/VMiLsYMIszmaRsWBxF3zM5nbffSrQxnyNCrirHt82Eg/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/3/item-200000028065443103_1712775361.jpg",
+"groups": [
+{
+"name": "Copper Coneys Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "No Mustard",
+"priceCents": 0
+},
+{
+"name": "No Onions",
+"priceCents": 0
+},
+{
+"name": "No Coney Sauce",
+"priceCents": 0
+},
+{
+"name": "No Hot Dog",
+"priceCents": 0
+},
+{
+"name": "Extra Mustard",
+"priceCents": 0
+},
+{
+"name": "Extra Onion",
+"priceCents": 50
+},
+{
+"name": "Extra Coney Sauce",
+"priceCents": 100
+},
+{
+"name": "Add Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Diced Jalapanos",
+"priceCents": 50
+},
+{
+"name": "Add Pickles",
+"priceCents": 50
+},
+{
+"name": "Add Ketchup",
+"priceCents": 0
+},
+{
+"name": "Light Onion",
+"priceCents": 0
+},
+{
+"name": "Light Mustard",
+"priceCents": 0
+},
+{
+"name": "Coney Sauce On Side",
+"priceCents": 0
+},
+{
+"name": "Add Queso",
+"priceCents": 75
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Diced Tomsto",
+"priceCents": 50
+},
+{
+"name": "Onions On Side",
+"priceCents": 0
+},
+{
+"name": "no bun",
+"priceCents": 0
+},
+{
+"name": "add relissh",
+"priceCents": 75
+}
+]
+},
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Plain Burger Options",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Add Extra Patty",
+"priceCents": 300
+},
+{
+"name": "Sub Impossible Patty",
+"priceCents": 400
+},
+{
+"name": "Add Velveeta",
+"priceCents": 0
+},
+{
+"name": "Add Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add White Cheddar",
+"priceCents": 50
+},
+{
+"name": "Add American",
+"priceCents": 50
+},
+{
+"name": "Add Pepperjack Cheese",
+"priceCents": 100
+},
+{
+"name": "Add Gouda",
+"priceCents": 75
+},
+{
+"name": "Add Ketchup",
+"priceCents": 0
+},
+{
+"name": "Add Mustard",
+"priceCents": 0
+},
+{
+"name": "Add Mayo",
+"priceCents": 0
+},
+{
+"name": "Add Pickles",
+"priceCents": 0
+},
+{
+"name": "Add Onions",
+"priceCents": 0
+},
+{
+"name": "Add Lettuce",
+"priceCents": 50
+},
+{
+"name": "Add Tomato",
+"priceCents": 50
+},
+{
+"name": "Add Bacon",
+"priceCents": 200
+},
+{
+"name": "Add Jalapanos",
+"priceCents": 50
+},
+{
+"name": "Extra Pickles",
+"priceCents": 25
+},
+{
+"name": "Extra Mayo",
+"priceCents": 25
+},
+{
+"name": "Add Carmalized Onions",
+"priceCents": 100
+},
+{
+"name": "Add Garlic Mayo",
+"priceCents": 50
+},
+{
+"name": "Add Whiskey Glaze",
+"priceCents": 50
+},
+{
+"name": "Add BBQ Sauce",
+"priceCents": 50
+},
+{
+"name": "Add 1 Oz. Feta Cheese",
+"priceCents": 75
+},
+{
+"name": "Add Swiss",
+"priceCents": 50
+},
+{
+"name": "Add Green Olives",
+"priceCents": 100
+}
+]
+}
+]
+},
+{
+"slug": "item-single-corn-dog_f8dbd07f-3067-4a65-9ab6-42b80b0f4a69",
+"name": "Single Corn Dog",
+"priceCents": 400,
+"desc": "Dearborn Brand dog, hand battered and fried to golden brown.",
+"image": "https://d1w7312wesee68.cloudfront.net/WWt_yPkWFix8p5-uc2XZtc8D5VKAni9J9xrnBAgl4sc/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000007246966489_1586444704.jpg",
+"groups": [
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Ketchup or Mustard",
+"rule": "up-to-1",
+"choices": [
+{
+"name": "Side of Ketchup",
+"priceCents": 0
+},
+{
+"name": "Side of Mustard",
+"priceCents": 0
+},
+{
+"name": "Side of Ketchup And Mustard",
+"priceCents": 0
+}
+]
+}
+]
+},
+{
+"slug": "item-single-chicago-dog_a033b236-a052-4305-a478-28d7f218e7fa",
+"name": "Single Chicago Dog",
+"priceCents": 600,
+"desc": "",
+"image": "https://d2s742iet3d3t1.cloudfront.net/restaurants/restaurant-16539000000000000/restaurant_1585257543.jpg",
+"groups": [
+{
+"name": "Additional Sauces",
+"rule": "optional-any",
+"choices": [
+{
+"name": "2 Oz. Ranch",
+"priceCents": 50
+},
+{
+"name": "5 Oz. Ranch",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Spicy Ranch",
+"priceCents": 50
+},
+{
+"name": "2 oz. Salsa",
+"priceCents": 100
+},
+{
+"name": "5 oz. Salsa",
+"priceCents": 200
+},
+{
+"name": "2 Oz. Queso",
+"priceCents": 200
+},
+{
+"name": "5 oz. Queso",
+"priceCents": 400
+},
+{
+"name": "2 oz. Guac",
+"priceCents": 200
+},
+{
+"name": "5 oz. Guacamole",
+"priceCents": 400
+},
+{
+"name": "2 Oz. Blue Cheese",
+"priceCents": 50
+},
+{
+"name": "2 Oz. Lime Vinagrette",
+"priceCents": 100
+},
+{
+"name": "2 oz. Boom Boom",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Carolina BBQ",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Ketchup",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mustard",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Mayo",
+"priceCents": 0
+},
+{
+"name": "2 Oz. Garlic Mayo",
+"priceCents": 100
+},
+{
+"name": "2 Oz. Greek",
+"priceCents": 50
+},
+{
+"name": "2oz Italian",
+"priceCents": 50
+},
+{
+"name": "2 oz. Honey Mustard",
+"priceCents": 75
+},
+{
+"name": "2 oz. Sweet Baby Rays",
+"priceCents": 100
+},
+{
+"name": "2 oz. crema",
+"priceCents": 100
+}
+]
+},
+{
+"name": "Chicago Dog Modifiers",
+"rule": "optional-any",
+"choices": [
+{
+"name": "Add Second Chicago Dog",
+"priceCents": 600
+},
+{
+"name": "no poppyseed bun",
+"priceCents": 0
+},
+{
+"name": "no yellow mustard",
+"priceCents": 0
+},
+{
+"name": "no sweet relish",
+"priceCents": 0
+},
+{
+"name": "no diced white onion",
+"priceCents": 0
+},
+{
+"name": "no tomato",
+"priceCents": 0
+},
+{
+"name": "no pickle",
+"priceCents": 0
+},
+{
+"name": "No Celery Salt",
+"priceCents": 0
+}
+]
+}
+]
+}
+]

@@ -1,27 +1,41 @@
-// The orderable menu, derived from FOOD_MENU rather than retyped.
+// The orderable menu: Copper's LIVE Toast menu, harvested item by item.
 //
-// lib/menu.ts stays the single source of truth for names, descriptions and
-// prices (glaze.md: facts live in one place). This file only adds what online
-// ordering needs on top: stable ids, choice groups and priced add-ons that the
-// menu states in prose ("your choice of sauce", "Add grilled chicken + $5"),
-// and the list of sections that do not sell online.
+// This file used to derive from lib/menu.ts, the printed site menu. That
+// changed the day we compared it against what their Toast channel actually
+// sells: Toast has items the site menu has never heard of (Quesadilla, Double
+// Smash Burger, Spicy Peach Wings, a pie), different prices in places (Nachos
+// $12 on Toast, $16 on the site), fuller descriptions ("Served w/ a side
+// choice"), a photo on nearly every food item, and real modifier groups per
+// item -- side choices, egg styles, thirty-line topping lists. Kevin's brief
+// is parity with Toast, so the ordering menu's source of truth is Toast's own
+// data, not the marketing menu.
 //
-// Because the orderable menu is derived, a new item added to FOOD_MENU becomes
-// orderable automatically, and an item renamed there without updating the
-// overlay below fails loudly at build time (see the assertion at the bottom)
-// rather than silently dropping its options.
+// HOW THE DATA GOT HERE, because it will need re-harvesting after menu
+// changes: order.toasttab.com renders its menu client side, so fetching the
+// page yields no items -- but every item has a server-rendered share page at
+// /item-<slug>_<guid> whose og:image is the item's photo and whose body lists
+// the modifier groups. toast-menu.json is those ~114 pages, fetched and
+// transcribed verbatim (Aug 2026). The item pages were enumerated from the
+// menu page's own hyperlinks.
+//
+// PHOTOS ARE HOT-LINKED to Toast's public CDN -- the bar's own uploads,
+// referenced in place rather than copied. Zero migration effort now, one real
+// obligation later: mirror the files into public/img/menu/ before the bar
+// ends its Toast contract, or the pictures die with the account. It is on the
+// README's before-launch list.
+//
+// lib/menu.ts still feeds the /menu display page and is deliberately
+// untouched; reconciling the two menus is a client conversation, not a code
+// decision.
 
-import { FOOD_MENU } from "@/lib/menu";
+import TOAST_MENU from "./toast-menu.json";
 
 export type OrderOption = {
-  name: string; // e.g. "Sauce"
+  name: string;
   required: boolean;
-  // Toast-style modifier groups come in two shapes: pick exactly one (sauce,
-  // protein, side) and pick any number (toppings, add-ons). multi covers the
-  // second. Their Toast page has real modifier groups loaded per item (Kevin,
-  // Aug 2026); this overlay currently carries only what the printed menu
-  // states, and grows to match Toast item by item as the bar's real modifier
-  // lists come over from the back office.
+  // Pick-any group (toppings, add-ons) vs pick-one (side, dressing). A
+  // required non-multi group renders as radios and demands exactly one; a
+  // required multi group demands at least one.
   multi?: boolean;
   choices: { name: string; priceCents: number }[];
 };
@@ -34,102 +48,43 @@ export type OrderableItem = {
   priceCents: number;
   options: OrderOption[];
   ageRestricted: boolean;
-  // Path under /public, e.g. "/img/menu/copper-burger.webp". Absent means the
-  // card renders text-only, which is deliberate: no gray placeholder boxes.
+  // Absent means the card renders text-only, on purpose: no placeholder
+  // boxes. 50 of 114 items carry a real photo today; the rest show none
+  // until the bar uploads one (to Toast, until we migrate; then to us).
   image?: string;
 };
 
 export type OrderableSection = { name: string; items: OrderableItem[]; ageRestricted: boolean };
 
-// Cocktails sell online on purpose: the bar's Toast page already sells a full
-// Online Drinks section, Michigan made cocktails-to-go permanent in 2023, and
-// the brief is parity with Toast. What we add that Toast's page does not show
-// is the guardrail: an alcohol order requires a 21+ acknowledgment at checkout
-// and the kitchen ticket carries an ID CHECK flag. Sealed-container rules at
-// handoff are the bar's side of the counter, exactly as they are with Toast.
-const AGE_RESTRICTED_SECTIONS = new Set(["Cocktails"]);
-const EXCLUDED_SECTIONS = new Set<string>([]);
-
-const WING_SAUCES = ["BBQ", "Garlic Parm", "Honey Sriracha", "Maple Chili", "Mango Habanero"];
-const TENDER_SAUCES = ["Ranch", "Honey Mustard", "BBQ"];
-const TACO_PROTEINS = ["Beef", "Chicken", "Pork"];
-
-// Options overlay, keyed by exact FOOD_MENU item name. Only items whose menu
-// text states a choice or a priced add-on appear here; everything else orders
-// as printed.
-const OPTIONS: Record<string, OrderOption[]> = {
-  Wings: [
-    { name: "Sauce", required: true, choices: WING_SAUCES.map((s) => ({ name: s, priceCents: 0 })) },
-  ],
-  "Chicken Tenders": [
-    { name: "Dipping sauce", required: true, choices: TENDER_SAUCES.map((s) => ({ name: s, priceCents: 0 })) },
-  ],
-  Tacos: [
-    { name: "Protein", required: true, choices: TACO_PROTEINS.map((p) => ({ name: p, priceCents: 0 })) },
-  ],
-  "Taco Salad": [
-    { name: "Protein", required: true, choices: TACO_PROTEINS.map((p) => ({ name: p, priceCents: 0 })) },
-  ],
-  "Greek Salad": [
-    { name: "Add grilled chicken", required: false, choices: [{ name: "Grilled chicken", priceCents: 500 }] },
-  ],
-  "Caesar Salad": [
-    { name: "Add grilled chicken", required: false, choices: [{ name: "Grilled chicken", priceCents: 500 }] },
-  ],
-  "Corn Dog": [
-    { name: "Add a second corn dog", required: false, choices: [{ name: "Second corn dog", priceCents: 300 }] },
-  ],
-  "Housemade Tortilla chips and salsa": [
-    { name: "Extra salsa", required: false, choices: [{ name: "Extra salsa", priceCents: 200 }] },
-  ],
-  "Housemade Tortilla chips and guacamole": [
-    { name: "Extra guacamole", required: false, choices: [{ name: "Extra guacamole", priceCents: 400 }] },
-  ],
-  "Housemade Tortilla chips and queso": [
-    { name: "Extra queso", required: false, choices: [{ name: "Extra queso", priceCents: 400 }] },
-  ],
+type RawChoice = { name: string; priceCents: number };
+type RawGroup = { name: string; required: boolean; multi: boolean; choices: RawChoice[] };
+type RawItem = {
+  id: string;
+  name: string;
+  desc: string;
+  priceCents: number;
+  image: string | null;
+  groups: RawGroup[];
 };
+type RawSection = { name: string; ageRestricted: boolean; items: RawItem[] };
 
-// Item photos, keyed by exact FOOD_MENU item name. Their Toast page has a
-// photo on every item (Kevin, standing in front of it, Aug 2026 — an earlier
-// markup-only fetch of that page missed them because Toast renders the menu
-// client side). Parity means every entry here eventually gets a real photo of
-// the real dish: the bar's own uploads from the Toast back office, or fresh
-// shots. NO stock photos, ever — the wings in the picture must be the wings
-// in the bag. Files go in public/img/menu/, webp, roughly square.
-const PHOTOS: Record<string, string> = {
-  // PLACEHOLDER: empty until the bar's item photos come over from Toast.
-  // The one burger shot in /img is the page hero, not verifiably the Copper
-  // Burger as plated, so it does not get promoted to an item card.
-};
-
-function slug(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
-
-function toCents(price: string): number {
-  return Math.round(parseFloat(price) * 100);
-}
-
-// "Caesar Salad" exists in two sections (Salads, Sides) at different prices,
-// which is why ids carry the section: sides-caesar-salad is not the $9 salad.
-export const ORDERABLE_MENU: OrderableSection[] = FOOD_MENU.filter(
-  (s) => !EXCLUDED_SECTIONS.has(s.name)
-).map((s) => ({
+export const ORDERABLE_MENU: OrderableSection[] = (TOAST_MENU as RawSection[]).map((s) => ({
   name: s.name,
-  ageRestricted: AGE_RESTRICTED_SECTIONS.has(s.name),
+  ageRestricted: s.ageRestricted,
   items: s.items.map((i) => ({
-    id: `${slug(s.name)}-${slug(i.name)}`,
+    id: i.id,
     section: s.name,
     name: i.name,
     desc: i.desc,
-    priceCents: toCents(i.price),
-    // Options attach in the item's home section only. The Sides "Caesar
-    // Salad" is a side, and adding $5 chicken to a $4 side is not on the menu.
-    options:
-      s.name === "Sides" ? [] : (OPTIONS[i.name] ?? []),
-    ageRestricted: AGE_RESTRICTED_SECTIONS.has(s.name),
-    image: PHOTOS[i.name],
+    priceCents: i.priceCents,
+    options: i.groups.map((g) => ({
+      name: g.name,
+      required: g.required,
+      multi: g.multi,
+      choices: g.choices,
+    })),
+    ageRestricted: s.ageRestricted,
+    image: i.image ?? undefined,
   })),
 }));
 
@@ -137,14 +92,9 @@ export const ITEM_INDEX: Map<string, OrderableItem> = new Map(
   ORDERABLE_MENU.flatMap((s) => s.items).map((i) => [i.id, i])
 );
 
-// Fail the build, not the guest: every OPTIONS key must still name a real
-// FOOD_MENU item, or a menu rename has silently orphaned its choices.
-const allNames = new Set(FOOD_MENU.flatMap((s) => s.items.map((i) => i.name)));
-for (const key of Object.keys(OPTIONS)) {
-  if (!allNames.has(key)) {
-    throw new Error(
-      `lib/ordering/menu.ts: OPTIONS names "${key}" but lib/menu.ts has no such item. ` +
-        `The menu was edited without updating the ordering overlay.`
-    );
-  }
+// Fail the build, not the guest: ids are the 86 board's and the cart's keys,
+// so a duplicate would let one tap 86 two different dishes.
+const total = ORDERABLE_MENU.reduce((n, s) => n + s.items.length, 0);
+if (ITEM_INDEX.size !== total) {
+  throw new Error("lib/ordering/menu.ts: duplicate item ids in toast-menu.json");
 }

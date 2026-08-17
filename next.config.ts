@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: { formats: ["image/webp"] },
+  images: {
+    formats: ["image/webp"],
+    // The ordering menu's item photos are the bar's own Toast uploads,
+    // hot-linked from Toast's public CDN (see lib/ordering/menu.ts for why,
+    // and the README for the migrate-before-leaving-Toast obligation).
+    remotePatterns: [
+      { protocol: "https", hostname: "d1w7312wesee68.cloudfront.net" },
+      { protocol: "https", hostname: "d2s742iet3d3t1.cloudfront.net" },
+    ],
+  },
   async redirects() {
     // Preserve the URLs the current WordPress site has indexed.
     return [
