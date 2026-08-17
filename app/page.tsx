@@ -81,7 +81,7 @@ export default function Home() {
               Copper Bar. Every wall is memorabilia and every screen dedicated to sports.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Button href={SITE.orderUrl} external>
+              <Button href={SITE.orderUrl}>
                 Order Online
               </Button>
               <Button href="/menu" variant="outline">

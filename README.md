@@ -190,6 +190,47 @@ note and the phone number and nothing else. Closing that means rendering the
 composed message on the page with a copy button, the way the Cookin' with Beans
 order builder does.
 
+## Online ordering: ours, replacing Toast's
+
+The `/order` page replaces the Toast online ordering channel: guests order
+pickup on the club's own site, every "Order Online" surface points at it (one
+constant, `SITE.orderUrl`), and orders land on `/kitchen`, a PIN-gated staff
+board that rings until each ticket is accepted. Toast the POS stays in the
+building untouched; this takes only the online channel. Kevin's call, August
+2026: full menu including cocktails to go (their Toast page already sells
+them; Michigan made cocktails-to-go permanent in 2023). Orders with drinks
+require a 21+ acknowledgment at checkout and carry an ID CHECK flag on the
+kitchen ticket.
+
+The model: a 99 cent order fee paid by the guest, disclosed in the banner
+above the menu and again as a labeled line in the cart, never sprung at
+payment. Half stays with the bar, half is Glazed Web's platform fee, taken as
+a Stripe `application_fee_amount` when payments are wired. Until
+`STRIPE_SECRET_KEY` is set, checkout runs in demo mode: the order is placed,
+nothing is charged, and the pay button says so.
+
+Decisions worth knowing before touching it:
+
+- **The orderable menu is derived from `lib/menu.ts`**, never retyped. Options
+  (wing sauces, taco proteins, priced add-ons) live in an overlay in
+  `lib/ordering/menu.ts` keyed by item name; a rename in `lib/menu.ts` without
+  updating the overlay fails the build on purpose.
+- **The server is the till.** Client prices are display only; the order API
+  recomputes everything from the menu, revalidates 86s and hours, and rejects
+  with a human sentence, not a code.
+- **Pause always auto-resumes** (30/60/90 minutes). A Friday-rush pause that
+  someone forgets cannot silently kill Saturday. Expired pauses clear on read.
+- **Storage is Postgres when `DATABASE_URL` exists, memory otherwise.** Memory
+  is fine locally and a trap deployed (orders can land on a lambda the kitchen
+  screen never polls), so the kitchen board shows a red banner when it is
+  running on memory.
+- **Ordering hours derive from the posted hours** (last order 9:30 PM, kitchen
+  closes at 10), computed per request in America/Detroit, never at build time.
+  `ORDERING_DEMO_ALWAYS_OPEN=1` overrides for pitching outside kitchen hours.
+- `/kitchen` is noindex and out of the sitemap; the PIN is a gate for
+  passers-by, not a vault, and the comment in `lib/ordering/auth.ts` says
+  exactly where that line is.
+
 ## Before launch
 
 - [ ] **Confirm the club's real enquiry inbox** (`info@copperac.com` in `lib/site.ts` is a placeholder)
@@ -199,7 +240,12 @@ order builder does.
 - [ ] Verify the lat/lng pin
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
-- [ ] Confirm the Toast plan includes Online Ordering Pro, then set up `order.copperac.com` and update `SITE.orderUrl`
+- [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
+- [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
+- [ ] **Ordering: set `ORDERING_DEMO_ALWAYS_OPEN=1` on the demo deploy, and REMOVE it at go-live** so real guests get real hours
+- [ ] **Ordering: wire Stripe Connect before real money** (see the PAYMENT SEAM comment in `app/api/ordering/order/route.ts`; until then checkout is demo mode and says so)
+- [ ] **Ordering: Michigan tax consult before launch** — whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
+- [ ] **Ordering: confirm with the club that Toast online ordering gets turned off** when this goes live, so two order channels never run at once
 - [ ] Decide on Next 16: three high-severity advisories in `postcss` and `sharp` only clear with the major bump
 
 ## Structure
@@ -213,10 +259,16 @@ app/
   reserve/          The Copper Reserve, gallery, inquiry form
   events/           events + Event schema, generated metadata
   contact/          hours, map, directions, contact form
-components/         Header, Footer, MenuList, InquiryForm, shared UI
+  order/            online ordering, guest side (menu, cart, demo checkout)
+  kitchen/          staff board: orders + chime, 86 toggles, busy dial, pause
+  api/ordering/     public state + order placement (server recomputes all prices)
+  api/kitchen/      PIN login, order queue, staff state
+components/         Header, Footer, MenuList, InquiryForm, ordering/, shared UI
 lib/
   site.ts           business facts, hours, events (single source of truth)
   menu.ts           menu data
+  ordering/         config (the 99 cent fee, hours window), derived orderable
+                    menu, storage (Postgres or memory), kitchen auth
 public/img/         WebP photography and logos
 ```
 

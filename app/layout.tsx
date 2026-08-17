@@ -122,7 +122,7 @@ const restaurantSchema = {
     "@type": "OrderAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: SITE.orderUrl,
+      urlTemplate: `${SITE.url}${SITE.orderUrl}`,
       inLanguage: "en-US",
       actionPlatform: [
         "http://schema.org/DesktopWebPlatform",
