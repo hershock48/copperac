@@ -106,8 +106,11 @@ export function renderFrontSlip(order: Order): string {
   }
   out.push(line());
   out.push(row("Subtotal", money(order.subtotalCents)));
-  out.push(row("Order fee", money(order.feeCents)));
-  out.push(row("Tax", money(order.taxCents)));
+  // One combined line, the same convention as every delivery receipt. The
+  // fee is disclosed itemized at checkout, where disclosure matters; the
+  // printed slip is post-purchase and does not need to re-litigate it.
+  // Kevin's call: "remove that order fee line and bake it in."
+  out.push(row("Taxes & fees", money(order.feeCents + order.taxCents)));
   if (order.tipCents > 0) out.push(row("Tip", money(order.tipCents)));
   out.push(row("TOTAL", money(order.totalCents)));
   out.push(line("="));
