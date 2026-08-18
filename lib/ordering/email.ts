@@ -53,7 +53,7 @@ export async function sendOrderConfirmation(order: Order): Promise<void> {
   if (!order.guestEmail) return;
   const paidLine = order.paid
     ? "Paid online. Nothing owed at pickup."
-    : `Due at pickup: ${money(order.totalCents)}.`;
+    : `Due at pickup: ${money(order.totalCents)}. Cash or card at the bar.`;
   await send(
     order.guestEmail,
     `Order #${order.number} at Copper Athletic Club`,

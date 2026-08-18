@@ -54,9 +54,15 @@ export type Order = {
   // happens at the counter, where it always has.
   hasAlcohol: boolean;
   // False until Stripe is wired: demo orders are DUE AT PICKUP and the front
-  // slip prints tip and signature lines. Live orders are prepaid and print
+  // slip prints tip and signature lines. Live prepaid orders print
   // PAID ONLINE.
   paid: boolean;
+  // The guest chose cash or card at the counter, which Toast's ordering page
+  // offers today, so ours does too. These orders never touch Stripe: the
+  // bartender rings the slip into the Toast register like any walk-up sale,
+  // and the whole 99 cent fee stays in the till since there is no charge to
+  // split. Older stored orders lack the field; undefined reads as false.
+  payAtPickup: boolean;
   status: OrderStatus;
   createdAt: number; // epoch ms
   acceptedAt: number | null;

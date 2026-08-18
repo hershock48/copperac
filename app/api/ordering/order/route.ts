@@ -37,6 +37,7 @@ type IncomingOrder = {
   tipCents: number;
   lines: IncomingLine[];
   ageAcknowledged?: boolean;
+  payAtPickup?: boolean;
 };
 
 function bad(message: string, status = 400) {
@@ -148,8 +149,12 @@ export async function POST(req: NextRequest) {
     hasAlcohol,
     // PAYMENT SEAM: flips to true when Stripe confirms the charge. Until
     // then the front-of-house slip prints DUE AT PICKUP with tip and
-    // signature lines.
+    // signature lines. payAtPickup orders skip Stripe entirely, live and
+    // demo alike: the counter collects, so paid stays false for good and
+    // there is no application fee to split -- the whole 99 cents is rung
+    // into the till with the rest.
     paid: false,
+    payAtPickup: body.payAtPickup === true,
     status: "new",
     createdAt: Date.now(),
     acceptedAt: null,

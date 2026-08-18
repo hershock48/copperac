@@ -265,6 +265,11 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                           ID check
                         </span>
                       )}
+                      {o.payAtPickup && (
+                        <span className="ml-3 rounded-sm bg-copper px-2 py-0.5 text-xs uppercase tracking-widest text-ink">
+                          Collect {money(o.totalCents)}
+                        </span>
+                      )}
                     </p>
                     <p className="text-xs text-cream-dim/70">
                       {age(o.createdAt)} · quoted {o.quotedMinutes} min · {money(o.totalCents)}

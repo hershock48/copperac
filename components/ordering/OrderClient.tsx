@@ -44,6 +44,7 @@ type Confirmation = {
   quotedMinutes: number;
   totalCents: number;
   emailedTo: string;
+  payAtPickup: boolean;
   status: "new" | "accepted" | "done" | "refunded";
 };
 
@@ -281,6 +282,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                   note: form.note,
                   tipCents: form.tipCents,
                   ageAcknowledged: form.ageAcknowledged,
+                  payAtPickup: form.payAtPickup,
                   lines: cart.map((l) => ({ itemId: l.itemId, qty: l.qty, options: l.options })),
                 }),
               });
@@ -295,6 +297,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                   quotedMinutes: data.quotedMinutes,
                   totalCents: data.totals.totalCents,
                   emailedTo: form.email,
+                  payAtPickup: form.payAtPickup,
                   status: "new",
                 });
                 setCart([]);
@@ -415,7 +418,7 @@ function Checkout({
   placing: boolean;
   error: string;
   onClose: () => void;
-  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean }) => void;
+  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean }) => void;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -423,6 +426,9 @@ function Checkout({
   const [note, setNote] = useState("");
   const [tipPct, setTipPct] = useState<number | null>(null);
   const [ageOk, setAgeOk] = useState(false);
+  // Toast's ordering page lets guests choose cash or card at the counter, so
+  // ours keeps that choice. Card online is the default.
+  const [payAtPickup, setPayAtPickup] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -535,6 +541,32 @@ function Checkout({
           </div>
         </dl>
 
+        <div className="mt-5">
+          <p className="text-sm text-cream-dim">How you want to pay</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              aria-pressed={!payAtPickup}
+              onClick={() => setPayAtPickup(false)}
+              className={`rounded-sm border px-3 py-2.5 text-sm transition-colors ${
+                !payAtPickup ? "border-copper bg-copper text-ink" : "border-ink-line text-cream-dim hover:border-copper-light"
+              }`}
+            >
+              Card, online now
+            </button>
+            <button
+              type="button"
+              aria-pressed={payAtPickup}
+              onClick={() => setPayAtPickup(true)}
+              className={`rounded-sm border px-3 py-2.5 text-sm transition-colors ${
+                payAtPickup ? "border-copper bg-copper text-ink" : "border-ink-line text-cream-dim hover:border-copper-light"
+              }`}
+            >
+              Cash or card at pickup
+            </button>
+          </div>
+        </div>
+
         <div className="mt-5 space-y-3">
           <label className="block text-sm text-cream-dim">
             Name for the order
@@ -598,7 +630,7 @@ function Checkout({
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk })}
+          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup })}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
         >
           {placing ? "Sending to the kitchen" : `Place order · ${money(total)}`}
@@ -649,7 +681,9 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
         </p>
       </div>
       <p className="mt-8 text-sm text-cream-dim/70">
-        Total {money(confirmation.totalCents)} · pay at pickup in this demo
+        {confirmation.payAtPickup
+          ? `Total ${money(confirmation.totalCents)} · cash or card at the counter`
+          : `Total ${money(confirmation.totalCents)} · pay at pickup in this demo`}
       </p>
       <a
         href="/order"
