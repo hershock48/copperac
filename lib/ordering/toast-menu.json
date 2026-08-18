@@ -858,7 +858,7 @@
    {
     "id": "nachos",
     "name": "Nachos",
-    "desc": "Your choice of beef, chicken, or pork, house made chips, queso, guacamole, red onions, tomatoes, black olives, jalape\u00f1os, lettuce, and crema.",
+    "desc": "Your choice of beef, chicken, or pork, house made chips, queso, guacamole, red onions, tomatoes, black olives, jalapeños, lettuce, and crema.",
     "priceCents": 1200,
     "image": "https://d1w7312wesee68.cloudfront.net/kUB21mrQkQTBo96q9h41K0mzq_1TDytSFE65klgJ7Y4/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/0/item-200000000666880220_1599232474.jpg",
     "groups": [
@@ -924,7 +924,7 @@
         "priceCents": 25
        },
        {
-        "name": "Extra Jalape\u00f1os",
+        "name": "Extra Jalapeños",
         "priceCents": 100
        },
        {
@@ -3431,7 +3431,7 @@
         "priceCents": 200
        },
        {
-        "name": "Extra Jalape\u00f1os",
+        "name": "Extra Jalapeños",
         "priceCents": 100
        },
        {
@@ -7454,7 +7454,7 @@
         "priceCents": 50
        },
        {
-        "name": "Add Jalape\u00f1os",
+        "name": "Add Jalapeños",
         "priceCents": 100
        },
        {
@@ -11071,7 +11071,7 @@
    {
     "id": "cocacola-togo-large",
     "name": "Coca-Cola, To-Go Large",
-    "desc": "Coca-Cola Original Taste \u2014 the crisp, refreshing taste you know and love",
+    "desc": "Coca-Cola Original Taste — the crisp, refreshing taste you know and love",
     "priceCents": 300,
     "image": "https://d1w7312wesee68.cloudfront.net/sotk4SMdmgEpUNoum1vW3wbdGL2FE6gVDNr2oUyaVs0/resize:fit:720:720/plain/s3://toasttab/restaurants/brand/coca-cola/Coca-Cola_Fountain.jpg",
     "groups": [
@@ -11282,6 +11282,159 @@
     "desc": "",
     "priceCents": 250,
     "image": null,
+    "groups": []
+   }
+  ]
+ },
+ {
+  "name": "Merch",
+  "ageRestricted": false,
+  "items": [
+   {
+    "id": "copper-t-shirt",
+    "name": "Copper T-Shirt",
+    "desc": "Club tee. Pick a color and a size.",
+    "priceCents": 2500,
+    "image": "https://d1w7312wesee68.cloudfront.net/nh6BwVNbs1jYdOls7gUzl0WJ_zgPK2y7cUIB5rNyfqc/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000062860296329_1764954764.jpg",
+    "groups": [
+     {
+      "name": "Color",
+      "required": true,
+      "multi": false,
+      "choices": [
+       {
+        "name": "Honolulu Blue",
+        "priceCents": 0
+       },
+       {
+        "name": "Navy/Orange",
+        "priceCents": 0
+       },
+       {
+        "name": "Yellow",
+        "priceCents": 0
+       },
+       {
+        "name": "Green",
+        "priceCents": 0
+       }
+      ]
+     },
+     {
+      "name": "Size",
+      "required": true,
+      "multi": false,
+      "choices": [
+       {
+        "name": "Small",
+        "priceCents": 0
+       },
+       {
+        "name": "Medium",
+        "priceCents": 0
+       },
+       {
+        "name": "Large",
+        "priceCents": 0
+       },
+       {
+        "name": "XL",
+        "priceCents": 0
+       },
+       {
+        "name": "XXL",
+        "priceCents": 0
+       },
+       {
+        "name": "XXXL",
+        "priceCents": 0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "red-long-sleeve",
+    "name": "Red Long Sleeve",
+    "desc": "\"Opportunity does not knock, it presents itself when you beat down the door.\" -Scotty Bowman",
+    "priceCents": 2500,
+    "image": "https://d1w7312wesee68.cloudfront.net/EDPJU7S51IujiudCLt_dnlRNYIK-wT94IPv4GwA2rgo/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/7/item-200000062860297277_1764959608.jpg",
+    "groups": [
+     {
+      "name": "Size",
+      "required": true,
+      "multi": false,
+      "choices": [
+       {
+        "name": "Small",
+        "priceCents": 0
+       },
+       {
+        "name": "Medium",
+        "priceCents": 0
+       },
+       {
+        "name": "Large",
+        "priceCents": 0
+       },
+       {
+        "name": "XL",
+        "priceCents": 0
+       },
+       {
+        "name": "XXL",
+        "priceCents": 0
+       },
+       {
+        "name": "XXXL",
+        "priceCents": 0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "black-hoodie",
+    "name": "Black Hoodie",
+    "desc": "Club hoodie in black. Pick a size.",
+    "priceCents": 4500,
+    "image": "https://d1w7312wesee68.cloudfront.net/5_ZnZUQFTWRRfLRY2ueNXstwURXIM3X_ndwjDxEuqMU/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000062860297289_1764960889.jpg",
+    "groups": [
+     {
+      "name": "Size",
+      "required": true,
+      "multi": false,
+      "choices": [
+       {
+        "name": "Small",
+        "priceCents": 0
+       },
+       {
+        "name": "Medium",
+        "priceCents": 0
+       },
+       {
+        "name": "Large",
+        "priceCents": 0
+       },
+       {
+        "name": "XL",
+        "priceCents": 0
+       },
+       {
+        "name": "XXXL",
+        "priceCents": 0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "copper-trucker-hat",
+    "name": "Copper Trucker Hat",
+    "desc": "Navy and White trucker style with a grey bill.",
+    "priceCents": 2500,
+    "image": "https://d1w7312wesee68.cloudfront.net/OClnFKKAB1xBazBvgQ3BbrxUy2PnAZNPrydhld3Jf1Y/resize:fit:720:720/plain/s3://toasttab/restaurants/restaurant-16539000000000000/menu/items/9/item-200000019691889009_1765028203.jpg",
     "groups": []
    }
   ]
