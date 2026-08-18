@@ -426,9 +426,6 @@ function Checkout({
   const [note, setNote] = useState("");
   const [tipPct, setTipPct] = useState<number | null>(null);
   const [ageOk, setAgeOk] = useState(false);
-  // Toast's ordering page lets guests choose cash or card at the counter, so
-  // ours keeps that choice. Card online is the default.
-  const [payAtPickup, setPayAtPickup] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -541,32 +538,6 @@ function Checkout({
           </div>
         </dl>
 
-        <div className="mt-5">
-          <p className="text-sm text-cream-dim">How you want to pay</p>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              aria-pressed={!payAtPickup}
-              onClick={() => setPayAtPickup(false)}
-              className={`rounded-sm border px-3 py-2.5 text-sm transition-colors ${
-                !payAtPickup ? "border-copper bg-copper text-ink" : "border-ink-line text-cream-dim hover:border-copper-light"
-              }`}
-            >
-              Card, online now
-            </button>
-            <button
-              type="button"
-              aria-pressed={payAtPickup}
-              onClick={() => setPayAtPickup(true)}
-              className={`rounded-sm border px-3 py-2.5 text-sm transition-colors ${
-                payAtPickup ? "border-copper bg-copper text-ink" : "border-ink-line text-cream-dim hover:border-copper-light"
-              }`}
-            >
-              Cash or card at pickup
-            </button>
-          </div>
-        </div>
-
         <div className="mt-5 space-y-3">
           <label className="block text-sm text-cream-dim">
             Name for the order
@@ -627,13 +598,25 @@ function Checkout({
           </p>
         )}
 
+        {/* Prepay is the road; cash is the shoulder. One big button pays
+            online (the Stripe path when it lands), and the counter option is
+            a single quiet click below it -- present because Toast's page
+            offers it today, unadvertised because prepay kills no-shows. */}
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup })}
+          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: false })}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {placing ? "Sending to the kitchen" : `Place order · ${money(total)}`}
+          {placing ? "Sending to the kitchen" : `Pay ${money(total)} · place order`}
+        </button>
+        <button
+          type="button"
+          disabled={!canPlace}
+          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: true })}
+          className="mt-3 w-full rounded-sm px-2 py-2 text-center text-sm text-cream-dim underline decoration-ink-line underline-offset-4 transition-colors hover:text-cream disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          or pay cash or card at pickup
         </button>
         {live.demo && (
           <p className="mt-3 text-center text-xs text-cream-dim/60">{`Demo checkout. No card is charged.`}</p>
