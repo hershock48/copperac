@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+// The marketing/demo host. The pitch renders at its root and the live in-house
+// product renders under /demo (see rewrites() below). The Toast parking
+// redirect deliberately does NOT fire here, so the demo — and the Jelly pitch,
+// whose entire argument is replacing Toast with in-house ordering — keeps
+// reaching the real /order page instead of bouncing viewers to Toast.
+const PITCH_HOST = "copperac.glazedweb.com";
+
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/webp"],
@@ -23,8 +30,17 @@ const nextConfig: NextConfig = {
       // Deliberately not permanent — browsers cache 308s for good, and this
       // decision is "for now". Keep the destination in step with
       // SITE.orderUrl in lib/site.ts; delete this line to bring /order back.
+      //
+      // `missing` host guard: everywhere EXCEPT the pitch host. Redirects run
+      // before rewrites and a rewrite target is never re-checked against
+      // redirects, so without this guard the pitch host's /demo/order rewrite
+      // (-> /order) and the Jelly pitch's own /order CTAs would all 307 to
+      // Toast — the demo, and the proposal to replace Toast, silently sending
+      // people to Toast. On the pitch host /order renders the real in-house
+      // page, which is exactly what the demo needs.
       {
         source: "/order",
+        missing: [{ type: "host", value: PITCH_HOST }],
         destination: "https://order.toasttab.com/online/copper-pub",
         permanent: false,
       },
@@ -53,7 +69,6 @@ const nextConfig: NextConfig = {
     // beforeFiles is load-bearing. A plain rewrites() array is afterFiles,
     // which runs only once Next has failed to find a page, and app/page.tsx
     // already answers "/" — so the root rewrite below would never have fired.
-    const PITCH_HOST = "copperac.glazedweb.com";
     const onPitchHost = [{ type: "host" as const, value: PITCH_HOST }];
     return {
       beforeFiles: [

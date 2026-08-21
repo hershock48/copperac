@@ -50,15 +50,44 @@ const LABELS: Record<string, string> = {
   message: "Message",
 };
 
+// Per-field ceilings. This inbox is relayed through our shared glazedweb.com
+// sending identity, so an unbounded field is an unbounded payload sent under
+// every Glazed Web site's sender reputation. A real enquiry clears these by an
+// order of magnitude; message is the only long field.
+const MAX_LEN: Record<string, number> = { message: 4000 };
+const DEFAULT_MAX = 200;
+
 export async function POST(request: Request) {
-  let body: Record<string, unknown>;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
+  // A JSON body of null/array/string is valid JSON but not a form. Guard it, or
+  // `body[k]` below throws a TypeError and the handler 500s instead of 400ing.
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
+  }
+  const fields = body as Record<string, unknown>;
 
-  const get = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
+  // Trim, and strip control characters (including CR/LF) so nothing a guest
+  // types can smuggle a line break into the email subject built from these.
+  const get = (k: string) =>
+    typeof fields[k] === "string"
+      ? // eslint-disable-next-line no-control-regex
+        (fields[k] as string).replace(/[\u0000-\u001f\u007f]/g, " ").trim()
+      : "";
+
+  const oversized = Object.keys(LABELS).find(
+    (k) => get(k).length > (MAX_LEN[k] ?? DEFAULT_MAX)
+  );
+  if (oversized) {
+    return NextResponse.json(
+      { ok: false, reason: "too_long", field: oversized },
+      { status: 422 }
+    );
+  }
 
   const missing = REQUIRED.filter((k) => !get(k));
   if (missing.length) {

@@ -109,13 +109,18 @@ const restaurantSchema = {
         "Saturday",
       ],
       opens: "11:00",
-      closes: "23:59",
+      // Midnight is "00:00" in schema.org, not "23:59". Every page posts a
+      // 12:00 AM close and LiveStatus treats close as midnight; "23:59" made
+      // Google render "Closes 11:59 PM", the exact hours contradiction this
+      // build exists to kill. (A close strictly after midnight would need the
+      // over-midnight span form; this closes at midnight, so 00:00 is right.)
+      closes: "00:00",
     },
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: "Sunday",
       opens: "09:00",
-      closes: "23:59",
+      closes: "00:00",
     },
   ],
   potentialAction: {
