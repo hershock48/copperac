@@ -4,9 +4,9 @@ import { SITE } from "@/lib/site";
 /**
  * Reserve and contact enquiries.
  *
- * ==========================================================================
- * STATUS: NOT LIVE. No enquiry sent through this site reaches an inbox yet.
- * ==========================================================================
+ * LIVE since 21 Aug 2026: sends via Resend from the verified glazedweb.com
+ * domain to the club's inbox. Config is RESEND_API_KEY, INQUIRY_FROM and
+ * INQUIRY_TO (see .env.example and the README).
  *
  * Deliberately fails loudly. With no RESEND_API_KEY or INQUIRY_FROM set this
  * returns 503 reason "not_configured" and InquiryForm hands off to the
@@ -16,29 +16,22 @@ import { SITE } from "@/lib/site";
  * version this replaced waited 500ms, said "Thanks, we got it" and sent
  * nothing anywhere.
  *
- * TO SWITCH IT ON, four steps:
+ * WHEN A GUEST REPORTS THE FORM OPENING THEIR EMAIL APP, that is this route
+ * refusing, and the mailto fallback doing its job. Every refusal below logs
+ * one line to the Vercel runtime logs saying which one and why; read those
+ * first, because the browser only ever sees the reason code. The three:
+ *   503 not_configured  an env var is missing
+ *   502 provider_error  Resend answered, and said no (the line carries its
+ *                       status and body: a bad key is 401, an unverified
+ *                       From domain is 403)
+ *   502 network_error   the call to Resend never completed
  *
- *   1. DONE (Aug 2026): the club's monitored inbox is reserve@copperac.com,
- *      confirmed by the owner and set as SITE.email.
+ * Env values are trimmed on read. A trailing space or CR on a pasted key is
+ * invisible in every dashboard and would otherwise fail as a bad credential.
  *
- *   2. Verify a sending domain in Resend. Resend requires DNS records on
- *      whatever domain the From address lives on, and we do not control
- *      copperac.com's DNS, the client does. Do not wait on them: verify
- *      glazedweb.com and send from e.g. copper@glazedweb.com. The reply_to
- *      below is set to the customer's own address, so the club hits reply and
- *      it goes straight to the customer. Same verified domain works for every
- *      site we build.
- *
- *   3. Set RESEND_API_KEY, INQUIRY_FROM and INQUIRY_TO in the Vercel project.
- *      See .env.example.
- *
- *   4. Redeploy, then actually submit the form once and confirm it arrives.
- *      The success panel only appears when Resend accepted the message, so if
- *      you see it, delivery was accepted.
- *
- * Known gap while this is unconfigured: the mailto fallback needs the visitor
- * to have a registered mail handler. Desktop webmail users get nothing from
- * that click beyond the on-screen note and the phone number.
+ * Known gap when unconfigured: the mailto fallback needs the visitor to have
+ * a registered mail handler. Desktop webmail users get nothing from that
+ * click beyond the on-screen note and the phone number.
  */
 
 const REQUIRED = ["first", "last", "email", "phone"] as const;
@@ -75,10 +68,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "bad_email" }, { status: 422 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.INQUIRY_TO || SITE.email;
-  const from = process.env.INQUIRY_FROM;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const to = process.env.INQUIRY_TO?.trim() || SITE.email;
+  const from = process.env.INQUIRY_FROM?.trim();
   if (!apiKey || !from) {
+    console.error(
+      `[inquiry] 503 not_configured: RESEND_API_KEY ${apiKey ? "set" : "MISSING"}, INQUIRY_FROM ${from ? "set" : "MISSING"}`
+    );
     return NextResponse.json({ ok: false, reason: "not_configured" }, { status: 503 });
   }
 
@@ -109,12 +105,17 @@ export async function POST(request: Request) {
       }),
     });
     if (!res.ok) {
+      // Resend's body names the actual problem (bad key, unverified From
+      // domain, malformed address). Without it this is an unreadable 502.
+      const detail = await res.text().catch(() => "<unreadable>");
+      console.error(`[inquiry] 502 provider_error: Resend ${res.status} ${detail}`);
       return NextResponse.json(
         { ok: false, reason: "provider_error", status: res.status },
         { status: 502 }
       );
     }
-  } catch {
+  } catch (err) {
+    console.error("[inquiry] 502 network_error: call to Resend failed:", err);
     return NextResponse.json({ ok: false, reason: "network_error" }, { status: 502 });
   }
 
