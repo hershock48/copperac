@@ -150,44 +150,35 @@ here rather than left to be rediscovered:
 Both carry the main-bar number. If it changes again, those are the two to
 remember.
 
-## The enquiry form does not reach an inbox yet
+## The enquiry form: live, delivering to reserve@copperac.com
 
-Read this before showing anyone the `/reserve` or `/contact` form, because it is
-the one thing on the site that can cost the client real business.
+Configured and confirmed end to end on 21 Aug 2026: a test enquiry sent
+through the real route was accepted by Resend and landed in an inbox.
 
-Right now `app/api/inquiry/route.ts` answers `503 not_configured`, and
-`InquiryForm` responds by opening the visitor's email app with every field
-prefilled, addressed to `SITE.email`. It does not claim the message was sent.
-That is the intended unconfigured behaviour, not a bug, and it is a deliberate
-replacement for what was there before: a stub that waited half a second, showed
-"Thanks, we got it", and sent nothing anywhere.
+How it is wired, for whoever touches it next:
 
-Of the two things that were missing, one is resolved:
+- **Destination:** `reserve@copperac.com`, the club's monitored inbox
+  (confirmed by the owner, Aug 2026). It is `SITE.email` in `lib/site.ts` and
+  also set explicitly as `INQUIRY_TO` on the Vercel project.
+- **Sending domain:** `glazedweb.com`, verified in Resend (us-east-1). We do
+  not control `copperac.com`'s DNS, the client does, so the From address
+  lives on our domain instead: `INQUIRY_FROM` is
+  `Copper Athletic Club <copper@glazedweb.com>`. The route sets `reply_to` to
+  the customer's own address, so the club hits reply and the reply lands with
+  the customer. One verified domain covers every site we build — the DKIM/SPF
+  records sit in Vercel DNS on glazedweb.com.
+- **Key:** the Vercel `RESEND_API_KEY` is a *sending-only* restricted key on
+  purpose; domain management needs a full-access key that exists only
+  transiently during setup and gets revoked after.
+- **Local dev:** `.env.local` carries the same config but points `INQUIRY_TO`
+  at our own inbox, so localhost form tests never email the club.
 
-**1. The club's inbox is confirmed: `reserve@copperac.com`** (owner, Aug
-2026). It is `SITE.email` in `lib/site.ts`, which is also the `INQUIRY_TO`
-default, so no env var is needed for the destination.
-
-**2. No mail provider is configured.** The Resend call is written and tested. It
-needs three environment variables in the Vercel project, listed in
-`.env.example`.
-
-On the sending domain, which is the part that trips people up: Resend requires
-DNS records on whatever domain the From address lives on, and we do not control
-`copperac.com`'s DNS, the client does. **Do not wait on them.** Verify
-`glazedweb.com` in Resend and send from something like `copper@glazedweb.com`.
-The route sets `reply_to` to the customer's own address, so the club hits reply
-and the reply lands with the customer. No client DNS work, and one verified
-domain covers every site we build.
-
-Then submit the form once against the deploy and confirm it arrives. The success
-panel only renders when Resend accepted the message, so seeing it is the proof.
-
-Known gap while it stays unconfigured: the `mailto:` handoff needs a registered
-mail handler on the visitor's machine. Desktop webmail users get the on-screen
-note and the phone number and nothing else. Closing that means rendering the
-composed message on the page with a copy button, the way the Cookin' with Beans
-order builder does.
+If the env vars are ever removed, the route answers `503 not_configured` and
+`InquiryForm` falls back to opening the visitor's email app with every field
+prefilled, addressed to `SITE.email` — it never fakes a success. Known gap in
+that fallback mode only: the `mailto:` handoff needs a registered mail handler
+on the visitor's machine; desktop webmail users get the on-screen note and the
+phone number and nothing else.
 
 ## Online ordering: Toast's for now, ours built and parked
 
@@ -244,7 +235,7 @@ Decisions worth knowing before touching it:
 ## Before launch
 
 - [x] Enquiry inbox confirmed by the owner: `reserve@copperac.com` (Aug 2026), set as `SITE.email`
-- [ ] **Configure enquiry delivery**: verify `glazedweb.com` in Resend, then set `RESEND_API_KEY`, `INQUIRY_FROM` and `INQUIRY_TO` in Vercel. See `.env.example` and the section above
+- [x] Enquiry delivery configured and confirmed (21 Aug 2026): `glazedweb.com` verified in Resend, env vars set in Vercel, test enquiry delivered. See the section above
 - [x] Kitchen close time confirmed by the owner: kitchen closes at 10 PM, bar stays open until midnight (Aug 2026). `KITCHEN_NOTE` is correct
 - [ ] Confirm the accessibility wording with the owner
 - [ ] Verify the lat/lng pin
