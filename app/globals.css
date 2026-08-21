@@ -143,6 +143,16 @@ button:not(:disabled) {
   color: var(--color-cream-dim);
 }
 .board-at { font-size: 11px; opacity: 0.45; text-transform: lowercase; }
+.board-when {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-cream-dim);
+  opacity: 0.62;
+}
 
 .board-score {
   font-family: var(--font-display);

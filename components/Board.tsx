@@ -124,6 +124,30 @@ function runChars(parts: string[]): number {
 }
 
 /**
+ * How long ago a result was, by Detroit calendar day, so "Last out" reads at a
+ * glance: "Today", "Yesterday", or "Nd ago". Compared on ET calendar dates, not
+ * raw hours, so a game at 9pm and a look at 1am the next day reads "Yesterday",
+ * not "4h". Server-rendered inside the 15-minute board cache, so no client clock
+ * and no hydration mismatch.
+ */
+function playedAgo(iso: string): string {
+  const day = (d: Date) => {
+    // en-CA gives YYYY-MM-DD; parse as UTC midnight to get a stable day index.
+    const ymd = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Detroit",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(d);
+    return Math.floor(Date.parse(`${ymd}T00:00:00Z`) / 86_400_000);
+  };
+  const days = day(new Date()) - day(new Date(iso));
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  return `${days}d ago`;
+}
+
+/**
  * How old a headline is, but only once that is worth saying.
  *
  * Nothing for anything inside 48 hours: on a crawl of current news "today" is the default and
@@ -247,6 +271,15 @@ function Row({ g, final = false }: { g: BoardGame; final?: boolean }) {
         <b className="text-cream">DET</b>
         <span className="board-at">{g.home ? "vs" : "@"}</span>
         <b>{g.opp}</b>
+        {/* When it was played. "Last out" lists results newest-first, but with
+            no date on any row you cannot tell whether the top one was tonight
+            or last week. This sits at the right edge of the matchup, so it
+            survives the narrow-screen layout that drops the network column. */}
+        {final && (
+          <time className="board-when" dateTime={g.date}>
+            {playedAgo(g.date)}
+          </time>
+        )}
       </span>
 
       {final && g.detScore !== null ? (
