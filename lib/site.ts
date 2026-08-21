@@ -31,29 +31,29 @@ export const SITE = {
   url: "https://copperac.com",
   phone: "(269) 558-8222",
   phoneHref: "tel:+12695588222",
-  // PLACEHOLDER. Nobody has confirmed this mailbox exists. It is both the
-  // address the enquiry form's mailto fallback writes to and the default for
-  // INQUIRY_TO, so if it is wrong, enquiries go nowhere and no error is raised.
-  // Get the real monitored inbox from the club. See README, "The enquiry form
-  // does not reach an inbox yet".
-  email: "info@copperac.com",
+  // Confirmed by the owner, 21 Aug 2026: reserve@copperac.com is the club's
+  // monitored inbox (replaces the info@ placeholder that was never confirmed).
+  // This is both the address the enquiry form's mailto fallback writes to and
+  // the default for INQUIRY_TO. Delivery via Resend is still unconfigured —
+  // see README, "The enquiry form does not reach an inbox yet".
+  email: "reserve@copperac.com",
   street: "133 W. Michigan Ave.",
   city: "Marshall",
   state: "MI",
   zip: "49068",
   mapUrl:
     "https://www.google.com/maps/dir/?api=1&destination=133+W+Michigan+Ave,+Marshall,+MI+49068",
-  // Ordering is ours now: the site's own /order page, built by Glazed Web,
-  // replaces the Toast online ordering channel entirely. Kevin's call, August
-  // 2026 ("we replace toast online"). Toast the POS stays in the building for
-  // dine-in; this only takes the online channel. Every "Order Online" surface
-  // reads this constant, so pointing the site back at Toast, or at a future
-  // order.copperac.com, is one edit here.
-  orderUrl: "/order",
-  // RETIRED, kept for the record: the Toast page this replaces. The old
-  // comment here recommended Toast Ordering Pro on order.copperac.com because
-  // Toast blocks iframes; building our own ordering made that moot.
-  toastOrderUrl: "https://order.toasttab.com/online/copper-pub",
+  // Ordering is Toast's, for now: Kevin's call when he took the site (Aug
+  // 2026) — he keeps Toast online ordering and likes the rest. This is the
+  // same store the old site links: copperac.com's nav points at
+  // www.toasttab.com/copper-pub/v3, which 301s to this URL (verified 21 Aug
+  // 2026). Every "Order Online" surface reads this constant. The in-house
+  // ordering Glazed Web built ("we replace toast online" was the earlier
+  // call, since reversed) stays intact at /order but parked behind a
+  // redirect to this same store — see next.config.ts. Switching to the
+  // in-house channel is this line back to "/order", that redirect deleted,
+  // and /order restored to app/sitemap.ts.
+  orderUrl: "https://order.toasttab.com/online/copper-pub",
   instagram: "https://www.instagram.com/copper_ac/",
   facebook: "https://www.facebook.com/TheCopperAC",
   geo: { lat: 42.2717, lng: -84.9636 },

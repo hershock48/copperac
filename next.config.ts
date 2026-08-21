@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
     return [
       { source: "/menus", destination: "/menu", permanent: true },
       { source: "/home", destination: "/", permanent: true },
+      // The in-house /order page is parked while the club stays on Toast for
+      // online ordering (Kevin's call, Aug 2026). This redirect runs before
+      // the filesystem, so app/order/page.tsx stays built but unreachable:
+      // no guest can place an order on a kitchen board nobody is watching.
+      // Deliberately not permanent — browsers cache 308s for good, and this
+      // decision is "for now". Keep the destination in step with
+      // SITE.orderUrl in lib/site.ts; delete this line to bring /order back.
+      {
+        source: "/order",
+        destination: "https://order.toasttab.com/online/copper-pub",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {

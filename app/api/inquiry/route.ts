@@ -18,8 +18,8 @@ import { SITE } from "@/lib/site";
  *
  * TO SWITCH IT ON, four steps:
  *
- *   1. Get the club's real monitored inbox. SITE.email is currently
- *      info@copperac.com and that is a placeholder nobody has confirmed.
+ *   1. DONE (Aug 2026): the club's monitored inbox is reserve@copperac.com,
+ *      confirmed by the owner and set as SITE.email.
  *
  *   2. Verify a sending domain in Resend. Resend requires DNS records on
  *      whatever domain the From address lives on, and we do not control

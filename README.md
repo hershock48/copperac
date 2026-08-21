@@ -162,12 +162,11 @@ That is the intended unconfigured behaviour, not a bug, and it is a deliberate
 replacement for what was there before: a stub that waited half a second, showed
 "Thanks, we got it", and sent nothing anywhere.
 
-Two separate things are missing, and fixing one without the other gets you
-nothing:
+Of the two things that were missing, one is resolved:
 
-**1. Nobody has confirmed the club's inbox.** `info@copperac.com` in
-`lib/site.ts` is a placeholder. Ask the owner for the address a human actually
-reads, and set it as `INQUIRY_TO`.
+**1. The club's inbox is confirmed: `reserve@copperac.com`** (owner, Aug
+2026). It is `SITE.email` in `lib/site.ts`, which is also the `INQUIRY_TO`
+default, so no env var is needed for the destination.
 
 **2. No mail provider is configured.** The Resend call is written and tested. It
 needs three environment variables in the Vercel project, listed in
@@ -190,17 +189,24 @@ note and the phone number and nothing else. Closing that means rendering the
 composed message on the page with a copy button, the way the Cookin' with Beans
 order builder does.
 
-## Online ordering: ours, replacing Toast's
+## Online ordering: Toast's for now, ours built and parked
 
-The `/order` page replaces the Toast online ordering channel: guests order
-pickup on the club's own site, every "Order Online" surface points at it (one
-constant, `SITE.orderUrl`), and orders land on `/kitchen`, a PIN-gated staff
-board that rings until each ticket is accepted. Toast the POS stays in the
-building untouched; this takes only the online channel. Kevin's call, August
-2026: full menu including cocktails to go (their Toast page already sells
-them; Michigan made cocktails-to-go permanent in 2023). Orders with drinks
-require a 21+ acknowledgment at checkout and carry an ID CHECK flag on the
-kitchen ticket.
+Kevin kept Toast when he took the site (Aug 2026): every "Order Online"
+surface points at the Toast store (one constant, `SITE.orderUrl`, the same
+store the old site's nav links), and `/order` redirects there in
+`next.config.ts`, so the in-house ordering below stays built but unreachable.
+That is the safe direction to park it: a live `/order` page would take orders
+onto a kitchen board nobody is watching. Switching the in-house channel on is
+three small edits, listed at `orderUrl` in `lib/site.ts`.
+
+What is parked: guests order pickup on the club's own site at `/order`, and
+orders land on `/kitchen`, a PIN-gated staff board that rings until each
+ticket is accepted. Toast the POS stays in the building untouched either way;
+this only ever took the online channel. Scope from the earlier "we replace
+toast online" call, since reversed: full menu including cocktails to go
+(their Toast page already sells them; Michigan made cocktails-to-go permanent
+in 2023). Orders with drinks require a 21+ acknowledgment at checkout and
+carry an ID CHECK flag on the kitchen ticket.
 
 The model: a 99 cent order fee paid by the guest, disclosed in the banner
 above the menu and again as a labeled line in the cart, never sprung at
@@ -237,13 +243,14 @@ Decisions worth knowing before touching it:
 
 ## Before launch
 
-- [ ] **Confirm the club's real enquiry inbox** (`info@copperac.com` in `lib/site.ts` is a placeholder)
+- [x] Enquiry inbox confirmed by the owner: `reserve@copperac.com` (Aug 2026), set as `SITE.email`
 - [ ] **Configure enquiry delivery**: verify `glazedweb.com` in Resend, then set `RESEND_API_KEY`, `INQUIRY_FROM` and `INQUIRY_TO` in Vercel. See `.env.example` and the section above
 - [x] Kitchen close time confirmed by the owner: kitchen closes at 10 PM, bar stays open until midnight (Aug 2026). `KITCHEN_NOTE` is correct
 - [ ] Confirm the accessibility wording with the owner
 - [ ] Verify the lat/lng pin
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
+- The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel — it is parked for now (see the ordering section above), so none of them block launch
 - [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
 - [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
 - [ ] **Ordering: set `ORDERING_DEMO_ALWAYS_OPEN=1` on the demo deploy, and REMOVE it at go-live** so real guests get real hours

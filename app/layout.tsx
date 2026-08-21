@@ -122,7 +122,11 @@ const restaurantSchema = {
     "@type": "OrderAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${SITE.url}${SITE.orderUrl}`,
+      // orderUrl is absolute while ordering lives on Toast, relative when it
+      // is the site's own /order page; either way this must stay absolute.
+      urlTemplate: SITE.orderUrl.startsWith("http")
+        ? SITE.orderUrl
+        : `${SITE.url}${SITE.orderUrl}`,
       inLanguage: "en-US",
       actionPlatform: [
         "http://schema.org/DesktopWebPlatform",
