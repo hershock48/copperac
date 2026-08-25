@@ -2,6 +2,26 @@
 export type MenuItem = { name: string; desc: string; price: string };
 export type MenuSection = { name: string; items: MenuItem[] };
 
+/*
+  Named export, not just a row in FOOD_MENU: this section has two more
+  consumers now (the live taplist's fallback in lib/taplist.ts and the
+  Scooplist seed in tools/populate-scooplist.mjs), and finding it by
+  display string is how a rename would silently break both. When the feed
+  is live these items are the SNAPSHOT the page falls back to; the bar
+  edits the live list in Scooplist.
+*/
+export const COCKTAILS: MenuSection = {
+  name: "Cocktails",
+  items: [
+    { name: "Copper Mule", desc: "Traditional mule made with copper distilled vodka", price: "9.00" },
+    { name: "Motown Mule", desc: "Maker’s Mark with Detroit’s famous ginger ale", price: "9.00" },
+    { name: "Michigan Mule", desc: "Featuring Grand Traverse Cherry Vodka", price: "9.00" },
+    { name: "Marshall Mule", desc: "In honor of our very own City of Hospitality, this version features a refreshing pineapple vodka", price: "9.00" },
+    { name: "Great Lakes Iced Tea", desc: "A Pure Michigan twist on an all-time classic", price: "9.00" },
+    { name: "Curse of Bobby Layne", desc: "Considered the greatest QB in Lions’ history, as well as one of the greatest drinkers, Bobby Layne led Detroit to three NFL Championships in the 1950’s. Then, the Lions traded him. Legend has it that on his way out, Bobby cursed the Lions, saying they wouldn’t win another championship for another 50 years. And, well…you know how that’s going. So, lift your glass (made with Bobby’s favorite scotch- whisky) and help us lift the curse!", price: "7.00" },
+  ],
+};
+
 export const FOOD_MENU: MenuSection[] = [
   {
     name: "Appetizers",
@@ -82,17 +102,7 @@ export const FOOD_MENU: MenuSection[] = [
       { name: "Better Made Chips", desc: "", price: "1.50" },
     ],
   },
-  {
-    name: "Cocktails",
-    items: [
-      { name: "Copper Mule", desc: "Traditional mule made with copper distilled vodka", price: "9.00" },
-      { name: "Motown Mule", desc: "Maker\u2019s Mark with Detroit\u2019s famous ginger ale", price: "9.00" },
-      { name: "Michigan Mule", desc: "Featuring Grand Traverse Cherry Vodka", price: "9.00" },
-      { name: "Marshall Mule", desc: "In honor of our very own City of Hospitality, this version features a refreshing pineapple vodka", price: "9.00" },
-      { name: "Great Lakes Iced Tea", desc: "A Pure Michigan twist on an all-time classic", price: "9.00" },
-      { name: "Curse of Bobby Layne", desc: "Considered the greatest QB in Lions\u2019 history, as well as one of the greatest drinkers, Bobby Layne led Detroit to three NFL Championships in the 1950\u2019s. Then, the Lions traded him. Legend has it that on his way out, Bobby cursed the Lions, saying they wouldn\u2019t win another championship for another 50 years. And, well\u2026you know how that\u2019s going. So, lift your glass (made with Bobby\u2019s favorite scotch- whisky) and help us lift the curse!", price: "7.00" },
-    ],
-  },
+  COCKTAILS,
 ];
 
 export const BRUNCH_MENU: MenuSection[] = [

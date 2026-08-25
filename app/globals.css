@@ -465,6 +465,74 @@ button:not(:disabled) {
   font-variant-numeric: tabular-nums;
 }
 
+/* The live tap board: the bar's rows inside the sportsbook .board-panel
+   treatment. Small text on the panel's near-black ground follows the
+   contrast table at the top: copper-light for anything under 18px, never
+   plain copper, never white on copper. */
+.tap-row {
+  display: grid;
+  grid-template-columns: 1fr auto minmax(52px, auto);
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.18s ease;
+}
+.tap-row:hover { background: rgba(184, 109, 42, 0.06); }
+.tap-name {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+}
+.tap-brewery {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-cream-dim);
+  opacity: 0.62;
+}
+.tap-abv {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  color: var(--color-cream-dim);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+/* the LED numeral, same glow recipe as .board-score */
+.tap-price {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-align: right;
+  color: var(--color-copper-light);
+  text-shadow: 0 0 14px rgba(209, 138, 72, 0.35);
+}
+.tap-chip {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+/* keg close to kicking: the board's copper alarm, not red (nothing is wrong) */
+.tap-chip-low { background: rgba(209, 138, 72, 0.16); color: var(--color-copper-light); }
+.tap-chip-local { background: rgba(232, 226, 216, 0.1); color: var(--color-cream-dim); }
+@media (max-width: 460px) {
+  /* same collapse point as .board-row: abv folds away, name and price stay */
+  .tap-row { grid-template-columns: 1fr minmax(52px, auto); gap: 10px; }
+  .tap-abv { display: none; }
+}
+
 /* "12 oz curls": the bar, in the house voice */
 .curls {
   display: flex;

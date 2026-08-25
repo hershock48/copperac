@@ -3,14 +3,28 @@ import Link from "next/link";
 import { Button, Eyebrow, Heading, Section } from "@/components/ui";
 import Board from "@/components/Board";
 import LiveStatus from "@/components/LiveStatus";
+import { getDrinks } from "@/lib/taplist";
 import { HOURS, KITCHEN_NOTE, SITE, upcomingEvents } from "@/lib/site";
 
 // The board pulls live Detroit scores, so the homepage regenerates every 15
 // minutes instead of being frozen at build time.
 export const revalidate = 900;
 
-export default function Home() {
+export default async function Home() {
   const nextEvent = upcomingEvents()[0];
+
+  /*
+    The tap teaser is honest by construction: it renders ONLY when the
+    Scooplist feed is live AND the bar has taps entered, so the LIVE chip
+    can never point at a guess (this page's whole comment history is
+    numbers nobody could re-check; this one re-checks itself away). The
+    count can lag the menu page by up to this page's 900s revalidate,
+    which is fine for presence; the full list stays on /menu on purpose,
+    because the homepage already carries the sports board and the news,
+    and a second copy of the taps doubles the stale surface.
+  */
+  const drinks = await getDrinks();
+  const tapsLive = drinks.live.taps && drinks.taps.length > 0;
 
   return (
     <>
@@ -120,7 +134,25 @@ export default function Home() {
           are the things people came to find, so they get the words people
           search for, not the house joke. */}
       <Section dark className="!py-0">
-        <div className="grid divide-y divide-ink-line lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+        {/* Four cards divide cleanly only in one row, so the live state
+            stays stacked until xl; a 2x2 at lg would put a stray divide-x
+            border on the second row's first card. */}
+        <div
+          className={`grid divide-y divide-ink-line ${
+            tapsLive
+              ? "xl:grid-cols-4 xl:divide-x xl:divide-y-0"
+              : "lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+          }`}
+        >
+          {tapsLive && (
+            <QuickCard
+              title="On Tap"
+              body={`${drinks.taps.length} ${drinks.taps.length === 1 ? "tap" : "taps"} pouring right now, kept current by the bar as kegs change.`}
+              href="/menu#taps"
+              cta="See what's pouring"
+              live
+            />
+          )}
           <QuickCard
             title="Menu"
             body="Burgers, coneys, wings and a Detroit-style loose burger that people drive in for. Kitchen runs till 10."
@@ -284,15 +316,27 @@ function QuickCard({
   body,
   href,
   cta,
+  live = false,
 }: {
   title: string;
   body: string;
   href: string;
   cta: string;
+  /** Renders the pulsing live chip; pass it only for content that IS live
+      (feed-backed), never for static copy dressed up as live. */
+  live?: boolean;
 }) {
   return (
     <Link href={href} className="group block px-5 py-14 lg:px-12">
-      <h2 className="display text-2xl uppercase tracking-widest text-copper">{title}</h2>
+      <h2 className="display flex flex-wrap items-center gap-3 text-2xl uppercase tracking-widest text-copper">
+        {title}
+        {live && (
+          <span className="status-chip status-open">
+            <span className="status-dot" aria-hidden="true" />
+            Live
+          </span>
+        )}
+      </h2>
       <p className="mt-4 text-base leading-relaxed text-cream-dim">{body}</p>
       <span className="display mt-6 inline-flex items-center gap-2 text-sm uppercase tracking-widest text-cream transition-colors group-hover:text-copper-light">
         {cta}

@@ -265,16 +265,53 @@ app/
   kitchen/          staff board: orders + chime, 86 toggles, busy dial, pause
   api/ordering/     public state + order placement (server recomputes all prices)
   api/kitchen/      PIN login, order queue, staff state
-components/         Header, Footer, MenuList, InquiryForm, ordering/, shared UI
+  api/status/       live-vs-fallback report for the taplist feed
+components/         Header, Footer, MenuList, TapList, InquiryForm, ordering/, shared UI
 lib/
   site.ts           business facts, hours, events (single source of truth)
-  menu.ts           menu data
+  menu.ts           menu data (Cocktails is a named export, see the taplist section)
+  taplist.ts        the live bar program from Scooplist, with fallbacks
+  scooplist-feed.ts the feed client, copied from glaze/assets/scooplist-feed/
   ordering/         config (the 99 cent fee, hours window), derived orderable
                     menu, storage (Postgres or memory), kitchen auth
+tools/
+  populate-scooplist.mjs  seeds the copperac Scooplist org from lib/menu.ts + the Toast harvest
 public/img/         WebP photography and logos
 ```
 
-Everything a non-developer would want to change lives in `lib/site.ts` and `lib/menu.ts`.
+Everything a non-developer would want to change lives in `lib/site.ts` and
+`lib/menu.ts`, except the taps and cocktails: the bar edits those itself in
+Scooplist, and the files hold the fallback snapshot the site shows when the
+feed cannot answer.
+
+## The taplist is live (when the bar keeps it that way)
+
+The menu page's bar area and the homepage's "On Tap" card render from the
+bar's own Scooplist org (`copperac` on `scooplist.glazedweb.com`, location
+`marshall`, categories `taps:On Tap,cocktails:Cocktails`). `lib/taplist.ts`
+fetches the feed server-side (60s revalidate, 3s timeout) through the
+drop-in client in `lib/scooplist-feed.ts`.
+
+The old rule, "no invented tap list, because the taps rotate", survives as
+the fallback rule. Per section:
+
+- **Taps** have no static fallback on purpose; when the feed is down or the
+  bar has entered nothing, the menu shows exactly the old curls panel
+  ("Taps rotate. Ask what's pouring.") and the homepage card does not
+  render at all, so the LIVE chip can never point at a guess.
+- **Cocktails** fall back to the `COCKTAILS` export in `lib/menu.ts`, the
+  printed-menu snapshot.
+- One bad row falls its whole section back (misconfig beats partial truth),
+  and sections fail independently.
+
+`GET /api/status` says which sections are live right now. First-time setup:
+create the org (`scooplist/tools/create-org.mjs`, category contract above),
+then seed it with `tools/populate-scooplist.mjs` (printed cocktails into the
+case, Toast drinks as library rotation stock, taps deliberately empty).
+
+A dedicated /drinks page is deferred on purpose: build it when the bar has
+demonstrably kept taps current for a while and the program outgrows one
+panel, not before.
 
 ---
 
