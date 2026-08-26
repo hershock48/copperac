@@ -34,19 +34,17 @@ const LOCATION = "marshall";
   Code default, env-overridable, the cascarellis rule: the feed URL is the
   client's own infrastructure, a public fact like their phone number, and
   requiring a dashboard step to turn the feature on once left a site
-  silently running on its snapshot with nothing saying so. Until the org
-  exists on the deployment the fetch 404s fast and every section falls
-  back, which renders today's page exactly. SCOOPLIST_FEED_URL overrides
-  for local testing against a local Scooplist.
+  silently running on its snapshot with nothing saying so. Until the
+  copperac org exists on the deployment the fetch 404s fast and every
+  section falls back, which renders today's page exactly.
+  SCOOPLIST_FEED_URL overrides for local testing against a local
+  Scooplist.
 
-  The host is the multi-org deployment's Vercel alias, not a glazedweb.com
-  subdomain, on purpose for now: scooplist.glazedweb.com is TAKEN, it is
-  True North's live single-tenant install and their site reads it, so
-  pointing here at it (or moving that domain) would break a live client.
-  If the central deployment ever gets a branded domain, this constant is
-  the one line to change.
+  scooplist.glazedweb.com is the multi-org deployment (Kevin's call,
+  August 2026: the product's domain belongs to the product; True North,
+  who used to hold it single-tenant, became its first org).
 */
-const DEFAULT_FEED = "https://scooplist-orgs.vercel.app";
+const DEFAULT_FEED = "https://scooplist.glazedweb.com";
 
 export type Tap = {
   name: string;

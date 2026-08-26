@@ -287,7 +287,7 @@ feed cannot answer.
 ## The taplist is live (when the bar keeps it that way)
 
 The menu page's bar area and the homepage's "On Tap" card render from the
-bar's own Scooplist org (`copperac` on `scooplist-orgs.vercel.app`, location
+bar's own Scooplist org (`copperac` on `scooplist.glazedweb.com`, location
 `marshall`, categories `taps:On Tap,cocktails:Cocktails`). `lib/taplist.ts`
 fetches the feed server-side (60s revalidate, 3s timeout) through the
 drop-in client in `lib/scooplist-feed.ts`.

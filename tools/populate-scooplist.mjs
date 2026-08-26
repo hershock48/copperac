@@ -10,7 +10,7 @@
  * Run (PowerShell), with the org's real PIN in YOUR terminal only:
  *
  *   $env:SCOOPLIST_ADMIN_PIN = "<pin>"
- *   node --experimental-strip-types tools/populate-scooplist.mjs https://scooplist-orgs.vercel.app
+ *   node --experimental-strip-types tools/populate-scooplist.mjs https://scooplist.glazedweb.com
  *
  * The org must already exist with this CATEGORY CONTRACT (the same list
  * lib/taplist.ts documents; scooplist/tools/create-org.mjs creates it):
