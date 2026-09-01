@@ -177,9 +177,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Courtesy copy of what the confirmation screen shows. Best-effort by
-  // design: an email problem must never fail an order.
+  // design: an email problem must never fail an order. But the send is
+  // AWAITED, because fire-and-forget dies on serverless: Vercel freezes the
+  // lambda the moment the response returns, so an un-awaited send silently
+  // never runs and its catch never logs. Proven live in devine's agreement
+  // flow, which delivered exactly one of its two emails for this reason.
+  // The catch keeps a bounced email from failing the order.
   const { sendOrderConfirmation } = await import("@/lib/ordering/email");
-  sendOrderConfirmation(order).catch(() => {});
+  await sendOrderConfirmation(order).catch(() => {});
 
   return NextResponse.json({
     id: order.id,

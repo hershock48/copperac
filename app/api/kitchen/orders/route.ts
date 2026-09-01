@@ -43,7 +43,10 @@ export async function PATCH(req: NextRequest) {
     const order = await store.getOrder(String(body.id));
     if (order) {
       const { sendRefundNotice } = await import("@/lib/ordering/email");
-      sendRefundNotice(order).catch(() => {});
+      // Awaited: a fire-and-forget send dies on serverless, the lambda
+      // freezes when the response returns. The catch keeps the notice
+      // best-effort, a bounced email never fails the refund.
+      await sendRefundNotice(order).catch(() => {});
     }
   }
   return NextResponse.json({ ok: true });
