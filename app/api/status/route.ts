@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDrinks } from "@/lib/taplist";
+import { workroomPasscode } from "@/lib/workroom/auth";
+import { getStore } from "@/lib/workroom/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,6 +33,14 @@ export async function GET() {
         updatedAt: drinks.updatedAt,
       },
       feed: { configured: Boolean(override), url: override ?? "code default (lib/taplist.ts)" },
+      // The workroom's two switches, as booleans and nothing more: whether a
+      // passcode is set (never the passcode) and which store saves land in.
+      // So the operator can confirm a dashboard change from outside without
+      // signing in to look for the memory banner.
+      workroom: {
+        passcode: workroomPasscode() === null ? "unset" : "set",
+        storage: getStore().backend,
+      },
       summary: drinks.live.taps
         ? `Live: ${drinks.taps.length} ${drinks.taps.length === 1 ? "tap renders" : "taps render"} from Scooplist.`
         : drinks.live.cocktails
