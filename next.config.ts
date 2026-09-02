@@ -117,6 +117,16 @@ const nextConfig: NextConfig = {
         source: "/pitch/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      {
+        // Every *.vercel.app address (copperac.vercel.app, the
+        // copperac-glazedweb and git-main aliases, and each per-deploy URL)
+        // serves the same site as copperac.com. Left indexable they compete
+        // with the club for its own name. Host-scoped, so copperac.com
+        // itself is untouched.
+        source: "/:path*",
+        has: [{ type: "host", value: "(.*)\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
     ];
   },
 };

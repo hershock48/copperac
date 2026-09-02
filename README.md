@@ -91,8 +91,8 @@ off after the first click.
 
 Every path on `copperac.glazedweb.com` sends `X-Robots-Tag: noindex, nofollow`,
 because `/demo` is a full copy of the client's site and must never compete with
-`copperac.com` for their own name. `copperac.vercel.app` is still indexable and
-is the same duplicate-content risk; worth a noindex or deletion before launch.
+`copperac.com` for their own name. Every `*.vercel.app` host gets the same
+header for the same reason (host-scoped rule in `next.config.ts`).
 
 Every claim in "What we found" was checked against the live site on 8 August
 2026 and links to the page that proves it. Two things were left out because they
@@ -244,7 +244,8 @@ Decisions worth knowing before touching it:
 - [x] Enquiry inbox confirmed by the owner: `reserve@copperac.com` (Aug 2026), set as `SITE.email`
 - [x] Enquiry delivery configured and confirmed (21 Aug 2026): `glazedweb.com` verified in Resend, env vars set in Vercel, test enquiry delivered. See the section above
 - [x] Kitchen close time confirmed by the owner: kitchen closes at 10 PM, bar stays open until midnight (Aug 2026). `KITCHEN_NOTE` is correct
-- [ ] Confirm the accessibility wording with the owner
+- [x] Accessibility wording confirmed (Kevin, 2 Sep 2026): main floor street-level accessible, the Reserve upstairs not wheelchair accessible, call and we will help. `ACCESSIBILITY_NOTE` in `lib/site.ts` stands as written
+- [x] Every `*.vercel.app` host sends `X-Robots-Tag: noindex, nofollow` (2 Sep 2026), so none of them can compete with `copperac.com` for the club's name
 - [x] Verify the lat/lng pin (2 Sep 2026): the old pin was on the Brooks Memorial Fountain roundabout, a block and a half west. Moved to mid-block on the south side of the 100 block, see the note at `geo` in `lib/site.ts`. Worth a glance on a phone in Google Maps to be sure of the exact storefront
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
