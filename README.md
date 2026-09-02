@@ -364,7 +364,7 @@ lib/
   ordering/         config (the 99 cent fee, hours window), derived orderable
                     menu, storage (Postgres or memory), kitchen auth
 tools/
-  populate-scooplist.mjs  seeds the copperac Scooplist org from lib/menu.ts + the Toast harvest
+  populate-scooplist.mjs  seeds the copper Scooplist org from lib/menu.ts + the Toast harvest
 public/img/         WebP photography and logos
 ```
 
@@ -376,7 +376,7 @@ feed cannot answer.
 ## The taplist is live (when the bar keeps it that way)
 
 The menu page's bar area and the homepage's "On Tap" card render from the
-bar's own Scooplist org (`copperac` on `scooplist.glazedweb.com`, location
+bar's own Scooplist org (`copper` on `scooplist.glazedweb.com`, location
 `marshall`, categories `taps:On Tap,cocktails:Cocktails`). `lib/taplist.ts`
 fetches the feed server-side (60s revalidate, 3s timeout) through the
 drop-in client in `lib/scooplist-feed.ts`.
@@ -418,7 +418,7 @@ to, and it renders only while that month is current.
 in multi-org mode and healthy, but no business has been created on it (True
 North's included), so `/api/status` reports both sections on fallback and the
 site shows the printed cocktails and the taps-rotate panel. Run the script
-above, then hand the bar `scooplist.glazedweb.com/login/copperac` and the PIN.
+above, then hand the bar `scooplist.glazedweb.com/login/copper` and the PIN.
 The site picks the feed up on its own within a minute.
 
 A dedicated /drinks page is deferred on purpose: build it when the bar has

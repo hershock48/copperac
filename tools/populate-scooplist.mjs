@@ -1,5 +1,5 @@
 /**
- * Seeds the copperac org on the multi-org Scooplist deployment with the
+ * Seeds the copper org on the multi-org Scooplist deployment with the
  * bar's cocktail program, straight from lib/menu.ts (the printed-menu
  * truth) plus the Toast harvest (data/toast-d.json) as a rotation library,
  * so the data is never typed twice. Idempotent-ish: flavors are matched by
@@ -15,7 +15,7 @@
  * The org must already exist with this CATEGORY CONTRACT (the same list
  * lib/taplist.ts documents; scooplist/tools/create-org.mjs creates it):
  *
- *   slug copperac, location marshall:Copper Athletic Club
+ *   slug copper, location marshall:Copper Athletic Club
  *   categories: taps:On Tap,cocktails:Cocktails
  *
  * What gets seeded, and what deliberately does not:
@@ -36,7 +36,7 @@ import { COCKTAILS } from "../lib/menu.ts";
 
 const BASE = (process.argv[2] || "").replace(/\/$/, "");
 const PIN = process.env.SCOOPLIST_ADMIN_PIN || "";
-const ORG = "copperac";
+const ORG = "copper";
 const LOCATION = "marshall";
 
 if (!BASE || !PIN) {
