@@ -59,7 +59,7 @@ export default function ContactPage() {
             <div className="mt-10 overflow-hidden rounded-sm border border-ink-line">
               <iframe
                 title="Map showing Copper Athletic Club at 133 W. Michigan Ave., Marshall, Michigan"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-84.9700%2C42.2685%2C-84.9572%2C42.2749&layer=mapnik&marker=42.2717%2C-84.9636"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-84.9661%2C42.2686%2C-84.9533%2C42.2750&layer=mapnik&marker=42.2718%2C-84.9597"
                 className="h-72 w-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

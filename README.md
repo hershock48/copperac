@@ -245,7 +245,7 @@ Decisions worth knowing before touching it:
 - [x] Enquiry delivery configured and confirmed (21 Aug 2026): `glazedweb.com` verified in Resend, env vars set in Vercel, test enquiry delivered. See the section above
 - [x] Kitchen close time confirmed by the owner: kitchen closes at 10 PM, bar stays open until midnight (Aug 2026). `KITCHEN_NOTE` is correct
 - [ ] Confirm the accessibility wording with the owner
-- [ ] Verify the lat/lng pin
+- [x] Verify the lat/lng pin (2 Sep 2026): the old pin was on the Brooks Memorial Fountain roundabout, a block and a half west. Moved to mid-block on the south side of the 100 block, see the note at `geo` in `lib/site.ts`. Worth a glance on a phone in Google Maps to be sure of the exact storefront
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
 - The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel — it is parked for now (see the ordering section above), so none of them block launch

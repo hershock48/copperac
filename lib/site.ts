@@ -56,7 +56,13 @@ export const SITE = {
   orderUrl: "https://order.toasttab.com/online/copper-pub",
   instagram: "https://www.instagram.com/copper_ac/",
   facebook: "https://www.facebook.com/TheCopperAC",
-  geo: { lat: 42.2717, lng: -84.9636 },
+  // Checked 2 Sep 2026: the old pin (42.2717, -84.9636) sat on the Brooks
+  // Memorial Fountain roundabout, a block and a half west of the building.
+  // This one is mid-block on the south side of the 100 block of W Michigan,
+  // between Broadway Grille (107) and Samar's (146) per OSM reverse geocoding.
+  // Directions use the street address, so this only places the contact-page
+  // marker and the Restaurant schema's geo.
+  geo: { lat: 42.2718, lng: -84.9597 },
 } as const;
 
 export const HOURS = [
