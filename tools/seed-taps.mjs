@@ -16,6 +16,11 @@
  * a few aliases for what was hand-typed before this list existed), updated
  * in place, and put in the marshall case. Nothing is deleted; a tap that
  * has since kicked is left exactly as the bar left it.
+ *
+ * The descriptions are our own one-liners (style and flavor, not the
+ * breweries' marketing copy, which is theirs). The bar can rewrite any of
+ * them in the Scooplist library. A re-run of this file puts ours back, so
+ * re-run to add taps, not to refresh words.
  */
 
 const BASE = process.argv[2]?.replace(/\/$/, "");
@@ -33,24 +38,38 @@ if (!BASE || !PIN) {
 const MI = ["local"];
 const TAPS = [
   // Domestics
-  { name: "Bud Light", producer: "Anheuser-Busch", abv: "4.2" },
-  { name: "PBR", producer: "Pabst", abv: "4.7" },
-  { name: "Michelob Ultra", producer: "Anheuser-Busch", abv: "4.2" },
+  { name: "Bud Light", producer: "Anheuser-Busch", abv: "4.2", description: "Light lager. Clean and easy." },
+  { name: "PBR", producer: "Pabst", abv: "4.7", description: "American lager. The classic can, on draft." },
+  { name: "Michelob Ultra", producer: "Anheuser-Busch", abv: "4.2", description: "Light lager, the lightest handle on the wall." },
   // IPAs
-  { name: "Two Hearted", producer: "Bell's", abv: "7", tags: MI, aliases: ["Bell's Two Hearted", "Bells Two Hearted", "Two-Hearted"] },
-  { name: "M-43 Hazy IPA", producer: "Old Nation", abv: "6.8", tags: MI, aliases: ["M-43", "M43", "Old Nation M-43 Hazy"] },
+  {
+    name: "Two Hearted",
+    producer: "Bell's",
+    abv: "7",
+    tags: MI,
+    aliases: ["Bell's Two Hearted", "Bells Two Hearted", "Two-Hearted"],
+    description: "American IPA built on Centennial hops. Grapefruit and pine.",
+  },
+  {
+    name: "M-43 Hazy IPA",
+    producer: "Old Nation",
+    abv: "6.8",
+    tags: MI,
+    aliases: ["M-43", "M43", "Old Nation M-43 Hazy"],
+    description: "New England style IPA. Hazy, juicy, tropical fruit up front.",
+  },
   // Featured
-  { name: "Oberon Lite", producer: "Bell's", abv: "4.2", tags: MI },
-  { name: "Blue Mitten", producer: "Kuhnhenn", abv: "5.4", tags: MI },
-  { name: "M-43 Orange Creamsicle", producer: "Old Nation", abv: "6.8", tags: MI },
-  { name: "Yuengling Lager", producer: "Yuengling", abv: "4.5" },
-  { name: "Dos Equis Ambar", producer: "Dos Equis", abv: "4.7" },
-  { name: "Summer Shandy", producer: "Leinenkugel's", abv: "4.2" },
-  { name: "Oberon", producer: "Bell's", abv: "5.8", tags: MI },
-  { name: "Limonata Pilsner", producer: "Dark Horse", abv: "4", tags: MI },
-  { name: "Guinness", producer: "Guinness", abv: "4.2" },
-  { name: "Warlock Imperial Pumpkin Stout", producer: "Southern Tier", abv: "8.6" },
-  { name: "Los Dos Pineapple Cider", producer: "Odd Brothers", abv: "3.4" },
+  { name: "Oberon Lite", producer: "Bell's", abv: "4.2", tags: MI, description: "Bell's summer wheat ale, lighter. Orange and a little spice." },
+  { name: "Blue Mitten", producer: "Kuhnhenn", abv: "5.4", tags: MI, description: "From Kuhnhenn in Warren, Michigan." },
+  { name: "M-43 Orange Creamsicle", producer: "Old Nation", abv: "6.8", tags: MI, description: "M-43 with orange and vanilla. Hazy IPA meets the ice cream truck." },
+  { name: "Yuengling Lager", producer: "Yuengling", abv: "4.5", description: "Amber lager from America's oldest brewery." },
+  { name: "Dos Equis Ambar", producer: "Dos Equis", abv: "4.7", description: "Vienna style amber lager. Toasty and smooth." },
+  { name: "Summer Shandy", producer: "Leinenkugel's", abv: "4.2", description: "Wheat beer with lemonade. Made for the patio." },
+  { name: "Oberon", producer: "Bell's", abv: "5.8", tags: MI, description: "Bell's summer wheat ale. Orange, spice, sunshine." },
+  { name: "Limonata Pilsner", producer: "Dark Horse", abv: "4", tags: MI, description: "Pilsner from Dark Horse, brewed right here in Marshall." },
+  { name: "Guinness", producer: "Guinness", abv: "4.2", description: "Irish dry stout on nitro. Roasty, creamy, lighter than it looks." },
+  { name: "Warlock Imperial Pumpkin Stout", producer: "Southern Tier", abv: "8.6", description: "Imperial pumpkin stout. Pumpkin pie spice with a stout's weight." },
+  { name: "Los Dos Pineapple Cider", producer: "Odd Brothers", abv: "3.4", description: "Pineapple cider. Light and sweet." },
 ];
 
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -100,7 +119,7 @@ for (const tap of TAPS) {
     producer: tap.producer,
     abv: tap.abv,
     tags: tap.tags ?? [],
-    description: "",
+    description: tap.description ?? "",
     sizes: [],
   };
   const { flavor } = await api("/api/admin/flavors", found ? { ...payload, id: found.id } : payload);

@@ -38,6 +38,7 @@ function TapRow({ tap }: { tap: Tap }) {
           {tap.local && <span className="tap-chip tap-chip-local">Michigan</span>}
         </span>
         {tap.brewery ? <span className="tap-brewery">{tap.brewery}</span> : null}
+        {tap.desc ? <span className="tap-desc">{tap.desc}</span> : null}
       </div>
       <span className="tap-abv">{tap.abv ?? ""}</span>
       <span className="tap-price">{price(tap.price)}</span>

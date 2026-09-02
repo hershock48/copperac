@@ -50,6 +50,8 @@ export type Tap = {
   name: string;
   /** Optional: a bar types "Bell's Two Hearted" at the counter and moves on. */
   brewery?: string;
+  /** One line about the beer, from the drink's description in Scooplist. */
+  desc?: string;
   /** Normalized to carry the sign: "5.2%". */
   abv?: string;
   /** First listed price as "7.00", matching MenuList's price() input. */
@@ -89,6 +91,7 @@ function toTap(f: FeedFlavor): Tap | null {
   return {
     name: f.name,
     brewery: brewery || undefined,
+    desc: f.description.trim() || undefined,
     abv: abv ? (abv.endsWith("%") ? abv : `${abv}%`) : undefined,
     price: dollars(f.sizes[0]?.price) ?? undefined,
     local: f.tags.some((t) => t.toLowerCase() === "local"),
