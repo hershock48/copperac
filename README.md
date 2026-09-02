@@ -354,7 +354,11 @@ the fallback rule. Per section:
 - **Cocktails** fall back to the `COCKTAILS` export in `lib/menu.ts`, the
   printed-menu snapshot.
 - One bad row falls its whole section back (misconfig beats partial truth),
-  and sections fail independently.
+  and sections fail independently. A bad tap row is one with no name; the
+  brewery, ABV and price are optional detail. The first version also
+  required a brewery, and the first two taps the bar ever entered (names
+  only) vanished from the site with nothing saying why. A bad cocktail row
+  is one with no price, because this menu always prints cocktail prices.
 
 `GET /api/status` says which sections are live right now. First-time setup:
 create the org (`scooplist/tools/create-org.mjs`, category contract above),

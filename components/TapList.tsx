@@ -37,7 +37,7 @@ function TapRow({ tap }: { tap: Tap }) {
           {tap.low && <span className="tap-chip tap-chip-low">Low</span>}
           {tap.local && <span className="tap-chip tap-chip-local">Michigan</span>}
         </span>
-        <span className="tap-brewery">{tap.brewery}</span>
+        {tap.brewery ? <span className="tap-brewery">{tap.brewery}</span> : null}
       </div>
       <span className="tap-abv">{tap.abv ?? ""}</span>
       <span className="tap-price">{price(tap.price)}</span>
@@ -69,7 +69,7 @@ export default function TapList({
       </div>
       <ul className="divide-y divide-ink-line">
         {taps.map((tap) => (
-          <TapRow key={`${tap.brewery} ${tap.name}`} tap={tap} />
+          <TapRow key={`${tap.brewery ?? ""} ${tap.name}`} tap={tap} />
         ))}
       </ul>
       {onDeck.length > 0 && (
@@ -80,7 +80,7 @@ export default function TapList({
             On deck
           </p>
           <p className="mt-1.5 text-sm text-cream-dim/70">
-            {onDeck.map((t) => `${t.name} (${t.brewery})`).join(" · ")}
+            {onDeck.map((t) => (t.brewery ? `${t.name} (${t.brewery})` : t.name)).join(" · ")}
           </p>
         </div>
       )}

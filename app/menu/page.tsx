@@ -73,7 +73,7 @@ export default async function MenuPage() {
               hasMenuItem: drinks.taps.map((t) => ({
                 "@type": "MenuItem",
                 name: t.name,
-                description: t.brewery,
+                ...(t.brewery ? { description: t.brewery } : {}),
                 ...(t.price
                   ? { offers: { "@type": "Offer", price: t.price, priceCurrency: "USD" } }
                   : {}),

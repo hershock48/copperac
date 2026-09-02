@@ -48,7 +48,8 @@ const DEFAULT_FEED = "https://scooplist.glazedweb.com";
 
 export type Tap = {
   name: string;
-  brewery: string;
+  /** Optional: a bar types "Bell's Two Hearted" at the counter and moves on. */
+  brewery?: string;
   /** Normalized to carry the sign: "5.2%". */
   abv?: string;
   /** First listed price as "7.00", matching MenuList's price() input. */
@@ -75,14 +76,19 @@ function dollars(raw: string | undefined): string | null {
   return Number.isFinite(n) && n > 0 ? n.toFixed(2) : null;
 }
 
-/** A tap without a brewery is not an honest tap row; reject it and the
-    section falls back whole (the template's misconfig-beats-partial rule). */
+/** A tap needs a name and nothing else. The first version also demanded a
+    brewery and rejected the row without one, and one rejected row falls
+    the whole section back, so the first two taps the bar ever entered
+    ("Bell's Two Hearted", "M-43", no producer filled in) vanished from the
+    site with nothing saying why (2 Sep 2026). A name-only tap is an honest
+    tap; the brewery is detail, shown when the bar bothers to add it. */
 function toTap(f: FeedFlavor): Tap | null {
-  if (!f.name.trim() || !f.producer.trim()) return null;
+  if (!f.name.trim()) return null;
   const abv = f.abv.trim();
+  const brewery = f.producer.trim();
   return {
     name: f.name,
-    brewery: f.producer,
+    brewery: brewery || undefined,
     abv: abv ? (abv.endsWith("%") ? abv : `${abv}%`) : undefined,
     price: dollars(f.sizes[0]?.price) ?? undefined,
     local: f.tags.some((t) => t.toLowerCase() === "local"),
