@@ -414,12 +414,13 @@ where the chips and dips live). Daily specials and happy hour are constants
 in `lib/site.ts`; the monthly chalkboard is too, with the month it belongs
 to, and it renders only while that month is current.
 
-**Status 2 Sep 2026: the org does not exist yet.** scooplist.glazedweb.com is
-in multi-org mode and healthy, but no business has been created on it (True
-North's included), so `/api/status` reports both sections on fallback and the
-site shows the printed cocktails and the taps-rotate panel. Run the script
-above, then hand the bar `scooplist.glazedweb.com/login/copperac` and the PIN.
-The site picks the feed up on its own within a minute.
+**Status 2 Sep 2026, evening: live.** The org exists (slug `copperac`; the
+bar calls it "copper", which is the display name, not the slug, and the
+slug is what the feed URL and the scripts use). The sixteen chalkboard
+handles were seeded with `tools/seed-taps.mjs`, and `/api/status` on
+production reports both sections on Scooplist with 16 taps rendering on
+`/menu`. The bar signs in at `scooplist.glazedweb.com/login/copperac` and
+keeps the list current from there; the site follows within a minute.
 
 A dedicated /drinks page is deferred on purpose: build it when the bar has
 demonstrably kept taps current for a while and the program outgrows one
