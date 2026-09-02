@@ -169,6 +169,8 @@ export const EVENTS: CACEvent[] = [
 
 export const NAV = [
   { href: "/menu", label: "Menu" },
+  // The owner's ask (2 Sep 2026): what's pouring, one tap from anywhere.
+  { href: "/taps", label: "On Tap" },
   { href: "/brunch", label: "Brunch" },
   { href: "/reserve", label: "The Copper Reserve" },
   { href: "/events", label: "Events" },

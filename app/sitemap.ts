@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // /order is out while the club stays on Toast: the path is a redirect to
   // the Toast store (next.config.ts), and redirects do not belong in a
   // sitemap. Restore it here if the in-house ordering channel is switched on.
-  const routes = ["", "/menu", "/brunch", "/reserve", "/events", "/contact"];
+  const routes = ["", "/menu", "/taps", "/brunch", "/reserve", "/events", "/contact"];
   // No lastModified on purpose: new Date() here is frozen at build time and
   // stamps every URL with the deploy moment, which tells a crawler nothing.
   return routes.map((r) => ({

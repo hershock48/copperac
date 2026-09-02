@@ -421,9 +421,11 @@ site shows the printed cocktails and the taps-rotate panel. Run the script
 above, then hand the bar `scooplist.glazedweb.com/login/copperac` and the PIN.
 The site picks the feed up on its own within a minute.
 
-A dedicated /drinks page is deferred on purpose: build it when the bar has
-demonstrably kept taps current for a while and the program outgrows one
-panel, not before.
+`/taps` ("On Tap" in the header) is the dedicated page, built 2 Sep 2026 the
+day the bar put all sixteen handles into Scooplist and the owner asked for a
+tab. Same source and same fallback rule as the menu page's bar area; the
+cocktails render below the taps. It was deferred until then on purpose: a
+page for a board nobody keeps is worse than no page.
 
 ---
 
