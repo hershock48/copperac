@@ -15,6 +15,9 @@ export default function MenuList({ sections }: { sections: MenuSection[] }) {
           <h2 className="display border-b border-copper/40 pb-3 text-xl uppercase tracking-widest text-copper-light">
             {section.name}
           </h2>
+          {section.note && (
+            <p className="mt-3 text-xs leading-relaxed text-cream-dim/60">{section.note}</p>
+          )}
           <ul className="mt-6 space-y-6">
             {section.items.map((item) => (
               <li key={item.name}>

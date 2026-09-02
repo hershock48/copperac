@@ -4,7 +4,7 @@ import TapList from "@/components/TapList";
 import { Button, PageHero, Section } from "@/components/ui";
 import { COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu";
 import { getDrinks } from "@/lib/taplist";
-import { CONSUMER_ADVISORY, KITCHEN_NOTE, SITE } from "@/lib/site";
+import { CONSUMER_ADVISORY, DAILY_SPECIALS, HAPPY_HOUR, KITCHEN_NOTE, SITE, currentMonthlySpecials } from "@/lib/site";
 import { jsonLd } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
@@ -38,6 +38,7 @@ export default async function MenuPage() {
   // Cocktails render from the resolved rows (live or fallback, the render
   // cannot tell, which is the point); the static file keeps owning the
   // section's name and position.
+  const monthly = currentMonthlySpecials();
   const sections: MenuSection[] = FOOD_MENU.map((s) =>
     s === COCKTAILS ? { name: s.name, items: drinks.cocktails } : s,
   );
@@ -61,8 +62,10 @@ export default async function MenuPage() {
         hasMenuItem: s.items.map((i) => ({
           "@type": "MenuItem",
           name: i.name,
-          description: i.desc,
-          offers: { "@type": "Offer", price: i.price, priceCurrency: "USD" },
+          ...(i.desc ? { description: i.desc } : {}),
+          // Pie of the Month has no printed price; an Offer with an empty
+          // price is invalid, so it gets no Offer at all.
+          ...(i.price ? { offers: { "@type": "Offer", price: i.price, priceCurrency: "USD" } } : {}),
         })),
       })),
       ...(drinks.live.taps && drinks.taps.length > 0
@@ -104,6 +107,40 @@ export default async function MenuPage() {
             Sunday Brunch Menu
           </Button>
           <p className="text-sm text-cream-dim/70 sm:ml-4">{KITCHEN_NOTE}</p>
+        </div>
+
+        {/* The standing deals from the back of the printed menu, and the
+            month's chalkboard while its month lasts. Above the menu because
+            they are what a regular checks first. */}
+        <div className="mb-14 grid gap-8 border-y border-ink-line py-8 md:grid-cols-3">
+          <div>
+            <h2 className="display text-sm uppercase tracking-widest text-copper-light">Daily specials</h2>
+            <ul className="mt-3 space-y-1.5 text-sm text-cream-dim">
+              {DAILY_SPECIALS.map((d) => (
+                <li key={d.day}>
+                  <span className="text-cream">{d.day}</span> {d.value}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 className="display text-sm uppercase tracking-widest text-copper-light">Happy hour</h2>
+            <p className="mt-3 text-sm text-cream">{HAPPY_HOUR.when}</p>
+            <p className="mt-1 text-sm text-cream-dim">{HAPPY_HOUR.value}</p>
+          </div>
+          {monthly && (
+            <div>
+              <h2 className="display text-sm uppercase tracking-widest text-copper-light">{monthly.label}</h2>
+              <ul className="mt-3 space-y-1.5 text-sm text-cream-dim">
+                {monthly.items.map((m) => (
+                  <li key={m.name}>
+                    <span className="text-cream">{m.name}</span> ${Number(m.price).toFixed(0)}
+                    {"desc" in m && m.desc ? <span className="text-cream-dim/60">, {m.desc}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <MenuList sections={sections} />

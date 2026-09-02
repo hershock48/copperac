@@ -74,6 +74,46 @@ export const RESERVE = {
   halfHourRate: 25,
 } as const;
 
+// From the back of the printed menu, photographed 2 Sep 2026. Standing
+// weekly facts, so they live here and not on a chalkboard constant.
+export const DAILY_SPECIALS = [
+  { day: "Monday", value: "Tacos $2.50, Nachos $12" },
+  { day: "Tuesday", value: "Gouda BLT with chips $8" },
+  { day: "Wednesday", value: "Copper Burger with chips $8" },
+  { day: "Thursday", value: "Coney dog, corn dog, or loose burger $2.50" },
+  { day: "Friday", value: "Fried bologna with chips $7" },
+] as const;
+
+export const HAPPY_HOUR = {
+  when: "Monday to Friday, 2 to 5 PM",
+  value: "Half off appetizers, $2.50 pints",
+} as const;
+
+/*
+  The chalkboard by the door: a month's specials, hand-written. Copied
+  here with the month it belongs to, and rendered only while that month is
+  current (see currentMonthlySpecials), so the September board cannot
+  still be on the website in November. When the bar writes a new board,
+  replace this whole block; when nobody does, the section simply
+  disappears on the first of the next month. Photographed 2 Sep 2026.
+*/
+export const MONTHLY_SPECIALS = {
+  label: "September at Copper A.C.",
+  through: "2026-09-30",
+  items: [
+    { name: "Black and Blue Burger", price: "14.00" },
+    { name: "Hawaiian Long Island", price: "8.00" },
+    { name: "Raspberry Iced Tea", desc: "Raspberry vodka", price: "7.00" },
+    { name: "Caramel Apple Nachos", desc: "Dessert", price: "10.00" },
+  ],
+} as const;
+
+/** The monthly board while its month lasts (America/Detroit), else null. */
+export function currentMonthlySpecials(now: Date = new Date()) {
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Detroit" }).format(now);
+  return today <= MONTHLY_SPECIALS.through ? MONTHLY_SPECIALS : null;
+}
+
 export const HOURS = [
   { label: "Monday – Saturday", value: "11:00 AM – 12:00 AM" },
   { label: "Sunday", value: "9:00 AM – 12:00 AM" },

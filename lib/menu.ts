@@ -1,6 +1,16 @@
-// Menu data lifted from copperac.com (schema.org Menu markup), with typo fixes.
+// Menu data, reconciled against the printed menu photographed at the bar on
+// 2 Sep 2026 (before that it was lifted from copperac.com's schema.org
+// markup, which had drifted: Greek salad price, section notes, item order,
+// the chips-and-dips living under the wrong heading). When the print
+// changes, this file changes; the print is the truth, not the old site.
 export type MenuItem = { name: string; desc: string; price: string };
-export type MenuSection = { name: string; items: MenuItem[] };
+export type MenuSection = {
+  name: string;
+  /** The line under the section title on the printed menu, when it has one
+      ("1/3 pound of beef, served with fries, chips, or coleslaw ..."). */
+  note?: string;
+  items: MenuItem[];
+};
 
 /*
   Named export, not just a row in FOOD_MENU: this section has two more
@@ -22,15 +32,24 @@ export const COCKTAILS: MenuSection = {
   ],
 };
 
+const SIDES_NOTE_BURGERS =
+  "1/3 pound of beef, served with fries, chips, or coleslaw. Substitute side salad, side Caesar salad, or mac and cheese + $1. Substitute side Greek salad + $2. Substitute soup or onion rings + $3. Add a fried egg + $2. All burgers cooked to medium-well unless otherwise requested.";
+
+const SIDES_NOTE_GRUB =
+  "Served with fries, chips, or coleslaw. Substitute side salad, side Caesar salad, or mac and cheese + $1. Substitute side Greek salad + $2. Substitute soup or onion rings + $3.";
+
 export const FOOD_MENU: MenuSection[] = [
   {
     name: "Appetizers",
     items: [
       { name: "Copper Fries", desc: "Natural cut fries drizzled with garlic mayo, hoisin sauce, sriracha, red onions, crushed peanuts, parmesan cheese, and cilantro.", price: "10.00" },
-      { name: "Chili Cheese Fries", desc: "Crispy, golden, fries smothered in chili and topped with a generous layer of melted cheese.", price: "8.00" },
+      { name: "Chili Cheese Fries", desc: "", price: "8.00" },
       { name: "Beer Battered Onion Rings", desc: "Homemade beer battered and sprinkled with parmesan cheese.", price: "8.00" },
       { name: "Wings", desc: "One pound bone-in, deep fried and breaded, covered in your choice of sauce: BBQ, Garlic Parm, Honey Sriracha, Maple Chili, or Mango Habanero.", price: "13.00" },
       { name: "Spinach and Artichoke Dip", desc: "House-made spinach and artichoke dip served with tortilla chips.", price: "8.00" },
+      { name: "Housemade Tortilla Chips and Salsa", desc: "Extra salsa + $2", price: "6.00" },
+      { name: "Housemade Tortilla Chips and Guacamole", desc: "Extra guacamole + $4", price: "8.00" },
+      { name: "Housemade Tortilla Chips and Queso", desc: "Extra queso + $4", price: "8.00" },
     ],
   },
   {
@@ -38,51 +57,52 @@ export const FOOD_MENU: MenuSection[] = [
     items: [
       { name: "Copper Chopped Salad", desc: "Romaine lettuce and mixed greens, red onion, tomato, blue cheese crumbles, asiago cheese, egg, bacon, and grilled chicken, served with housemade ranch.", price: "15.00" },
       { name: "Taco Salad", desc: "Romaine lettuce, shredded American cheese, tomato, red onion, guacamole, tortilla chips. Served with spicy ranch and salsa. Your choice of beef, chicken, or pork.", price: "13.00" },
-      { name: "Greek Salad", desc: "Romaine lettuce, feta cheese, red onion, pepperoncinis, kalamata olives, beets and cucumbers. Served with Greek dressing on the side. Add grilled chicken + $5", price: "11.00" },
+      { name: "Greek Salad", desc: "Romaine lettuce, feta cheese, red onion, pepperoncinis, kalamata olives, beets and cucumbers. Served with Greek dressing on the side. Add grilled chicken + $5", price: "12.00" },
       { name: "Caesar Salad", desc: "Romaine lettuce, tossed in Caesar dressing, topped with asiago, parmesan cheese, and croutons. Add grilled chicken + $5", price: "9.00" },
     ],
   },
   {
-    name: "South of the border",
+    name: "South of the Border",
+    note: "Your choice of ground beef, shredded chicken, or pulled pork.",
     items: [
       { name: "Nachos", desc: "Housemade chips, queso, red onions, tomatoes, black olives, jalapenos, lettuce, guacamole, and crema.", price: "16.00" },
       { name: "Tacos", desc: "Three fried corn tortillas, lettuce, onion, tomato, cheese, and crema. Served with chips and salsa.", price: "12.00" },
-      { name: "Housemade Tortilla chips and salsa", desc: "extra salsa $2", price: "6.00" },
-      { name: "Housemade Tortilla chips and guacamole", desc: "extra guacamole $4", price: "8.00" },
-      { name: "Housemade Tortilla chips and queso", desc: "extra queso $4", price: "8.00" },
     ],
   },
   {
     name: "Burgers",
+    note: SIDES_NOTE_BURGERS,
     items: [
       { name: "Copper Burger", desc: "Velveeta cheese, onion, pickle, ketchup, mustard, on a sesame seed bun.", price: "12.00" },
       { name: "PBB", desc: "Peanut butter, spicy jelly, jalapenos, bacon, cheddar cheese, served on a brioche bun.", price: "14.00" },
-      { name: "Impossible Burger", desc: "Vegan patty with lettuce, tomato, grilled onions, pickle, garlic mayo, served on a brioche bun. Impossible patty can be substituted for any burger, nacho, or taco + $4", price: "15.00" },
+      { name: "Mushroom Swiss Burger", desc: "Swiss cheese, sautéed mushroom and onions, and mayonnaise served on a brioche bun.", price: "14.00" },
       { name: "Whiskey Burger", desc: "Caramelized onions, smoked gouda, lettuce, blue cheese crumbles, whiskey glaze, served on a brioche bun.", price: "14.00" },
-      { name: "Mushroom Swiss Burger", desc: "Swiss cheese saut\u00e9ed mushrooms and onions with mayonnaise served on a brioche bun.", price: "14.00" },
+      { name: "Impossible Burger", desc: "Vegan patty with lettuce, tomato, grilled onions, pickle, garlic mayo, served on a brioche bun. Impossible patty can be substituted for any burger, nacho, or taco + $4", price: "15.00" },
     ],
   },
   {
     name: "Game Day Grub",
+    note: SIDES_NOTE_GRUB,
     items: [
       { name: "Copper Chicken", desc: "Grilled chicken breast marinated in olive oil, garlic, and rosemary served with lettuce, tomato, red onion, garlic mayo, on a pretzel bun.", price: "13.00" },
       { name: "Fried Chicken", desc: "Fried chicken, hot honey, pickles, on a brioche bun.", price: "12.00" },
-      { name: "Detroit Style Loose Burgers", desc: "Two hot dog buns filled with seasoned hamburger meat and topped with coney sauce, mustard and onions. A Detroit favorite!", price: "13.00" },
-      { name: "Copper Coneys", desc: "Two Dearborn brand natural casing hot dogs, coney sauce, onions, mustard, on hot dog buns.", price: "12.00" },
-      { name: "Corn Dog", desc: "One cornmeal battered and deep fried Dearborn hot dog. add a second corn dog + $3", price: "7.00" },
-      { name: "BBQ Pork", desc: "Slow roasted pork shoulder, pickles, coleslaw, and BBQ sauce on a toasted brioche bun.", price: "11.00" },
-      { name: "Cheesesteak", desc: "Shaved ribeye, onions, mild peppers, American cheese, A1 sauce, served on baguette.", price: "15.00" },
-      { name: "Gouda BLT", desc: "Gouda cheese, garlic mayo, bacon, lettuce, tomato on toasted sourdough.", price: "12.00" },
-      { name: "Cuban", desc: "Slow roasted pork, sliced ham, mozzarella cheese, pickles, mustard, served on baguette.", price: "15.00" },
-      { name: "Italian", desc: "Capicola, mortadella, ham, salami, lettuce, tomato, mild peppers, mozzarella cheese, Italian dressing, served on baguette.", price: "15.00" },
-      { name: "Fried Bologna", desc: "Thin sliced bologna, American cheese, grilled onions, mayo, mustard, on a brioche bun.", price: "9.00" },
-      { name: "Chicken Tenders", desc: "Four hand-breaded chicken strips served with ranch, honey mustard, or bbq sauce.", price: "12.00" },
+      { name: "Chicken Tenders", desc: "Four hand-breaded chicken strips served with ranch, honey mustard, or bbq.", price: "12.00" },
       { name: "Meatball Sub", desc: "Italian meatballs smothered in marinara sauce and mozzarella cheese. Served on a toasted baguette.", price: "15.00" },
-      { name: "Chicago Dog", desc: "Authentic style hot dog with mustard, onion, tomatoes, sweet relish, sports peppers, a pickle spear, and celery salt. Served on a poppyseed hotdog bun.", price: "12.00" },
+      { name: "Detroit Style Loose Burgers", desc: "Two hot dog buns filled with seasoned hamburger meat and topped with coney sauce, mustard and onions. A Detroit favorite!", price: "13.00" },
+      { name: "Chicago Dog", desc: "Authentic style hot dog with mustard, onion, tomatoes, sweet relish, sport peppers, a pickle spear, and celery salt. Served on a poppy seed hot dog bun.", price: "12.00" },
+      { name: "Copper Coneys", desc: "Two Dearborn brand natural casing hot dogs, coney sauce, onions, mustard, on hot dog buns.", price: "12.00" },
+      { name: "Corn Dog", desc: "One cornmeal battered and deep fried Dearborn hot dog. Add a second corn dog + $3", price: "7.00" },
+      { name: "BBQ Pork", desc: "Slow roasted pork shoulder, pickles, coleslaw, and BBQ sauce on a toasted brioche bun.", price: "11.00" },
+      { name: "Gouda BLT", desc: "Gouda cheese, garlic mayo, bacon, lettuce, tomato on toasted sourdough.", price: "12.00" },
+      { name: "Cheesesteak", desc: "Shaved ribeye, onions, mild peppers, American cheese, A1 sauce, served on baguette.", price: "15.00" },
+      { name: "Italian", desc: "Capicola, mortadella, ham, salami, lettuce, tomato, mild peppers, mozzarella cheese, Italian dressing, served on baguette.", price: "15.00" },
+      { name: "Cuban", desc: "Slow roasted pork, sliced ham, mozzarella cheese, pickles, mustard, served on baguette.", price: "15.00" },
+      { name: "Fried Bologna", desc: "Thin sliced bologna, American cheese, grilled onions, mayo, mustard, on a brioche bun.", price: "9.00" },
     ],
   },
   {
     name: "Kids",
+    note: "Served with fries or chips, and a drink.",
     items: [
       { name: "Hot Dog", desc: "", price: "7.00" },
       { name: "Grilled Cheese", desc: "", price: "6.00" },
@@ -95,14 +115,39 @@ export const FOOD_MENU: MenuSection[] = [
       { name: "Cup of Soup", desc: "", price: "6.00" },
       { name: "Natural Cut Fries", desc: "", price: "3.00" },
       { name: "Housemade Mac and Cheese", desc: "White cheddar, caramelized onions, and bacon.", price: "4.00" },
-      { name: "Caesar Salad", desc: "", price: "4.00" },
-      { name: "Greek Salad", desc: "", price: "5.00" },
-      { name: "Coleslaw", desc: "", price: "3.00" },
-      { name: "Side Salad", desc: "Lettuce, tomato, cucumber, onion, cheese.", price: "4.00" },
       { name: "Better Made Chips", desc: "", price: "1.50" },
+      { name: "Greek Salad", desc: "", price: "5.00" },
+      { name: "Caesar Salad", desc: "", price: "4.00" },
+      { name: "Side Salad", desc: "Lettuce, tomato, cucumber, onion, cheese.", price: "4.00" },
+      { name: "Coleslaw", desc: "", price: "3.00" },
+    ],
+  },
+  {
+    name: "Dessert",
+    items: [
+      { name: "Pie of the Month", desc: "Ask your server for the current seasonal flavor and pricing.", price: "" },
     ],
   },
   COCKTAILS,
+  {
+    // The printed dessert-drink card, 2 Sep 2026.
+    name: "Dessert Drinks",
+    items: [
+      { name: "Pineapple Upside-Down Cake", desc: "A classic tropical dessert with an alcoholic twist. Vanilla vodka, whipped vodka, and pineapple juice.", price: "6.00" },
+      { name: "Golden Cadillac", desc: "Crème de cacao and Galliano, a velvety delight topped with chocolate shavings.", price: "6.00" },
+      { name: "S’mores Martini", desc: "Chocolate, marshmallow and graham cracker with a hint of vodka. Served in a chocolate drizzled glass with toasted marshmallow skewers.", price: "8.00" },
+      { name: "White Russian", desc: "Vodka, coffee liqueur, and cream over ice.", price: "6.00" },
+    ],
+  },
+  {
+    // The printed mocktail card, 2 Sep 2026.
+    name: "Mocktails",
+    items: [
+      { name: "Strawberry Cream Colada", desc: "Coconut milk, pineapple, lime, strawberry, and honey. Coconut rim, garnished with a lime wheel.", price: "5.00" },
+      { name: "Cranberry Bramble", desc: "A fizzing, tart delight of cranberry, black cherry, and blackberry. Garnished with mint and a lime wheel.", price: "5.00" },
+      { name: "Starburst Sparkle", desc: "Strawberry, blue raspberry, and Starburst candy, swirled with edible glitter.", price: "5.00" },
+    ],
+  },
 ];
 
 export const BRUNCH_MENU: MenuSection[] = [
@@ -114,7 +159,7 @@ export const BRUNCH_MENU: MenuSection[] = [
       { name: "Maple Bacon Smash Burger", desc: "Two beef smash patties, Copper Hash Browns, bacon, cheddar cheese, a sunny-side-up egg, and house-made maple aioli on a brioche bun. Served with fries.", price: "16.00" },
       { name: "Copper Breakfast", desc: "Two eggs* any way, Copper Hash Browns, choice of bacon or sausage and sourdough or wheat toast.", price: "11.00" },
       { name: "Gouda BLT", desc: "Gouda cheese, garlic mayo, bacon, lettuce, and tomato on toasted sourdough. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "12.00" },
-      { name: "Copper Burger", desc: "\u2153 pound of beef with Velveeta cheese, onion, pickles, ketchup, and mustard on a sesame seed bun. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "12.00" },
+      { name: "Copper Burger", desc: "⅓ pound of beef with Velveeta cheese, onion, pickles, ketchup, and mustard on a sesame seed bun. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "12.00" },
       { name: "Fried Bologna Sandwich", desc: "Thinly sliced, grilled bologna, American cheese, grilled onions, mayo and mustard on a brioche bun. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "9.00" },
       { name: "Copper Fries", desc: "Natural cut fries drizzled with garlic mayo, hoisin sauce, sriracha, red onions, crushed peanuts, and cilantro.", price: "10.00" },
       { name: "Soup", desc: "", price: "6.00" },
@@ -163,7 +208,7 @@ export const BRUNCH_MENU: MenuSection[] = [
   {
     name: "Brunch Shots",
     items: [
-      { name: "Mini Espresso Martini Shot", desc: "Vanilla vodka, Baileys and Kahl\u00faa.", price: "6.00" },
+      { name: "Mini Espresso Martini Shot", desc: "Vanilla vodka, Baileys and Kahlúa.", price: "6.00" },
       { name: "Breakfast Shot", desc: "Jameson Triple, maple syrup, buttershots. Chased with orange juice and candied bacon.", price: "7.00" },
       { name: "French Toast Shot", desc: "Butterscotch Schnapps, Fireball, cream, cinnamon-sugar rim", price: "6.00" },
     ],

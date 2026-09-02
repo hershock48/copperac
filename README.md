@@ -366,6 +366,16 @@ then seed it with `tools/populate-scooplist.mjs` (printed cocktails into the
 case, Toast drinks as library rotation stock, taps deliberately empty).
 `tools/setup-scooplist.ps1` does both in one run; it asks for the Scooplist
 master secret and a PIN for the bar and never stores either.
+`tools/seed-taps.mjs` gives the tap board a head start from the chalkboard
+photographed on 2 Sep 2026 (sixteen handles with ABVs); after it runs, the
+bar keeps the list current in Scooplist and that file is history, not truth.
+
+The food menu in `lib/menu.ts` was reconciled against the printed menu
+photographed the same day. The print is the truth; the old site's markup,
+which this started from, had drifted (Greek salad price, section notes,
+where the chips and dips live). Daily specials and happy hour are constants
+in `lib/site.ts`; the monthly chalkboard is too, with the month it belongs
+to, and it renders only while that month is current.
 
 **Status 2 Sep 2026: the org does not exist yet.** scooplist.glazedweb.com is
 in multi-org mode and healthy, but no business has been created on it (True
