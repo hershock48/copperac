@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import MenuList from "@/components/MenuList";
 import TapList from "@/components/TapList";
 import { Button, PageHero, Section } from "@/components/ui";
-import { COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu";
+import type { MenuSection } from "@/lib/menu";
+import { getMenus } from "@/lib/content";
 import { getDrinks } from "@/lib/taplist";
 import { CONSUMER_ADVISORY, DAILY_SPECIALS, HAPPY_HOUR, KITCHEN_NOTE, SITE, currentMonthlySpecials } from "@/lib/site";
 import { jsonLd } from "@/lib/jsonld";
@@ -39,8 +40,12 @@ export default async function MenuPage() {
   // cannot tell, which is the point); the static file keeps owning the
   // section's name and position.
   const monthly = currentMonthlySpecials();
-  const sections: MenuSection[] = FOOD_MENU.map((s) =>
-    s === COCKTAILS ? { name: s.name, items: drinks.cocktails } : s,
+  // The workroom's edits laid over the printed menu; the cocktails section
+  // then yields to the live Scooplist list (matched by name: these are new
+  // objects, not the COCKTAILS constant).
+  const menus = await getMenus();
+  const sections: MenuSection[] = menus.food.map((s) =>
+    s.name === menus.cocktailsName ? { name: s.name, items: drinks.cocktails } : s,
   );
 
   /*

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Button, Eyebrow, Heading, PageHero, Section } from "@/components/ui";
-import { RESERVE, SITE, upcomingEvents } from "@/lib/site";
+import { RESERVE, SITE, type CACEvent } from "@/lib/site";
+import { getEventsContact, getUpcomingEvents } from "@/lib/content";
 import { jsonLd } from "@/lib/jsonld";
 
 // Re-render hourly so finished events fall off on their own. Without this the
@@ -12,7 +13,7 @@ export const revalidate = 3600;
 // generateMetadata, not a static `metadata` object: a static one is evaluated
 // once at module load, so the date cutoff below would never move.
 export async function generateMetadata(): Promise<Metadata> {
-  const next = upcomingEvents()[0];
+  const next = (await getUpcomingEvents())[0];
   const price = next?.price ? `${next.price}. ` : "";
   return {
     title: "Events",
@@ -35,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function buildEventSchema(events: ReturnType<typeof upcomingEvents>) {
+function buildEventSchema(events: CACEvent[]) {
   return events.map((e) => ({
   "@context": "https://schema.org",
   "@type": "Event",
@@ -73,9 +74,21 @@ function buildEventSchema(events: ReturnType<typeof upcomingEvents>) {
   }));
 }
 
-export default function EventsPage() {
-  const events = upcomingEvents();
+export default async function EventsPage() {
+  // Both from the content seam: the workroom's events laid over the
+  // checked-in seed, and whoever the planner named as the person to ask.
+  const [events, contact] = await Promise.all([getUpcomingEvents(), getEventsContact()]);
   const eventSchema = buildEventSchema(events);
+  const askHref = contact.email
+    ? `mailto:${contact.email}?subject=${encodeURIComponent("Events at Copper Athletic Club")}`
+    : contact.phone
+      ? `tel:${contact.phone.replace(/[^\d+]/g, "")}`
+      : SITE.phoneHref;
+  const askLabel = contact.name
+    ? `Ask ${contact.name.split(" ")[0]} about events`
+    : contact.email
+      ? "Email us about events"
+      : `Call ${SITE.phone}`;
 
   return (
     <>
@@ -145,8 +158,8 @@ export default function EventsPage() {
                         Get Tickets
                       </Button>
                     )}
-                    <Button href={SITE.phoneHref} variant="outline">
-                      Call {SITE.phone}
+                    <Button href={askHref} variant="outline">
+                      {askLabel}
                     </Button>
                   </div>
                 </div>

@@ -258,6 +258,43 @@ Decisions worth knowing before touching it:
 - [ ] **Ordering: confirm with the club that Toast online ordering gets turned off** when this goes live, so two order channels never run at once
 - [x] Next 16 (2 Sep 2026): `npm audit` is clean. `middleware.ts` became `proxy.ts` (Next's rename, same code), the lint config is native flat config, and three components stopped calling state setters inside effects or `Date.now()` during render to satisfy the stricter hooks rules. Every route, redirect, host gate, header and an order placement were re-checked on the new version
 
+## The workroom: events and the menu, edited by the club
+
+`/workroom` is the club's own editor, built 2 Sep 2026 for the planner who
+runs their social media and events. Two screens behind one passcode:
+
+- **Events.** Name, date and times, a price line, the Toast ticket link, a
+  photo or flyer (resized on the phone before upload, stored in the
+  database, served at `/img/events/{id}`), and a few bullets. Saving
+  publishes; the events page, the homepage card, the search snippet and the
+  Event schema follow within seconds. A draft stays off the site. The screen
+  also holds who handles events, shown on the events page as the person to
+  ask (email if given, else phone, else the bar's number).
+- **Menu.** A price, a description and an on/off switch per item, main menu
+  and Sunday brunch. Names and sections stay in `lib/menu.ts`, because the
+  printed menu is still the truth for shape. Clearing a price restores the
+  printed one.
+
+It is a port of the anchor repo's workroom (the newest copy in the studio's
+workroom family): passcode gate with a hashed cookie and a five-misses lockout
+(`lib/workroom/auth.ts`, `app/api/workroom/login`), a Postgres-or-memory
+store of jsonb rows that creates its own tables (`lib/workroom/store.ts`),
+whitelisted field definitions the screen and the route both check against
+(`lib/workroom/events-def.ts`, `menu-def.ts`), and a content seam
+(`lib/content.ts`) that lays stored edits over the checked-in data and
+revalidates every page on save. The customer pages read the seam, never the
+store; deleting every edit puts the site back exactly as built.
+
+Its shell is `app/workroom/layout.tsx`, outside the customer chrome, which is
+why the customer pages moved into the `app/(site)/` route group. Noindex,
+out of the sitemap, disallowed in robots, linked from nowhere.
+
+**To switch it on in production:** set `WORKROOM_PASSCODE` on the Vercel
+project (four characters or more; unset means closed, never open), and add
+the free Neon database (Storage > Create Database) so saves persist. Until
+the database exists every workroom screen says so in a banner. Then hand the
+planner `copperac.com/workroom` and the passcode.
+
 ## Cutover day
 
 A fine-tooth pass on 2 Sep 2026 (three independent reviews plus the glaze

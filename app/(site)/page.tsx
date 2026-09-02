@@ -4,7 +4,8 @@ import { Button, Eyebrow, Heading, Section } from "@/components/ui";
 import Board from "@/components/Board";
 import LiveStatus from "@/components/LiveStatus";
 import { getDrinks } from "@/lib/taplist";
-import { HOURS, KITCHEN_NOTE, RESERVE, SITE, upcomingEvents } from "@/lib/site";
+import { HOURS, KITCHEN_NOTE, RESERVE, SITE } from "@/lib/site";
+import { getUpcomingEvents } from "@/lib/content";
 
 // The homepage regenerates every minute, the same cadence as the menu page,
 // so the On Tap card follows Scooplist as fast as the menu does. It used to
@@ -15,7 +16,7 @@ import { HOURS, KITCHEN_NOTE, RESERVE, SITE, upcomingEvents } from "@/lib/site";
 export const revalidate = 60;
 
 export default async function Home() {
-  const nextEvent = upcomingEvents()[0];
+  const nextEvent = (await getUpcomingEvents())[0];
 
   /*
     The tap teaser is honest by construction: it renders ONLY when the

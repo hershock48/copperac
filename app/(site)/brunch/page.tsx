@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import MenuList from "@/components/MenuList";
 import { Button, PageHero, Section } from "@/components/ui";
-import { BRUNCH_MENU } from "@/lib/menu";
+import { getMenus } from "@/lib/content";
 import { CONSUMER_ADVISORY, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BrunchPage() {
+export default async function BrunchPage() {
   return (
     <>
       <PageHero
@@ -41,7 +41,7 @@ export default function BrunchPage() {
           </p>
         </div>
 
-        <MenuList sections={BRUNCH_MENU} />
+        <MenuList sections={(await getMenus()).brunch} />
 
         <div className="mt-10 space-y-3 border-t border-ink-line pt-8 text-xs leading-relaxed text-cream-dim/60">
           <p>Prices subject to change. Ask your server about seasonal specials.</p>
