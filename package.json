@@ -9,19 +9,19 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "next": "15.5.23",
+    "next": "^16.3.4",
     "pg": "^8.23.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^22",
     "@types/pg": "^8.21.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^15.5.23",
+    "eslint-config-next": "^16.3.4",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3"
   }

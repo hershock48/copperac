@@ -6,7 +6,7 @@ The brand is theirs and stays theirs: the copper deer logo, the copper-on-black 
 
 ## Stack
 
-Next.js 15 (App Router), React 19, Tailwind CSS v4, TypeScript. Every route is statically prerendered. No CMS lock-in, no plugin stack.
+Next.js 16 (App Router), React 19, Tailwind CSS v4, TypeScript. Every route is statically prerendered. No CMS lock-in, no plugin stack.
 
 ```bash
 npm install
@@ -256,7 +256,7 @@ Decisions worth knowing before touching it:
 - [ ] **Ordering: wire Stripe Connect before real money** (see the PAYMENT SEAM comment in `app/api/ordering/order/route.ts`; until then checkout is demo mode and says so)
 - [ ] **Ordering: Michigan tax consult before launch** — whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
 - [ ] **Ordering: confirm with the club that Toast online ordering gets turned off** when this goes live, so two order channels never run at once
-- [ ] Decide on Next 16: three high-severity advisories in `postcss` and `sharp` only clear with the major bump
+- [x] Next 16 (2 Sep 2026): `npm audit` is clean. `middleware.ts` became `proxy.ts` (Next's rename, same code), the lint config is native flat config, and three components stopped calling state setters inside effects or `Date.now()` during render to satisfy the stricter hooks rules. Every route, redirect, host gate, header and an order placement were re-checked on the new version
 
 ## Structure
 

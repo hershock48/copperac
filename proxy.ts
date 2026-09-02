@@ -14,7 +14,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // copperac.vercel.app) and the demo host (see the host-scoped rewrites in
 // next.config.ts), so the gate is by Host header, not an env flag. The guest
 // /order page is parked separately in next.config.ts (redirect to Toast, with
-// the same pitch-host exception); this middleware covers everything else:
+// the same pitch-host exception); this proxy covers everything else:
 // /kitchen, the ordering/kitchen APIs, and the /pitch/* pages.
 //
 // To bring the in-house platform back to the client site, remove this file (or
@@ -23,7 +23,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PITCH_HOST = "copperac.glazedweb.com";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // On the demo host everything works — that is where the preserved tool lives.
   if ((request.headers.get("host") ?? "") === PITCH_HOST) {
     return NextResponse.next();

@@ -73,9 +73,14 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   }, []);
 
   useEffect(() => {
-    refreshLive();
+    // First refresh goes through the scheduler rather than being called
+    // here, so the effect body sets no state itself (the hooks lint rule).
+    const first = setTimeout(refreshLive, 0);
     const t = setInterval(refreshLive, 30000);
-    return () => clearInterval(t);
+    return () => {
+      clearTimeout(first);
+      clearInterval(t);
+    };
   }, [refreshLive]);
 
   // Confirmation polling: the "Accepted" flip is the product moment, worth a

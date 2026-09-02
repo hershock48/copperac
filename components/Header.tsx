@@ -3,14 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NAV, SITE } from "@/lib/site";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => setOpen(false), [pathname]);
+  // Close the mobile menu on navigation. Done during render against the
+  // last seen path rather than in an effect, so the closed menu never
+  // paints one frame open on the new page.
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (pathname !== seenPath) {
+    setSeenPath(pathname);
+    setOpen(false);
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink-line bg-ink/95 backdrop-blur supports-[backdrop-filter]:bg-ink/80">

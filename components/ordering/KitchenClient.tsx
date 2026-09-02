@@ -33,6 +33,10 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   const [pinError, setPinError] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
   const [state, setState] = useState<KitchenState | null>(null);
+  // The board's clock: stamped by each poll, read during render. Render
+  // itself never calls Date.now(), so the pause countdown is a pure
+  // function of state and ticks with the 5s poll.
+  const [now, setNow] = useState(0);
   const [backend, setBackend] = useState<"postgres" | "memory" | null>(null);
   const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean }[]>([]);
   // The board opens on 86s and hours (Kevin's call): that is the tab staff
@@ -90,6 +94,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
       }
       if (stateRes.ok) {
         const data = await stateRes.json();
+        setNow(Date.now());
         setState(data.state);
         setPrinters(data.printers ?? []);
       }
@@ -116,9 +121,15 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
 
   useEffect(() => {
     if (!authed) return;
-    poll();
+    // First poll goes through the scheduler rather than being called here:
+    // the effect body then sets no state itself, which is the rule the
+    // hooks lint enforces, and the board still fills on the next tick.
+    const first = setTimeout(poll, 0);
     const t = setInterval(poll, 5000);
-    return () => clearInterval(t);
+    return () => {
+      clearTimeout(first);
+      clearInterval(t);
+    };
   }, [authed, poll]);
 
   async function login() {
@@ -197,7 +208,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   }
 
   const newCount = orders.filter((o) => o.status === "new").length;
-  const paused = state?.pausedUntil != null && state.pausedUntil > Date.now();
+  const paused = state?.pausedUntil != null && state.pausedUntil > now;
 
   return (
     <div className="pb-16">
@@ -357,7 +368,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                   onClick={() => patchState({ pauseMinutes: 0 })}
                   className="rounded-sm border border-[#7dd18a]/50 bg-[#7dd18a]/10 px-4 py-3 text-sm text-[#7dd18a]"
                 >
-                  Paused · resumes in {Math.max(1, Math.ceil((state!.pausedUntil! - Date.now()) / 60000))} min · tap to resume now
+                  Paused · resumes in {Math.max(1, Math.ceil((state!.pausedUntil! - now) / 60000))} min · tap to resume now
                 </button>
               ) : (
                 <>
