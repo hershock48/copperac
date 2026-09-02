@@ -9,7 +9,7 @@ import { COCKTAILS, type MenuItem } from "./menu";
  * the site renders whatever they saved, and how it stays honest when the
  * feed cannot answer.
  *
- * CATEGORY CONTRACT with the copper org (tools/populate-scooplist.mjs
+ * CATEGORY CONTRACT with the copperac org (tools/populate-scooplist.mjs
  * and the org-creation command carry the same list; a key missing on the
  * deployment silently coerces categories, which is why the populate
  * script hard-exits on a coerced save):
@@ -27,7 +27,7 @@ import { COCKTAILS, type MenuItem } from "./menu";
  *    printed-menu snapshot the page rendered before the feed existed.
  */
 
-const ORG = "copper";
+const ORG = "copperac";
 const LOCATION = "marshall";
 
 /*
@@ -35,7 +35,7 @@ const LOCATION = "marshall";
   client's own infrastructure, a public fact like their phone number, and
   requiring a dashboard step to turn the feature on once left a site
   silently running on its snapshot with nothing saying so. Until the
-  copper org exists on the deployment the fetch 404s fast and every
+  copperac org exists on the deployment the fetch 404s fast and every
   section falls back, which renders today's page exactly.
   SCOOPLIST_FEED_URL overrides for local testing against a local
   Scooplist.

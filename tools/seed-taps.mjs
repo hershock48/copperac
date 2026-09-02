@@ -20,7 +20,7 @@
 
 const BASE = process.argv[2]?.replace(/\/$/, "");
 const PIN = process.env.SCOOPLIST_ADMIN_PIN || "";
-const ORG = "copper";
+const ORG = "copperac";
 const LOCATION = "marshall";
 
 if (!BASE || !PIN) {

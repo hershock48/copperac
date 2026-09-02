@@ -18,7 +18,7 @@
 # guess.
 #
 # When it finishes, the bar's sign-in link is
-#   https://scooplist.glazedweb.com/login/copper
+#   https://scooplist.glazedweb.com/login/copperac
 # and https://copperac.vercel.app/api/status should report cocktails: live.
 
 $ErrorActionPreference = "Stop"
@@ -47,7 +47,7 @@ $env:SCOOPLIST_MASTER = $master
 Push-Location $scooplist
 try {
   node tools/create-org.mjs --url https://scooplist.glazedweb.com `
-    --slug copper --name "Copper Athletic Club" --pin $pin `
+    --slug copperac --name "Copper Athletic Club" --pin $pin `
     --preset tavern --categories "taps:On Tap,cocktails:Cocktails" `
     --locations "marshall:Copper Athletic Club"
   if ($LASTEXITCODE -ne 0) { throw "create-org failed (exit $LASTEXITCODE)." }
@@ -71,6 +71,6 @@ try {
 
 Write-Host ""
 Write-Host "Done."
-Write-Host "  Bar sign-in:  https://scooplist.glazedweb.com/login/copper   (PIN: the one you chose)"
-Write-Host "  TV board:     https://scooplist.glazedweb.com/board/copper/marshall"
+Write-Host "  Bar sign-in:  https://scooplist.glazedweb.com/login/copperac   (PIN: the one you chose)"
+Write-Host "  TV board:     https://scooplist.glazedweb.com/board/copperac/marshall"
 Write-Host "  Site check:   https://copperac.vercel.app/api/status  (expect cocktails: live)"
