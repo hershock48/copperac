@@ -6,9 +6,13 @@ import LiveStatus from "@/components/LiveStatus";
 import { getDrinks } from "@/lib/taplist";
 import { HOURS, KITCHEN_NOTE, RESERVE, SITE, upcomingEvents } from "@/lib/site";
 
-// The board pulls live Detroit scores, so the homepage regenerates every 15
-// minutes instead of being frozen at build time.
-export const revalidate = 900;
+// The homepage regenerates every minute, the same cadence as the menu page,
+// so the On Tap card follows Scooplist as fast as the menu does. It used to
+// be 15 minutes for the sports board's sake, and that lag read as "Scooplist
+// isn't updating the site" (Kevin, 2 Sep 2026). The scores and news keep
+// their own 15-minute cache in lib/board.ts and lib/news.ts, so a faster
+// page costs ESPN nothing.
+export const revalidate = 60;
 
 export default async function Home() {
   const nextEvent = upcomingEvents()[0];
