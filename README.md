@@ -165,7 +165,7 @@ How it is wired, for whoever touches it next:
   lives on our domain instead: `INQUIRY_FROM` is
   `Copper Athletic Club <copper@glazedweb.com>`. The route sets `reply_to` to
   the customer's own address, so the club hits reply and the reply lands with
-  the customer. One verified domain covers every site we build — the DKIM/SPF
+  the customer. One verified domain covers every site we build, the DKIM/SPF
   records sit in Vercel DNS on glazedweb.com.
 - **Key:** the Vercel `RESEND_API_KEY` is a *sending-only* restricted key on
   purpose; domain management needs a full-access key that exists only
@@ -175,7 +175,7 @@ How it is wired, for whoever touches it next:
 
 If the env vars are ever removed, the route answers `503 not_configured` and
 `InquiryForm` falls back to opening the visitor's email app with every field
-prefilled, addressed to `SITE.email` — it never fakes a success. Known gap in
+prefilled, addressed to `SITE.email`, it never fakes a success. Known gap in
 that fallback mode only: the `mailto:` handoff needs a registered mail handler
 on the visitor's machine; desktop webmail users get the on-screen note and the
 phone number and nothing else.
@@ -249,14 +249,58 @@ Decisions worth knowing before touching it:
 - [x] Verify the lat/lng pin (2 Sep 2026): the old pin was on the Brooks Memorial Fountain roundabout, a block and a half west. Moved to mid-block on the south side of the 100 block, see the note at `geo` in `lib/site.ts`. Worth a glance on a phone in Google Maps to be sure of the exact storefront
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
-- The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel — it is parked for now (see the ordering section above), so none of them block launch
+- The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel, it is parked for now (see the ordering section above), so none of them block launch
 - [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
 - [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
 - [ ] **Ordering: set `ORDERING_DEMO_ALWAYS_OPEN=1` on the demo deploy, and REMOVE it at go-live** so real guests get real hours
 - [ ] **Ordering: wire Stripe Connect before real money** (see the PAYMENT SEAM comment in `app/api/ordering/order/route.ts`; until then checkout is demo mode and says so)
-- [ ] **Ordering: Michigan tax consult before launch** — whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
+- [ ] **Ordering: Michigan tax consult before launch**, whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
 - [ ] **Ordering: confirm with the club that Toast online ordering gets turned off** when this goes live, so two order channels never run at once
 - [x] Next 16 (2 Sep 2026): `npm audit` is clean. `middleware.ts` became `proxy.ts` (Next's rename, same code), the lint config is native flat config, and three components stopped calling state setters inside effects or `Date.now()` during render to satisfy the stricter hooks rules. Every route, redirect, host gate, header and an order placement were re-checked on the new version
+
+## Cutover day
+
+A fine-tooth pass on 2 Sep 2026 (three independent reviews plus the glaze
+audit, width, motion and perf checks, all clean) left the code ready and one
+operational blocker: **the production domains are not attached to the Vercel
+project yet.** Until they are, pointing DNS at Vercel serves a Vercel 404.
+
+In order:
+
+1. Vercel project > Settings > Domains: add `copperac.com` as primary and
+   `www.copperac.com` redirecting to it. Do this before DNS moves. The apex
+   must be primary: `SITE.url` drives every canonical, OG URL, sitemap entry
+   and the robots sitemap line, so a www-primary choice would put canonicals
+   cross-host.
+2. Confirm `RESEND_API_KEY` and `INQUIRY_FROM` exist on the Production
+   environment (they were set 21 Aug; the names are what matter).
+3. The client sets the A/CNAME records Vercel shows; wait for "Valid
+   Configuration".
+4. Fetch `https://copperac.com/` once: 200, `Strict-Transport-Security`
+   present, no `X-Robots-Tag`.
+5. Fetch `https://www.copperac.com/` once: 308 to the apex.
+6. Fetch `/menus/` once: lands on `/menu`.
+7. Submit one real enquiry on `/contact` and confirm it arrives at
+   reserve@copperac.com.
+8. Search Console: submit the sitemap, request re-indexing of `/menus`.
+9. Watch the Vercel runtime logs for `[inquiry]` lines for the first day.
+
+Two decisions taken in that pass, recorded so nobody re-litigates them:
+
+- HSTS is `max-age` only, no `includeSubDomains`, no `preload`. The header
+  ships on the client's own apex, and `includeSubDomains` would commit every
+  copperac.com subdomain they run (mail, anything old) to HTTPS the moment a
+  browser saw it. Their call, not ours.
+- The Restaurant schema no longer states `acceptsReservations`. "False" was
+  true for tables but Google renders it as "Doesn't accept reservations"
+  beside a site whose Reserve page exists to book a room.
+
+Left as prose on purpose: the homepage's "Kitchen runs till 10" and "Every
+Sunday, 9 to 2" and the brunch page's hours line. They match `HOURS` and
+`KITCHEN_NOTE` today and are written in the bar's voice; if the hours ever
+change, grep for them. The events data still holds the 20 Aug trivia night,
+hidden by `upcomingEvents()`; get the next event from the owner so the
+events page does not launch empty.
 
 ## Structure
 

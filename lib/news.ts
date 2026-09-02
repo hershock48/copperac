@@ -3,14 +3,14 @@ import { unstable_cache } from "next/cache";
 /**
  * Detroit sports headlines, for the news crawl under the score ticker.
  *
- * SOURCE. The same ESPN public site API the scoreboard already reads — no key, no account,
+ * SOURCE. The same ESPN public site API the scoreboard already reads, no key, no account,
  * no vendor, nothing to pay for. Using the source that is already in the build rather than
  * adding a second one is the whole point: one thing to watch, one failure mode, and the
  * board and the news can never disagree about who Detroit played.
  *
  * WHY NOT AN RSS FEED. That was the first instinct and it half works. The Lions and Tigers
  * both publish real, current RSS on their official club sites
- * (detroitlions.com/rss/news, mlb.com/tigers/feeds/news/rss.xml — both verified live).
+ * (detroitlions.com/rss/news, mlb.com/tigers/feeds/news/rss.xml, both verified live).
  * The problem is the other two: the NHL retired per-team RSS entirely
  * (nhl.com/redwings/rss/news is a 404) and the NBA serves HTML at the old feed path. So an
  * RSS build covers two clubs in one season each and goes quiet on the other two, which on a
@@ -37,7 +37,7 @@ import { unstable_cache } from "next/cache";
  * month-old story as news: the sort takes the newest twelve regardless of age, and a club deep
  * in its offseason has nothing recent, so its newest item might be from three weeks ago and
  * would crawl past looking exactly like tonight's result. Kevin's framing settles what should
- * happen instead — *"I don't expect pistons news when it's not bball season"* — so a club with
+ * happen instead, *"I don't expect pistons news when it's not bball season"*, so a club with
  * nothing recent simply drops out of the crawl rather than padding it with old copy. That is
  * why MAX_AGE_DAYS exists and why an item with no date at all is dropped: if its age cannot be
  * established, its currency cannot be claimed.
@@ -45,7 +45,7 @@ import { unstable_cache } from "next/cache";
  * EVERY FIELD IS OPTIONAL. This is an undocumented third-party endpoint with no contract, so
  * the normaliser treats the response as unknown shape and drops anything it cannot read.
  * A league that fails, changes shape, or returns nothing costs us that league and nothing
- * else. If all four fail the strip does not render at all — see `ok`.
+ * else. If all four fail the strip does not render at all, see `ok`.
  */
 
 export type NewsItem = {
@@ -146,10 +146,14 @@ async function fetchClubNews(club: Club): Promise<NewsItem[]> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/${club.path}/news?limit=50`;
   let json: EspnNews;
   try {
-    // no-store on the raw request, then the small derived list is cached below — the same
+    // no-store on the raw request, then the small derived list is cached below, the same
     // arrangement lib/board.ts uses, and for the same reason: the raw payloads are large
     // and the thing worth caching is the handful of strings we keep.
-    const res = await fetch(url, { cache: "no-store", headers: { accept: "application/json" } });
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+    });
     if (!res.ok) return [];
     json = (await res.json()) as EspnNews;
   } catch {
@@ -193,7 +197,7 @@ export type NewsFeed = {
 async function buildNews(): Promise<NewsFeed> {
   const all = (await Promise.all(CLUBS.map(fetchClubNews))).flat();
 
-  // Dedupe by id, then by headline — the same story can appear under two categories.
+  // Dedupe by id, then by headline, the same story can appear under two categories.
   const seen = new Set<string>();
   const unique = all.filter((n) => {
     const k = n.headline.toLowerCase();

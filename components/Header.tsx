@@ -89,6 +89,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={pathname === item.href ? "page" : undefined}
                 className="display block border-b border-ink-line py-4 text-base uppercase tracking-widest text-cream-dim"
               >
                 {item.label}

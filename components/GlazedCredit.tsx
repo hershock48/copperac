@@ -2,7 +2,7 @@
  * The studio credit for a client footer. Drop-in, self-contained, one file.
  *
  * THE MARK IS HIS ACTUAL MARK. Every path string below is copied verbatim out of
- * glazedweb's `components/Logo.jsx` — the v9 symbol, `<symbol id="mark" viewBox="0 0 200 250">` —
+ * glazedweb's `components/Logo.jsx`, the v9 symbol, `<symbol id="mark" viewBox="0 0 200 250">` -
  * and every gradient carries his exact stops. An earlier version of this file had a donut I
  * drew myself, and it was wrong: not his colours, not his drips, not his silhouette. A studio
  * mark is the one graphic on a site that cannot be approximated, because it is the signature.
@@ -10,7 +10,7 @@
  * FOUR THINGS ARE DIFFERENT FROM HIS SOURCE, AND THESE ARE ALL OF THEM.
  *
  * 1. THE VIEWBOX IS CROPPED TO THE INK. His is `0 0 200 250`; a pixel scan of a 4x render puts
- *    the actual painted bounds at x 48.00–151.75, y 18.00–199.75 — so 48% of his declared width
+ *    the actual painted bounds at x 48.00–151.75, y 18.00–199.75, so 48% of his declared width
  *    and 27% of his height is empty margin. `46 16 110 186` is those bounds plus two units of
  *    bleed. Not one coordinate moves; the window around them tightens. This is what makes his
  *    real mark usable at footer size: at a 26px render the disc goes from 12.5px across to
@@ -20,46 +20,46 @@
  *
  * 2. THE HOLE IS PUNCHED, NOT FILLED. His source paints the hole as an opaque
  *    `fill="var(--hole, #FDF6EC)"` circle, which is right on glazedweb.com because that cream
- *    IS his page background — the fill and the hole are indistinguishable there. Dropped into a
+ *    IS his page background, the fill and the hole are indistinguishable there. Dropped into a
  *    near-black client footer the same circle reads as a cream dot sitting on the donut rather
  *    than a hole through it. So his `<circle cx="100" cy="70" r="52">` disc and his
  *    `<circle cx="100" cy="72" r="13">` hole are expressed as one path with `fill-rule="evenodd"`:
  *    same centres, same radii, same 2-unit downward offset of the hole against the disc, and the
- *    footer's own background shows through whatever it happens to be — flat, gradient or image.
+ *    footer's own background shows through whatever it happens to be, flat, gradient or image.
  *    Verified by pixel diff against his original circle: identical everywhere outside the hole.
  *
  * 3. THE GRADIENT IDS ARE PREFIXED `gwc-`. His `#pinkGrad` / `#lgGrad` / `#creepGrad` / `#dgGrad`
  *    are generic enough to collide with a client's own defs, and duplicate SVG ids are undefined
- *    behaviour — that class of bug already cost this project a day when two instances of the MI Gas
+ *    behaviour, that class of bug already cost this project a day when two instances of the MI Gas
  *    sun shared a filter id and painted a dark square on the page. Prefixing renames the strings
  *    and nothing else. It is also why the defs live inline here rather than requiring his
  *    `LogoDefs()` to be mounted: one file to drop in, no second component to keep in sync.
  *
  *    Worth knowing while editing: rewrite BOTH ends of every reference. The harness that chose
  *    these settings rewrote `url(#x)` but not `id="x"`, so all four gradients resolved to nothing
- *    and rendered as invisible shapes — a whole comparison run wasted on a search-and-replace.
+ *    and rendered as invisible shapes, a whole comparison run wasted on a search-and-replace.
  *
- * 4. THE DRIPS EXTEND ON HOVER. Resting, they are exactly his lengths — the default state is his
+ * 4. THE DRIPS EXTEND ON HOVER. Resting, they are exactly his lengths, the default state is his
  *    drawing, untouched. Hover runs the glaze a little further down. A footer is the last thing
  *    before somebody leaves and on several of these sites it holds the one call to action, so an
  *    animation that plays forever down there competes with the client's own business. On hover it
  *    rewards the person who noticed and costs everyone else nothing, and under reduced motion the
- *    resting state is unchanged and the hover simply snaps — there is no autoplay to suppress,
+ *    resting state is unchanged and the hover simply snaps, there is no autoplay to suppress,
  *    which is the easiest kind of motion to make accessible.
  *
  *    The glaze pool at the donut's base (his `<ellipse cx="100" cy="110">`) is deliberately NOT in
- *    the scaling group — it is the collar where the glaze meets the donut, not a drip, and
+ *    the scaling group, it is the collar where the glaze meets the donut, not a drip, and
  *    stretching it pulls the whole mark out of shape. Everything below it scales: his two short
  *    stalactites, his three long drips, the cream highlight strokes that run down them, and the
  *    droplet near the longest tip. Paint order inside the group is unchanged from his file.
  *
  * ON THE LINE: `line` is a prop with a plain default. "Double dipped by Glazed Web" is the
- * studio's voice and it fits a farm or a bakery. MI Gas gets "Baked by" — a facility director
+ * studio's voice and it fits a farm or a bakery. MI Gas gets "Baked by", a facility director
  * selling SOPs to licensed operators is a different room, and a donut pun in that footer reads as
  * the studio talking about itself while the visitor is mid-decision. Pick per client.
  *
  * ON THE LINK: leave it followed. A designer credit is a genuine editorial link. The anchor text
- * stays "Glazed Web" and not anything keyword-shaped — a sitewide footer link reading "website
+ * stays "Glazed Web" and not anything keyword-shaped, a sitewide footer link reading "website
  * design in Marshall Michigan" is the version that looks like a scheme.
  *
  * REMOVING IT is deleting one line from the footer. Worth being able to say that to a client, and
@@ -82,7 +82,7 @@ export default function GlazedCredit({
       // visitor AWAY from the client, and doing that in their own tab is a small unkindness to
       // the person paying for the site.
       target="_blank"
-      // noopener for the usual reason. NOT nofollow — see the note on the link above.
+      // noopener for the usual reason. NOT nofollow, see the note on the link above.
       rel="noopener noreferrer"
     >
       {line}{" "}
@@ -117,7 +117,7 @@ export default function GlazedCredit({
           </linearGradient>
         </defs>
 
-        {/* The glaze pool at the base of the donut. Static — see note 4. */}
+        {/* The glaze pool at the base of the donut. Static, see note 4. */}
         <ellipse cx="100" cy="110" rx="38" ry="15" fill="url(#gwc-dgGrad)" />
 
         <g className="gw-credit-drips">
@@ -142,7 +142,7 @@ export default function GlazedCredit({
         </g>
 
         {/* The donut. His circle cx100 cy70 r52 and his hole cx100 cy72 r13, as one evenodd
-            path so the hole is a hole. See note 2 — this is the only geometry that is expressed
+            path so the hole is a hole. See note 2, this is the only geometry that is expressed
             differently from his file, and it describes the same two circles. */}
         <path
           fillRule="evenodd"
@@ -155,7 +155,7 @@ export default function GlazedCredit({
           fill="url(#gwc-creepGrad)"
         />
         <path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" strokeWidth="4" strokeLinecap="round" opacity="0.85" />
-        {/* His soft inner edge on the hole. Kept — with the hole punched it now reads as the
+        {/* His soft inner edge on the hole. Kept, with the hole punched it now reads as the
             glaze lipping over the rim rather than as a ring drawn around a dot. */}
         <circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" strokeWidth="3" opacity="0.3" />
         {/* Specular highlight: the arc and the dot, at his opacity. */}

@@ -4,7 +4,7 @@ import { Button, Eyebrow, Heading, Section } from "@/components/ui";
 import Board from "@/components/Board";
 import LiveStatus from "@/components/LiveStatus";
 import { getDrinks } from "@/lib/taplist";
-import { HOURS, KITCHEN_NOTE, SITE, upcomingEvents } from "@/lib/site";
+import { HOURS, KITCHEN_NOTE, RESERVE, SITE, upcomingEvents } from "@/lib/site";
 
 // The board pulls live Detroit scores, so the homepage regenerates every 15
 // minutes instead of being frozen at build time.
@@ -166,8 +166,8 @@ export default async function Home() {
             cta="See brunch"
           />
           <QuickCard
-            title="Copper Reserve"
-            body={`The private room upstairs seats 72 with its own bar, ${SITE.tvCountReserve} TVs and the Sunday Ticket. $50 an hour.`}
+            title="The Copper Reserve"
+            body={`The private room upstairs seats ${RESERVE.seats} with its own bar, ${SITE.tvCountReserve} TVs and the Sunday Ticket. $${RESERVE.hourlyRate} an hour.`}
             href="/reserve"
             cta="Reserve the space"
           />
@@ -279,7 +279,7 @@ export default async function Home() {
         <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
           <div>
             <Eyebrow>Find us</Eyebrow>
-            <Heading className="mt-5">133 W. Michigan Ave.</Heading>
+            <Heading className="mt-5">{SITE.street}</Heading>
             <p className="mt-5 text-base leading-relaxed text-cream-dim">
               Right in the heart of downtown Marshall, one block off the fountain. Street
               parking out front and a lot around the corner.

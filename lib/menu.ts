@@ -58,7 +58,7 @@ export const FOOD_MENU: MenuSection[] = [
       { name: "Copper Burger", desc: "Velveeta cheese, onion, pickle, ketchup, mustard, on a sesame seed bun.", price: "12.00" },
       { name: "PBB", desc: "Peanut butter, spicy jelly, jalapenos, bacon, cheddar cheese, served on a brioche bun.", price: "14.00" },
       { name: "Impossible Burger", desc: "Vegan patty with lettuce, tomato, grilled onions, pickle, garlic mayo, served on a brioche bun. Impossible patty can be substituted for any burger, nacho, or taco + $4", price: "15.00" },
-      { name: "Whiskey Burger", desc: "Caramelized onions, smoked gouda, lettuce, blue cheese crumbles, whiskey glaze, served on an brioche bun.", price: "14.00" },
+      { name: "Whiskey Burger", desc: "Caramelized onions, smoked gouda, lettuce, blue cheese crumbles, whiskey glaze, served on a brioche bun.", price: "14.00" },
       { name: "Mushroom Swiss Burger", desc: "Swiss cheese saut\u00e9ed mushrooms and onions with mayonnaise served on a brioche bun.", price: "14.00" },
     ],
   },
@@ -67,7 +67,7 @@ export const FOOD_MENU: MenuSection[] = [
     items: [
       { name: "Copper Chicken", desc: "Grilled chicken breast marinated in olive oil, garlic, and rosemary served with lettuce, tomato, red onion, garlic mayo, on a pretzel bun.", price: "13.00" },
       { name: "Fried Chicken", desc: "Fried chicken, hot honey, pickles, on a brioche bun.", price: "12.00" },
-      { name: "Detroit Style Loose Burgers", desc: "Two hotdog buns filled with seasoned hamburger meat and topped with coney sauce, mustard and onions. A Detroit favorite!", price: "13.00" },
+      { name: "Detroit Style Loose Burgers", desc: "Two hot dog buns filled with seasoned hamburger meat and topped with coney sauce, mustard and onions. A Detroit favorite!", price: "13.00" },
       { name: "Copper Coneys", desc: "Two Dearborn brand natural casing hot dogs, coney sauce, onions, mustard, on hot dog buns.", price: "12.00" },
       { name: "Corn Dog", desc: "One cornmeal battered and deep fried Dearborn hot dog. add a second corn dog + $3", price: "7.00" },
       { name: "BBQ Pork", desc: "Slow roasted pork shoulder, pickles, coleslaw, and BBQ sauce on a toasted brioche bun.", price: "11.00" },
@@ -76,7 +76,7 @@ export const FOOD_MENU: MenuSection[] = [
       { name: "Cuban", desc: "Slow roasted pork, sliced ham, mozzarella cheese, pickles, mustard, served on baguette.", price: "15.00" },
       { name: "Italian", desc: "Capicola, mortadella, ham, salami, lettuce, tomato, mild peppers, mozzarella cheese, Italian dressing, served on baguette.", price: "15.00" },
       { name: "Fried Bologna", desc: "Thin sliced bologna, American cheese, grilled onions, mayo, mustard, on a brioche bun.", price: "9.00" },
-      { name: "Chicken Tenders", desc: "Four Hand-breaded chicken strips served with ranch, honey mustard, or bbq sauce.", price: "12.00" },
+      { name: "Chicken Tenders", desc: "Four hand-breaded chicken strips served with ranch, honey mustard, or bbq sauce.", price: "12.00" },
       { name: "Meatball Sub", desc: "Italian meatballs smothered in marinara sauce and mozzarella cheese. Served on a toasted baguette.", price: "15.00" },
       { name: "Chicago Dog", desc: "Authentic style hot dog with mustard, onion, tomatoes, sweet relish, sports peppers, a pickle spear, and celery salt. Served on a poppyseed hotdog bun.", price: "12.00" },
     ],
@@ -112,7 +112,7 @@ export const BRUNCH_MENU: MenuSection[] = [
       { name: "Peach Cobbler French Toast Bake", desc: "A sweet peach French toast bake topped with a buttery crumble. Finished with powdered sugar, whipped cream, and fresh peaches. Served with your choice of bacon or sausage.", price: "13.00" },
       { name: "Breakfast Nachos", desc: "Tortilla chips topped with chorizo, shredded cheese, scrambled eggs, red onion, crema, guacamole, and cilantro. Served with a side of salsa.", price: "16.00" },
       { name: "Maple Bacon Smash Burger", desc: "Two beef smash patties, Copper Hash Browns, bacon, cheddar cheese, a sunny-side-up egg, and house-made maple aioli on a brioche bun. Served with fries.", price: "16.00" },
-      { name: "Copper Breakfast", desc: "Two eggs* any way, Copper hashbrowns, choice of bacon or sausage and sourdough or wheat toast.", price: "11.00" },
+      { name: "Copper Breakfast", desc: "Two eggs* any way, Copper Hash Browns, choice of bacon or sausage and sourdough or wheat toast.", price: "11.00" },
       { name: "Gouda BLT", desc: "Gouda cheese, garlic mayo, bacon, lettuce, and tomato on toasted sourdough. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "12.00" },
       { name: "Copper Burger", desc: "\u2153 pound of beef with Velveeta cheese, onion, pickles, ketchup, and mustard on a sesame seed bun. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "12.00" },
       { name: "Fried Bologna Sandwich", desc: "Thinly sliced, grilled bologna, American cheese, grilled onions, mayo and mustard on a brioche bun. Served with fries or Copper Hash Browns. Add an egg* for $2.", price: "9.00" },
@@ -125,7 +125,7 @@ export const BRUNCH_MENU: MenuSection[] = [
     name: "Brunch Sides",
     items: [
       { name: "Two eggs", desc: "", price: "4.00" },
-      { name: "Copper Hash browns", desc: "Hash brown patty fried with white cheddar, onion, and spices", price: "3.00" },
+      { name: "Copper Hash Browns", desc: "Hash brown patty fried with white cheddar, onion, and spices", price: "3.00" },
       { name: "Toast", desc: "", price: "2.00" },
       { name: "Sausage", desc: "", price: "3.00" },
       { name: "Bacon", desc: "", price: "3.00" },
@@ -163,7 +163,7 @@ export const BRUNCH_MENU: MenuSection[] = [
   {
     name: "Brunch Shots",
     items: [
-      { name: "Mini Espresso Martini Shot", desc: "Vanilla vodka, Bailey's and Kahl\u00faa.", price: "6.00" },
+      { name: "Mini Espresso Martini Shot", desc: "Vanilla vodka, Baileys and Kahl\u00faa.", price: "6.00" },
       { name: "Breakfast Shot", desc: "Jameson Triple, maple syrup, buttershots. Chased with orange juice and candied bacon.", price: "7.00" },
       { name: "French Toast Shot", desc: "Butterscotch Schnapps, Fireball, cream, cinnamon-sugar rim", price: "6.00" },
     ],

@@ -236,7 +236,7 @@ button:not(:disabled) {
      August board and 55.7 px/s on a ten-game October one. Same CSS, double the
      speed, entirely because the board filled up.
 
-     So duration comes from character count, which tracks width closely —
+     So duration comes from character count, which tracks width closely:
      measured 8.66 px/char here and 6.70 px/char on the news crawl, the
      difference being the display face in caps versus body text.
 
@@ -246,7 +246,7 @@ button:not(:disabled) {
      Measured on both a five-item August board and a ten-game, twelve-headline
      in-season one. The news side is very stable (6.64 and 6.70 px/char) because
      sentence text averages out; the scores drift 46->51 px/s because their mix
-     changes — "Final" against "Fri 8/15, 7:00 PM" is a different characters-to-
+     changes, "Final" against "Fri 8/15, 7:00 PM" is a different characters-to-
      pixels ratio, and short items carry proportionally more of the fixed
      separator-and-diamond overhead. So the ratio lands between 1.13x and 1.22x
      rather than on a single number. It never inverts, which is the property that
@@ -257,7 +257,7 @@ button:not(:disabled) {
      against the scores' short tokens (234px) over near-identical 40s and 42s
      durations. Matching the durations is exactly what made the speeds mismatch.
      The old fixed 42s also meant the scoreboard ran 27.8 px/s in August and
-     55.7 px/s in October — it would have overtaken the news crawl in season.
+     55.7 px/s in October, it would have overtaken the news crawl in season.
      The fix was to stop setting durations at all.
 
      Fallbacks are today's real counts, so a missing variable degrades to a
@@ -284,7 +284,7 @@ button:not(:disabled) {
 @keyframes boardCrawl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ============================================================
-   Detroit news crawl — the bottom line under the score ticker
+   Detroit news crawl, the bottom line under the score ticker
    ============================================================
    Deliberately a rank below the score ticker: sentence case rather than the
    display face in caps, a thinner rail, and a slower crawl. Scores are the
@@ -325,7 +325,7 @@ button:not(:disabled) {
 .news-crawl-track {
   display: flex;
   width: max-content;
-  /* 58 px/s — a little faster than the scoreboard's 48. See the speed note on
+  /* 58 px/s, a little faster than the scoreboard's 48. See the speed note on
      .board-ticker-track above for why this is per-character and not per-item. */
   animation: newsCrawl calc(var(--news-chars, 340) * 0.115s) linear infinite;
 }
@@ -564,7 +564,7 @@ button:not(:disabled) {
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Glazed Web studio credit — pairs with components/GlazedCredit.
+   Glazed Web studio credit, pairs with components/GlazedCredit.
    Everything is scoped to .gw-credit. The words inherit the footer's own colour
    and size; the mark carries Glazed's own palette, because it is a logo and a
    logo does not take on the host's colours.
@@ -602,7 +602,7 @@ button:not(:disabled) {
 }
 .gw-credit-drips {
   transform-box: fill-box;
-  /* Top centre of the drip group — where the glaze leaves the donut. Scaling from
+  /* Top centre of the drip group, where the glaze leaves the donut. Scaling from
      anywhere else slides the drips off the donut instead of running them down. */
   transform-origin: 50% 0%;
   /* Resting is 1: the default state is his drawing at his lengths. */
@@ -614,18 +614,18 @@ button:not(:disabled) {
   transform: scaleY(1.22);
 }
 @media (prefers-reduced-motion: reduce) {
-  /* Nothing to suppress — there is no autoplay. The hover just stops easing. */
+  /* Nothing to suppress, there is no autoplay. The hover just stops easing. */
   .gw-credit-drips {
     transition-duration: 0s;
   }
 }
 /* ───────────────────────────────────────────────────────────────────────────
-   The signature plate — pairs with components/GlazedPlate.
+   The signature plate, pairs with components/GlazedPlate.
    Set the three values below per site, in that site's own palette block:
      --gw-above      the footer colour directly above (the drip's fill)
      --gw-plate      cream #FDF6EC under a dark footer, chocolate-2 #201712 under a light one
      --gw-plate-ink  cream on chocolate (16.41) or chocolate on cream (15.05); both AA
-   The inversion is not taste — a chocolate plate under a #191919 footer measures 1.00 and the
+   The inversion is not taste, a chocolate plate under a #191919 footer measures 1.00 and the
    drip vanishes. See the table in GlazedPlate for every footer in the account.
    ─────────────────────────────────────────────────────────────────────────── */
 .gw-plate {
@@ -644,7 +644,7 @@ button:not(:disabled) {
   color: var(--gw-above);
   fill: currentColor;
   /* Kills the hairline of plate colour that otherwise shows along the top edge from
-     subpixel rounding — the same -1px his DripDivider uses. */
+     subpixel rounding, the same -1px his DripDivider uses. */
   margin-bottom: -1px;
 }
 .gw-plate-bar {

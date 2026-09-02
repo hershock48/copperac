@@ -3,6 +3,7 @@ import { Inter, Oswald } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SITE } from "@/lib/site";
+import { jsonLd } from "@/lib/jsonld";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Copper Athletic Club",
   },
   description:
-    "A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan. Order online or call (269) 558-8222.",
+    `A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan. Order online or call ${SITE.phone}.`,
   keywords: [
     "sports bar Marshall MI",
     "Copper Athletic Club",
@@ -96,7 +97,9 @@ const restaurantSchema = {
   hasMap: SITE.mapUrl,
   sameAs: [SITE.instagram, SITE.facebook],
   hasMenu: `${SITE.url}/menu`,
-  acceptsReservations: "False",
+  // No acceptsReservations field: "False" is true for tables (walk in) but
+  // Google renders it as "Doesn't accept reservations" beside a site whose
+  // Reserve page exists to book a room. Saying nothing is more honest.
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
@@ -160,7 +163,7 @@ export default function RootLayout({
         <Footer />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(restaurantSchema) }}
         />
       </body>
     </html>

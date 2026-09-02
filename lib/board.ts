@@ -98,6 +98,9 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
     const res = await fetch(url, {
       cache: "no-store",
       headers: { accept: "application/json" },
+      // A hung connection must not stall the homepage regeneration; a
+      // failed one already falls to the empty board.
+      signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) return [];
     json = (await res.json()) as EspnSchedule;

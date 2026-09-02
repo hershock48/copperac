@@ -9,7 +9,7 @@ import { Eyebrow, Heading } from "@/components/ui";
  */
 export default async function Board() {
   // Both in flight together. The news strip is decoration on top of the scoreboard, so it
-  // must never add its latency to the board's — and if it fails it costs nothing.
+  // must never add its latency to the board's, and if it fails it costs nothing.
   const [board, news] = await Promise.all([getBoard(), getNews()]);
   if (!board.ok) return null; // every league failed, so say nothing rather than lie
 
@@ -40,7 +40,7 @@ export default async function Board() {
           <div className="board-ticker mt-8" aria-hidden="true">
             {/* Duration comes from characters, not items. See the note in globals.css: with a
                 fixed duration this ticker ran at 27.8 px/s on five August games and 55.7 on a
-                ten-game October board — the same CSS, double the speed, purely because the
+                ten-game October board, the same CSS, double the speed, purely because the
                 distance changed. */}
             <div
               className="board-ticker-track"
@@ -63,7 +63,7 @@ export default async function Board() {
         )}
 
         {/* Second crawl: Detroit headlines, the way the bottom line runs under a broadcast.
-            Renders only if the feed returned something — an empty rail reads as broken. */}
+            Renders only if the feed returned something, an empty rail reads as broken. */}
         {news.ok && <NewsCrawl items={news.items} />}
 
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
@@ -99,7 +99,7 @@ export default async function Board() {
 
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/70">
           Every Detroit game goes up on the wall. Most nights we&apos;ll put yours on a screen
-          too &mdash; ask. When Detroit has a big one, it takes the room.
+          too, just ask. When Detroit has a big one, it takes the room.
         </p>
       </div>
     </section>
@@ -108,7 +108,7 @@ export default async function Board() {
 
 /**
  * The score ticker's text for one game. Extracted so the character count that drives the
- * crawl duration is computed from the SAME string that gets rendered — counting one thing and
+ * crawl duration is computed from the SAME string that gets rendered, counting one thing and
  * rendering another is how a calibrated speed silently stops being calibrated.
  */
 function scoreLabel(g: BoardGame): string {
@@ -171,8 +171,8 @@ function ageLabel(published: string | null): string | null {
  * 1. IT IS A REAL LIST, NOT AN ARIA-HIDDEN DECORATION. The score ticker above is hidden from
  *    screen readers because every score in it is repeated in the panels below, so announcing
  *    it twice is noise. These headlines appear nowhere else on the page, so hiding them would
- *    delete content. The first run is a real <ul> of links; only the duplicate run — which
- *    exists purely so the crawl can loop seamlessly — is aria-hidden.
+ *    delete content. The first run is a real <ul> of links; only the duplicate run, which
+ *    exists purely so the crawl can loop seamlessly, is aria-hidden.
  *
  * 2. IT PAUSES ON HOVER AND ON FOCUS. These items are links, and a link that slides out from
  *    under the cursor cannot be clicked. Pausing is not a nicety here, it is what makes the

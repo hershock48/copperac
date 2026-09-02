@@ -2,27 +2,30 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import InquiryForm from "@/components/InquiryForm";
 import { Button, Eyebrow, Heading, Section } from "@/components/ui";
-import { ACCESSIBILITY_NOTE, SITE } from "@/lib/site";
+import { ACCESSIBILITY_NOTE, RESERVE, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   // 63 chars once the "| Copper Athletic Club" template is appended, which
   // Google truncates. Shorter, and it stops saying Copper three times.
   title: "The Copper Reserve",
   description:
-    `Marshall's private bar and event space. Seats 72, its own bartender, ${SITE.tvCountReserve} TVs with the NFL Sunday Ticket. $50 per hour. Birthdays, drafts, showers, meetings.`,
+    `Marshall's private bar and event space. Seats ${RESERVE.seats}, its own bartender, ${SITE.tvCountReserve} TVs with the NFL Sunday Ticket. $${RESERVE.hourlyRate} per hour. Birthdays, drafts, showers, meetings.`,
   alternates: { canonical: "/reserve" },
   openGraph: {
+    url: "/reserve",
+    type: "website",
+    siteName: "Copper Athletic Club",
     title: "The Copper Reserve | Private Event Space in Marshall, MI",
     description:
-      `Seats 72 with its own bartender, ${SITE.tvCountReserve} TVs and the NFL Sunday Ticket. $50 per hour. No setup, no cleanup, just show up.`,
-    images: [{ url: "/og/reserve.jpg", width: 1200, height: 630, alt: "The Copper Reserve private event space, seats 72 with its own bartender" }],
+      `Seats ${RESERVE.seats} with its own bartender, ${SITE.tvCountReserve} TVs and the NFL Sunday Ticket. $${RESERVE.hourlyRate} per hour. No setup, no cleanup, just show up.`,
+    images: [{ url: "/og/reserve.jpg", width: 1200, height: 630, alt: `The Copper Reserve private event space, seats ${RESERVE.seats} with its own bartender` }],
   },
 };
 
 const SPECS = [
-  { label: "Rate", value: "$50 per hour, or $25 per half hour" },
+  { label: "Rate", value: `$${RESERVE.hourlyRate} per hour, or $${RESERVE.halfHourRate} per half hour` },
   { label: "Includes", value: "A personal bartender for your party" },
-  { label: "Capacity", value: "Seating for up to 72 guests" },
+  { label: "Capacity", value: `Seating for up to ${RESERVE.seats} guests` },
   { label: "Food", value: "Buffet style, built around your group" },
   // From the constant, not spelled out. This number and the homepage's are
   // different rooms and both are real, which is exactly the pair most likely to

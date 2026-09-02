@@ -6,7 +6,7 @@ import GlazedCredit from "@/components/GlazedCredit";
  * The drip path is the `dripEdge` symbol from glazedweb's components/Logo.jsx, copied
  * verbatim. The idea is his: on glazedweb.com that same edge separates every band of the
  * homepage, in four different colour pairs. This is that element doing the one job it was
- * always right for — marking where the studio signs off.
+ * always right for, marking where the studio signs off.
  *
  * THE PLATE INVERTS AGAINST THE FOOTER. This is the whole trick and it is not a style
  * preference, it is arithmetic. The drip only reads if there is a real tonal step between the
@@ -21,12 +21,12 @@ import GlazedCredit from "@/components/GlazedCredit";
  *   sprinkles     #FFF6EA                 16.45         1.00
  *   beanumber inline #F9FAFB              16.85         1.03
  *
- * A chocolate plate under a near-black footer is a contrast ratio of 1.00 — the drip would be
+ * A chocolate plate under a near-black footer is a contrast ratio of 1.00, the drip would be
  * completely invisible, a flat band pretending to be a graphic. So: dark footer gets the CREAM
  * plate, light footer gets the CHOCOLATE plate, and every site lands a 12–18× step.
  *
- * The happy consequence is that the donut always sits on one of its own two native grounds —
- * cream #FDF6EC or chocolate-2 #201712 — which are exactly the two the mark is drawn against on
+ * The happy consequence is that the donut always sits on one of its own two native grounds -
+ * cream #FDF6EC or chocolate-2 #201712, which are exactly the two the mark is drawn against on
  * glazedweb.com. It stops adapting to seven different palettes and starts looking like itself.
  *
  * THREE VALUES, SET ONCE PER SITE, in that site's own CSS where the palette already lives:
@@ -34,7 +34,7 @@ import GlazedCredit from "@/components/GlazedCredit";
  *                    it must match exactly or a seam appears along the top edge.
  *   --gw-plate       the plate ground: cream under a dark footer, chocolate-2 under a light one.
  *   --gw-plate-ink   the text colour on it. cream on chocolate is 16.41, chocolate on cream is
- *                    15.05; both pass AA. Taupe #8A7663 measures 4.07 and 4.03 — it clears AA
+ *                    15.05; both pass AA. Taupe #8A7663 measures 4.07 and 4.03, it clears AA
  *                    for large text only, so it is NOT safe for a 12px credit line. Do not
  *                    reach for it here.
  *

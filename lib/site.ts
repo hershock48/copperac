@@ -34,8 +34,8 @@ export const SITE = {
   // Confirmed by the owner, 21 Aug 2026: reserve@copperac.com is the club's
   // monitored inbox (replaces the info@ placeholder that was never confirmed).
   // This is both the address the enquiry form's mailto fallback writes to and
-  // the default for INQUIRY_TO. Delivery via Resend is still unconfigured —
-  // see README, "The enquiry form does not reach an inbox yet".
+  // the default for INQUIRY_TO. Delivery via Resend is live and confirmed
+  // (21 Aug 2026); see README, "The enquiry form: live".
   email: "reserve@copperac.com",
   street: "133 W. Michigan Ave.",
   city: "Marshall",
@@ -44,13 +44,13 @@ export const SITE = {
   mapUrl:
     "https://www.google.com/maps/dir/?api=1&destination=133+W+Michigan+Ave,+Marshall,+MI+49068",
   // Ordering is Toast's, for now: Kevin's call when he took the site (Aug
-  // 2026) — he keeps Toast online ordering and likes the rest. This is the
+  // 2026), he keeps Toast online ordering and likes the rest. This is the
   // same store the old site links: copperac.com's nav points at
   // www.toasttab.com/copper-pub/v3, which 301s to this URL (verified 21 Aug
   // 2026). Every "Order Online" surface reads this constant. The in-house
   // ordering Glazed Web built ("we replace toast online" was the earlier
   // call, since reversed) stays intact at /order but parked behind a
-  // redirect to this same store — see next.config.ts. Switching to the
+  // redirect to this same store, see next.config.ts. Switching to the
   // in-house channel is this line back to "/order", that redirect deleted,
   // and /order restored to app/sitemap.ts.
   orderUrl: "https://order.toasttab.com/online/copper-pub",
@@ -63,6 +63,15 @@ export const SITE = {
   // Directions use the street address, so this only places the contact-page
   // marker and the Restaurant schema's geo.
   geo: { lat: 42.2718, lng: -84.9597 },
+} as const;
+
+// The Copper Reserve's facts, read by every surface that states them (the
+// homepage card, the Reserve page and its metadata, the events page, the
+// enquiry form's guest field). Six copies before this constant existed.
+export const RESERVE = {
+  seats: 72,
+  hourlyRate: 50,
+  halfHourRate: 25,
 } as const;
 
 export const HOURS = [

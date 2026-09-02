@@ -5,6 +5,7 @@ import { Button, PageHero, Section } from "@/components/ui";
 import { COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu";
 import { getDrinks } from "@/lib/taplist";
 import { CONSUMER_ADVISORY, KITCHEN_NOTE, SITE } from "@/lib/site";
+import { jsonLd } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -12,6 +13,11 @@ export const metadata: Metadata = {
     "Burgers, wings, coneys, Detroit-style loose burgers, tacos, salads and more at Copper Athletic Club in Marshall, MI. Order online or dine in.",
   alternates: { canonical: "/menu" },
   openGraph: {
+    // Next replaces the layout's openGraph object rather than merging it,
+    // so url, type and siteName have to be restated on every page.
+    url: "/menu",
+    type: "website",
+    siteName: "Copper Athletic Club",
     title: "Menu | Copper Athletic Club",
     description:
       "Burgers, wings, coneys, Detroit-style loose burgers, tacos, salads and more in downtown Marshall, MI.",
@@ -112,7 +118,7 @@ export default async function MenuPage() {
             it is a wink about beer, not a label someone has to decode. */}
         <div id="taps" className="curls mt-14">
           <div>
-            <span className="curls-title display">12 oz curls</span>
+            <h2 className="curls-title display">12 oz curls</h2>
             <p className="curls-sub">Draft, bottles, cans and a full bar. The only reps we count.</p>
           </div>
           <p className="curls-note">
@@ -131,7 +137,7 @@ export default async function MenuPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(menuSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(menuSchema) }}
       />
     </>
   );

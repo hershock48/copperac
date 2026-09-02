@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Sunday brunch at Copper Athletic Club in Marshall, MI. 9 AM to 2 PM every Sunday. Peach cobbler french toast bake, breakfast nachos and mimosa flights.",
   alternates: { canonical: "/brunch" },
   openGraph: {
+    url: "/brunch",
+    type: "website",
+    siteName: "Copper Athletic Club",
     title: "Sunday Brunch | Copper Athletic Club",
     description:
       "Every Sunday, 9 AM to 2 PM in downtown Marshall. Peach cobbler french toast bake, breakfast nachos, mimosa flights.",

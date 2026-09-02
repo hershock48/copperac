@@ -6,12 +6,15 @@ import { ACCESSIBILITY_NOTE, HOURS, KITCHEN_NOTE, SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact & Hours",
   description:
-    "Copper Athletic Club is at 133 W. Michigan Ave. in downtown Marshall, MI. Call (269) 558-8222. Open Monday to Saturday 11 AM to midnight, Sunday from 9 AM.",
+    `Copper Athletic Club is at ${SITE.street} in downtown Marshall, MI. Call ${SITE.phone}. Open Monday to Saturday 11 AM to midnight, Sunday from 9 AM.`,
   alternates: { canonical: "/contact" },
   openGraph: {
+    url: "/contact",
+    type: "website",
+    siteName: "Copper Athletic Club",
     title: "Contact & Hours | Copper Athletic Club",
     description:
-      "133 W. Michigan Ave., Marshall, MI. Call (269) 558-8222. Open Mon–Sat 11 AM to midnight, Sunday from 9 AM.",
+      `${SITE.street}, Marshall, MI. Call ${SITE.phone}. Open Mon–Sat 11 AM to midnight, Sunday from 9 AM.`,
     images: [{ url: "/og/contact.jpg", width: 1200, height: 630, alt: "Copper Athletic Club, 133 W. Michigan Ave., Marshall, Michigan" }],
   },
 };
@@ -59,7 +62,7 @@ export default function ContactPage() {
             <div className="mt-10 overflow-hidden rounded-sm border border-ink-line">
               <iframe
                 title="Map showing Copper Athletic Club at 133 W. Michigan Ave., Marshall, Michigan"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-84.9661%2C42.2686%2C-84.9533%2C42.2750&layer=mapnik&marker=42.2718%2C-84.9597"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${SITE.geo.lng - 0.0064}%2C${SITE.geo.lat - 0.0032}%2C${SITE.geo.lng + 0.0064}%2C${SITE.geo.lat + 0.0032}&layer=mapnik&marker=${SITE.geo.lat}%2C${SITE.geo.lng}`}
                 className="h-72 w-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

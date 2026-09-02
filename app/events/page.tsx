@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Button, Eyebrow, Heading, PageHero, Section } from "@/components/ui";
-import { SITE, upcomingEvents } from "@/lib/site";
+import { RESERVE, SITE, upcomingEvents } from "@/lib/site";
+import { jsonLd } from "@/lib/jsonld";
 
 // Re-render hourly so finished events fall off on their own. Without this the
 // page is frozen at build time and keeps advertising a night that already
@@ -20,13 +21,16 @@ export async function generateMetadata(): Promise<Metadata> {
       : "Trivia, watch parties and live events at Copper Athletic Club in Marshall, MI.",
     alternates: { canonical: "/events" },
     openGraph: {
+      url: "/events",
+      type: "website",
+      siteName: "Copper Athletic Club",
       title: next ? `${next.title} | Copper Athletic Club` : "Events | Copper Athletic Club",
       description: next
         ? `${next.displayDate}, ${next.time}. ${price}${next.details[0] ?? ""}`.trim()
         : "Trivia, watch parties and live events in downtown Marshall, MI.",
       // The branded card rather than the event flyer: flyers are portrait and
       // already carry their own type, so they crop badly and double up.
-      images: [{ url: "/og/events.jpg", width: 1200, height: 630, alt: "Trivia, watch parties and live music at Copper Athletic Club" }],
+      images: [{ url: "/og/events.jpg", width: 1200, height: 630, alt: "Trivia, watch parties and live events at Copper Athletic Club" }],
     },
   };
 }
@@ -157,8 +161,8 @@ export default function EventsPage() {
           <Eyebrow>Want the room to yourself?</Eyebrow>
           <Heading className="mt-5">Host it in the Copper Reserve</Heading>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-            Seats 72, has its own bartender and {SITE.tvCountReserve} TVs with the Sunday Ticket. $50 an
-            hour.
+            Seats {RESERVE.seats}, has its own bartender and {SITE.tvCountReserve} TVs with the Sunday Ticket. $
+            {RESERVE.hourlyRate} an hour.
           </p>
           <div className="mt-9 flex justify-center">
             <Button href="/reserve">See the Space</Button>
@@ -166,10 +170,9 @@ export default function EventsPage() {
         </div>
       </Section>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
-      />
+      {eventSchema.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(eventSchema) }} />
+      )}
     </>
   );
 }

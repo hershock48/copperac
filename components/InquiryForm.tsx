@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SITE } from "@/lib/site";
+import { RESERVE, SITE } from "@/lib/site";
 
 type Variant = "reserve" | "contact";
 
@@ -69,6 +69,19 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
         setSent(true);
         return;
       }
+      // The route refused the input itself. That is the visitor's to fix on
+      // the page, not a delivery problem, so no mail-app handoff: it would
+      // open with the same too-long or malformed content and no explanation.
+      if (res.status === 422) {
+        setError(
+          json.reason === "too_long"
+            ? "One of the fields is longer than we can take. The message can hold about 4,000 characters; the rest hold 200. Trim it and try again."
+            : json.reason === "bad_email"
+              ? "That email address does not look right. Check it and try again."
+              : "A required field is empty. Fill in the marked fields and try again."
+        );
+        return;
+      }
       // Not wired up, or the mail provider failed. Hand off to the mail client
       // rather than pretending the message went through.
       window.location.href = composeEmail(data);
@@ -129,7 +142,7 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
           <div className="grid gap-5 sm:grid-cols-3">
             <Field label="Start time" name="start" type="time" />
             <Field label="End time" name="end" type="time" />
-            <Field label="Guests" name="guests" type="number" placeholder="Up to 72" />
+            <Field label="Guests" name="guests" type="number" placeholder={`Up to ${RESERVE.seats}`} />
           </div>
         </>
       ) : (

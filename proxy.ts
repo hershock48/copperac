@@ -4,8 +4,8 @@ import { NextResponse, type NextRequest } from "next/server";
 // Park the in-house "Jelly" ordering platform on the live client site.
 //
 // The club uses Toast for online ordering (Kevin's call, Aug 2026). We built a
-// full in-house ordering system — the guest order page, the /kitchen staff
-// board, their APIs, and the sales pitch for it — and we are KEEPING all of it
+// full in-house ordering system, the guest order page, the /kitchen staff
+// board, their APIs, and the sales pitch for it, and we are KEEPING all of it
 // (it may be used later), but none of it should be reachable on the client's
 // own site. It stays fully alive on the marketing/demo host so it can still be
 // shown and, someday, switched on.
@@ -24,7 +24,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PITCH_HOST = "copperac.glazedweb.com";
 
 export function proxy(request: NextRequest) {
-  // On the demo host everything works — that is where the preserved tool lives.
+  // On the demo host everything works, that is where the preserved tool lives.
   if ((request.headers.get("host") ?? "") === PITCH_HOST) {
     return NextResponse.next();
   }
@@ -46,8 +46,12 @@ export function proxy(request: NextRequest) {
   }
 
   // In-house ordering APIs: 404 as if not deployed. Nothing on the client site
-  // calls these — the /order page redirects to Toast, so its client never runs.
-  if (path.startsWith("/api/ordering/") || path.startsWith("/api/kitchen/")) {
+  // calls these, the /order page redirects to Toast, so its client never runs.
+  if (
+    path.startsWith("/api/ordering/") ||
+    path.startsWith("/api/kitchen/") ||
+    path === "/api/printer"
+  ) {
     return new NextResponse("Not found", { status: 404 });
   }
 
@@ -61,5 +65,9 @@ export const config = {
     "/pitch/:path*",
     "/api/ordering/:path*",
     "/api/kitchen/:path*",
+    // The cloud-printer poll endpoint belongs to the parked ordering system
+    // too; a printer token minted for the demo must not work on the client's
+    // domain.
+    "/api/printer",
   ],
 };

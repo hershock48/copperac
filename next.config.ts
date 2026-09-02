@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 // The marketing/demo host. The pitch renders at its root and the live in-house
 // product renders under /demo (see rewrites() below). The Toast parking
-// redirect deliberately does NOT fire here, so the demo — and the Jelly pitch,
-// whose entire argument is replacing Toast with in-house ordering — keeps
+// redirect deliberately does NOT fire here, so the demo, and the Jelly pitch,
+// whose entire argument is replacing Toast with in-house ordering, keeps
 // reaching the real /order page instead of bouncing viewers to Toast.
 const PITCH_HOST = "copperac.glazedweb.com";
 
@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
       // online ordering (Kevin's call, Aug 2026). This redirect runs before
       // the filesystem, so app/order/page.tsx stays built but unreachable:
       // no guest can place an order on a kitchen board nobody is watching.
-      // Deliberately not permanent — browsers cache 308s for good, and this
+      // Deliberately not permanent, browsers cache 308s for good, and this
       // decision is "for now". Keep the destination in step with
       // SITE.orderUrl in lib/site.ts; delete this line to bring /order back.
       //
@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
       // before rewrites and a rewrite target is never re-checked against
       // redirects, so without this guard the pitch host's /demo/order rewrite
       // (-> /order) and the Jelly pitch's own /order CTAs would all 307 to
-      // Toast — the demo, and the proposal to replace Toast, silently sending
+      // Toast, the demo, and the proposal to replace Toast, silently sending
       // people to Toast. On the pitch host /order renders the real in-house
       // page, which is exactly what the demo needs.
       {
@@ -68,7 +68,7 @@ const nextConfig: NextConfig = {
     // ------------------------------------------------------------------
     // beforeFiles is load-bearing. A plain rewrites() array is afterFiles,
     // which runs only once Next has failed to find a page, and app/page.tsx
-    // already answers "/" — so the root rewrite below would never have fired.
+    // already answers "/", so the root rewrite below would never have fired.
     const onPitchHost = [{ type: "host" as const, value: PITCH_HOST }];
     return {
       beforeFiles: [
@@ -98,8 +98,13 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
+            // Two years, this host only. includeSubDomains and preload were
+            // dropped on purpose: this header ships on the client's own
+            // apex, and includeSubDomains would commit every copperac.com
+            // subdomain they run (mail, anything old) to HTTPS the moment a
+            // browser sees it. That is their call to make, not ours.
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
+            value: "max-age=63072000",
           },
         ],
       },
