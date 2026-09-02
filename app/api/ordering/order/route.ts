@@ -23,12 +23,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ORDERING } from "@/lib/ordering/config";
 import { guestMenu } from "@/lib/ordering/menu";
+import { parsePicks, priceOptions, type OptionPick } from "@/lib/ordering/pricing";
 import { orderingWindow } from "@/lib/ordering/time";
 import { effectiveState, getStore, type Order, type OrderLine } from "@/lib/ordering/store";
 
 export const dynamic = "force-dynamic";
 
-type IncomingLine = { itemId: string; qty: number; options: string[] };
+type IncomingLine = { itemId: string; qty: number; options: OptionPick[] };
 type IncomingOrder = {
   guestName: string;
   guestPhone: string;
@@ -84,34 +85,24 @@ export async function POST(req: NextRequest) {
     const qty = Math.floor(Number(raw.qty));
     if (!Number.isFinite(qty) || qty < 1 || qty > 12) return bad("Quantity out of range.");
 
-    const chosen = Array.isArray(raw.options) ? raw.options.map(String) : [];
-    let optionCents = 0;
-    for (const group of item.options) {
-      const inGroup = group.choices.filter((c) => chosen.includes(c.name));
-      if (group.multi) {
-        // Any number; required multi means at least one.
-        if (group.required && inGroup.length === 0) {
-          return bad(`${item.name} needs at least one ${group.name.toLowerCase()}.`);
-        }
-      } else {
-        if (group.required && inGroup.length !== 1) {
-          return bad(`${item.name} needs a ${group.name.toLowerCase()} picked.`);
-        }
-        if (!group.required && inGroup.length > 1) return bad("Malformed options.");
-      }
-      optionCents += inGroup.reduce((sum, c) => sum + c.priceCents, 0);
+    // Picks arrive group-qualified and are priced by lib/ordering/pricing.ts,
+    // the same function the cart uses, so the two cannot disagree. See that
+    // file for why a bare choice name is not enough.
+    const picks = parsePicks(raw.options);
+    if (picks === "stale") {
+      return bad("This page is out of date. Refresh it and add the items again.");
     }
-    // Reject names that match no group: silence here would misprice quietly.
-    const legal = new Set(item.options.flatMap((g) => g.choices.map((c) => c.name)));
-    if (chosen.some((c) => !legal.has(c))) return bad("Malformed options.");
+    if (picks === null) return bad("Malformed options.");
+    const priced = priceOptions(item, picks);
+    if (!priced.ok) return bad(priced.error);
 
-    const unitCents = item.priceCents + optionCents;
+    const unitCents = item.priceCents + priced.optionCents;
     lines.push({
       itemId: item.id,
       name: item.name,
       qty,
       unitCents,
-      options: chosen,
+      options: priced.labels,
       lineCents: unitCents * qty,
     });
   }

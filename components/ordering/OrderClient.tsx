@@ -15,6 +15,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrderableSection } from "@/lib/ordering/menu";
+import { priceOptions, type OptionPick } from "@/lib/ordering/pricing";
 
 type LiveState = {
   open: boolean;
@@ -34,7 +35,8 @@ type CartLine = {
   name: string;
   unitCents: number;
   qty: number;
-  options: string[];
+  options: OptionPick[]; // what the server prices, group-qualified
+  labels: string[]; // what the cart shows, from the same pricing pass
   ageRestricted: boolean;
 };
 
@@ -97,7 +99,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const unavailable = useMemo(() => new Set(live?.unavailable ?? []), [live]);
 
   function addToCart(line: Omit<CartLine, "key" | "qty">) {
-    const key = `${line.itemId}|${[...line.options].sort().join(",")}`;
+    const key = `${line.itemId}|${line.options.map((p) => `${p.group}=${p.choice}`).sort().join(",")}`;
     setCart((c) => {
       const existing = c.find((l) => l.key === key);
       if (existing) {
@@ -209,6 +211,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                                 name: item.name,
                                 unitCents: item.priceCents,
                                 options: [],
+                                labels: [],
                                 ageRestricted: item.ageRestricted,
                               })
                         }
@@ -222,12 +225,13 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
                   {isOpen && !soldOut && (
                     <OptionPicker
                       item={item}
-                      onAdd={(options, unitCents) =>
+                      onAdd={(options, labels, unitCents) =>
                         addToCart({
                           itemId: item.id,
                           name: item.name,
                           unitCents,
                           options,
+                          labels,
                           ageRestricted: item.ageRestricted,
                         })
                       }
@@ -322,18 +326,21 @@ function OptionPicker({
   onAdd,
 }: {
   item: OrderableSection["items"][number];
-  onAdd: (options: string[], unitCents: number) => void;
+  onAdd: (options: OptionPick[], labels: string[], unitCents: number) => void;
 }) {
   const [picked, setPicked] = useState<Record<string, string[]>>({});
 
-  const chosen = Object.values(picked).flat();
-  const optionCents = item.options
-    .flatMap((g) => g.choices)
-    .filter((c) => chosen.includes(c.name))
-    .reduce((s, c) => s + c.priceCents, 0);
-  const ready = item.options.every(
-    (g) => !g.required || (picked[g.name]?.length ?? 0) >= 1
+  // Picks stay attached to their group. The same function the order API
+  // runs prices them here, so the Add button never quotes a number the
+  // server would then compute differently, and it stays disabled until
+  // every required group is satisfied.
+  const picks: OptionPick[] = Object.entries(picked).flatMap(([group, names]) =>
+    names.map((choice) => ({ group, choice }))
   );
+  const priced = priceOptions(item, picks);
+  const ready = priced.ok;
+  const optionCents = priced.ok ? priced.optionCents : 0;
+  const labels = priced.ok ? priced.labels : [];
 
   return (
     <div className="mt-4 rounded-sm border border-ink-line bg-ink-soft p-4">
@@ -388,7 +395,7 @@ function OptionPicker({
       <button
         type="button"
         disabled={!ready}
-        onClick={() => onAdd(chosen, item.priceCents + optionCents)}
+        onClick={() => onAdd(picks, labels, item.priceCents + optionCents)}
         className="display mt-2 rounded-sm bg-copper px-5 py-2.5 text-xs uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
       >
         Add · {money(item.priceCents + optionCents)}
@@ -461,8 +468,8 @@ function Checkout({
             <li key={line.key} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="text-sm text-cream">{line.name}</p>
-                {line.options.length > 0 && (
-                  <p className="text-xs text-cream-dim/70">{line.options.join(", ")}</p>
+                {line.labels.length > 0 && (
+                  <p className="text-xs text-cream-dim/70">{line.labels.join(", ")}</p>
                 )}
               </div>
               <div className="flex flex-none items-center gap-2">

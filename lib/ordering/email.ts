@@ -9,7 +9,15 @@
 //
 // From-address strategy is the studio standard: a verified glazedweb.com
 // sender, reply_to the bar's inbox, so no client DNS work is ever on the
-// critical path.
+// critical path. INQUIRY_FROM is the complete From header, display name
+// included ("Copper Athletic Club <copper@glazedweb.com>"), read exactly the
+// way app/api/inquiry/route.ts reads it and sent as-is. An earlier version
+// wrapped it in a second display name, which Resend refuses as malformed.
+//
+// Best-effort is not the same as silent. Resend answering with anything but
+// 2xx (a bad key is 401, an unverified From domain is 403) is logged with
+// its status and body, because the enquiry route once lost mail exactly
+// this way and the runtime log was the only place the reason showed up.
 
 import { ORDERING } from "./config";
 import { SITE } from "@/lib/site";
@@ -26,26 +34,32 @@ function orderLines(order: Order): string {
 }
 
 async function send(to: string, subject: string, text: string): Promise<void> {
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.INQUIRY_FROM;
+  // Trimmed on read: a trailing space or CR on a pasted key is invisible in
+  // every dashboard and would otherwise fail as a bad credential.
+  const key = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.INQUIRY_FROM?.trim();
   if (!key || !from) {
     console.log(`[ordering email, delivery unconfigured] to=${to} subject="${subject}"\n${text}`);
     return;
   }
   try {
-    await fetch("https://api.resend.com/emails", {
+    const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: `Copper Athletic Club <${from}>`,
+        from,
         to: [to],
         reply_to: SITE.email,
         subject,
         text,
       }),
     });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "<unreadable>");
+      console.error(`[ordering email] Resend refused ${res.status}: ${detail} to=${to} subject="${subject}"`);
+    }
   } catch (err) {
-    console.log(`[ordering email failed] to=${to} subject="${subject}"`, err);
+    console.error(`[ordering email] call to Resend failed to=${to} subject="${subject}"`, err);
   }
 }
 

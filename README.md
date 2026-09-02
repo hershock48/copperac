@@ -219,6 +219,13 @@ Decisions worth knowing before touching it:
 - **The server is the till.** Client prices are display only; the order API
   recomputes everything from the menu, revalidates 86s and hours, and rejects
   with a human sentence, not a code.
+- **Option picks carry their group name** (`{ group, choice }`, never a bare
+  choice name), and one pure function, `lib/ordering/pricing.ts`, prices them
+  for the cart and the API alike. Toast reuses names across groups on one item
+  (Nachos sells "5 oz. Queso" in two groups; a burger's "Add Pickles" is 50
+  cents in one group and free in another), and matching by bare name once
+  billed a queso twice. `node lib/__tests__/ordering-pricing.mjs` pins the
+  colliding cases against the real harvest.
 - **Pause always auto-resumes** (30/60/90 minutes). A Friday-rush pause that
   someone forgets cannot silently kill Saturday. Expired pauses clear on read.
 - **Storage is Postgres when `DATABASE_URL` exists, memory otherwise.** Memory
