@@ -429,7 +429,7 @@ button:not(:disabled) {
   /* the global reset squashes durations; an infinite crawl would jitter, so stop it */
   .board-ticker-track { animation: none !important; transform: none !important; }
   .news-crawl-track { animation: none !important; transform: none !important; }
-  .board-live-dot, .status-open .status-dot { animation: none !important; }
+  .board-live-dot, .status-open .status-dot, .tap-live-dot { animation: none !important; }
 }
 
 /* four-team strip: every Detroit club, even out of season */
@@ -508,6 +508,33 @@ button:not(:disabled) {
   line-height: 1.45;
   color: rgba(232, 226, 216, 0.62);
   max-width: 52ch;
+}
+/* the LIVE marker: green, the one place copper yields, because it is a signal.
+   Flashes on a slow pulse (the status chip's own rhythm); still under reduced motion. */
+.tap-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 209, 138, 0.45);
+  background: rgba(125, 209, 138, 0.1);
+  color: #7dd18a;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  vertical-align: middle;
+}
+.tap-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7dd18a;
+  animation: statusPulse 2.6s ease-out infinite, tapLiveBlink 2.6s ease-in-out infinite;
+}
+@keyframes tapLiveBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
 }
 .tap-abv {
   font-family: var(--font-display);

@@ -59,8 +59,16 @@ export default function TapList({
   return (
     <div className="board-panel mt-6">
       <div className="board-panel-head">
-        <h3 className="display text-sm uppercase tracking-[0.25em] text-copper-light">
+        <h3 className="display flex items-center gap-3 text-sm uppercase tracking-[0.25em] text-copper-light">
           On tap
+          {/* The owner's ask (3 Sep 2026): say out loud that this is live.
+              This component only renders when the feed is live, so the
+              marker can never lie. Green on purpose, the one place the
+              copper palette gives way: it is a signal, not a style. */}
+          <span className="tap-live" aria-label="Live, updated by the bar">
+            <span className="tap-live-dot" aria-hidden="true" />
+            Live
+          </span>
         </h3>
         {updated && (
           <p className="display text-[10.5px] uppercase tracking-[0.14em] text-cream-dim/60">
