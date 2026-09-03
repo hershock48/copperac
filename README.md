@@ -293,7 +293,9 @@ out of the sitemap, disallowed in robots, linked from nowhere.
 project (four characters or more; unset means closed, never open), and add
 the free Neon database (Storage > Create Database) so saves persist. Until
 the database exists every workroom screen says so in a banner. Then hand the
-planner `copperac.com/workroom` and the passcode.
+planner `copperac.com/workroom` and the passcode. `GET /api/status` reports
+both switches (`workroom.passcode` set or unset, `workroom.storage` postgres
+or memory), so a dashboard change can be confirmed without signing in.
 
 ## Cutover day
 
