@@ -270,6 +270,13 @@ runs their social media and events. Two screens behind one passcode:
   Event schema follow within seconds. A draft stays off the site. The screen
   also holds who handles events, shown on the events page as the person to
   ask (email if given, else phone, else the bar's number).
+- **Taps.** Not a screen here: a tab that signs her straight into the bar's
+  Scooplist board, no second PIN. `app/api/workroom/taps` mints a
+  two-minute HMAC link with the org's handoff key and redirects to
+  Scooplist's `/api/handoff`, which verifies it and sets its own session.
+  Needs `SCOOPLIST_HANDOFF_KEY` on this project, printed once when the org
+  is created or re-run with `tools/setup-scooplist.ps1`. `GET /api/status`
+  reports it under `workroom.tapsHandoff`.
 - **Menu.** A price, a description and an on/off switch per item, main menu
   and Sunday brunch. Names and sections stay in `lib/menu.ts`, because the
   printed menu is still the truth for shape. Clearing a price restores the

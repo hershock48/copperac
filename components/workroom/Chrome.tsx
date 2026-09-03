@@ -10,6 +10,10 @@ import { SITE } from "@/lib/site";
 const TABS = [
   { href: "/workroom", label: "Events" },
   { href: "/workroom/menu", label: "Menu" },
+  // Not a workroom screen: a signed handoff onto the bar's Scooplist board
+  // (app/api/workroom/taps), opened in its own tab so the workroom stays
+  // where she left it.
+  { href: "/api/workroom/taps", label: "Taps ↗", external: true },
 ];
 
 export default function WorkroomChrome() {
@@ -29,11 +33,17 @@ export default function WorkroomChrome() {
           <span className="wr-word">Workroom</span>
         </a>
         <nav className="wr-tabs" aria-label="Workroom">
-          {TABS.map((t) => (
-            <a key={t.href} href={t.href} aria-current={isActive(t.href) ? "page" : undefined}>
-              {t.label}
-            </a>
-          ))}
+          {TABS.map((t) =>
+            t.external ? (
+              <a key={t.href} href={t.href} target="_blank" rel="noreferrer">
+                {t.label}
+              </a>
+            ) : (
+              <a key={t.href} href={t.href} aria-current={isActive(t.href) ? "page" : undefined}>
+                {t.label}
+              </a>
+            )
+          )}
         </nav>
         <div className="wr-right">
           <a href="/events" target="_blank" rel="noreferrer">

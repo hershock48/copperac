@@ -40,6 +40,8 @@ export async function GET() {
       workroom: {
         passcode: workroomPasscode() === null ? "unset" : "set",
         storage: getStore().backend,
+        // The Taps tab's handoff into Scooplist needs the org's key here.
+        tapsHandoff: process.env.SCOOPLIST_HANDOFF_KEY?.trim() ? "set" : "unset",
       },
       summary: drinks.live.taps
         ? `Live: ${drinks.taps.length} ${drinks.taps.length === 1 ? "tap renders" : "taps render"} from Scooplist.`

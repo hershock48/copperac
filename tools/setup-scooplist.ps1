@@ -71,6 +71,9 @@ try {
 
 Write-Host ""
 Write-Host "Done."
+Write-Host "  The handoff key printed above goes into the copperac Vercel project as"
+Write-Host "  SCOOPLIST_HANDOFF_KEY (then redeploy). It is what lets the workroom's Taps"
+Write-Host "  tab sign the planner into Scooplist without the PIN."
 Write-Host "  Bar sign-in:  https://scooplist.glazedweb.com/login/copperac   (PIN: the one you chose)"
 Write-Host "  TV board:     https://scooplist.glazedweb.com/board/copperac/marshall"
 Write-Host "  Site check:   https://copperac.vercel.app/api/status  (expect cocktails: live)"
