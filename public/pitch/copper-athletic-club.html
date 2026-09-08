@@ -18,18 +18,19 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://copperac.glazedweb.com/og/home.jpg">
 <!--
-  Glazed Web proposal for Copper Athletic Club. August 2026.
+  Glazed Web proposal for Copper Athletic Club. August 2026, price added September 2026.
 
   The stylesheet and all three donut instances below are lifted verbatim from
   pitch/griffin-claw/index.html in the griffin-claw-rebuild repo, so the two
   proposals cannot drift apart. If the Glazed brand changes, change it there and
   copy it here rather than editing this file's tokens by hand.
 
-  Griffin Claw's pricing calculator and price-box CSS were stripped, not left
-  unused, because this proposal deliberately has no prices in it.
+  Griffin Claw's pricing calculator was stripped. Its price-box CSS is kept,
+  and the build figure counts down from our published market price the way
+  the anchor proposal's does (data-to is the real price in the markup).
 
   Every claim in "What we found" was checked against the live site on
-  2026-08-08 and links to the page that proves it. Two things were left out
+  2026-08-08 and again on 2026-09-08 and links to the page that proves it. Two things were left out
   because they could not be verified: any page-speed score for copperac.com
   (Google's API rate-limited every attempt) and any hex value for the Reserve
   page's palette, where only the blue logo file name is provable.
@@ -42,7 +43,7 @@
 :root{
  --paper:#FDF6EC; --paper2:#FFF7EA; --card:#FFFDF8;
  --ink:#2B1E16; --ink2:#201712; --body:#6B5747; --mute:#8A7663; --line:#E8DCC8;
- --pink:#E84D8A; --pink-ink:#C9356F; --pink-d:#CE3672; --pink-t:#FCE7F0;
+ --pink:#E84D8A; --pink-d:#CE3672; --pink-t:#FCE7F0;
  --green:#BFE07A; --green-b:#A9D65C; --green-d:#55974A; --green-t:#F1F8DC;
  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
  --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -73,7 +74,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 nav{display:flex;gap:20px;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
 nav a{color:var(--mute);text-decoration:none}
 nav a:hover{color:var(--pink-d)}
-@media(max-width:720px){nav{display:none}.brand span{display:none}}
+@media(max-width:720px){nav{display:none}.brand .bw~span{display:none}}
 
 /* hero */
 .hero{padding:66px 0 54px;text-align:left}
@@ -132,7 +133,8 @@ nav a:hover{color:var(--pink-d)}
 .step .no{font-family:var(--sans);font-weight:800;font-size:.78rem;color:#fff;background:var(--pink);width:28px;height:28px;
  border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .step h4{font-family:var(--sans);font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:4px}
-.step p{font-size:.95rem;margin:0}
+.step>div{min-width:0}
+.step p{font-size:.95rem;margin:0;overflow-wrap:anywhere}
 
 footer{background:var(--ink);color:#B9A894;padding:44px 0;font-size:.86rem;margin-top:20px}
 footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
@@ -185,291 +187,319 @@ footer .gmark{height:78px;width:auto}
 @media(max-width:600px){.clock .clockgrid{grid-template-columns:1fr}
  .clock .cc+.cc{border-left:0;border-top:1px solid rgba(255,255,255,.1)}}
 
-/* lifted from the True North proposal (4 Sep 2026): the price card, the
-   proof list, the verdict box and the one CTA, so this page carries the same
-   sections every proposal now carries. */
-.verify.loose{color:var(--pink-ink);letter-spacing:.08em;padding:7px 14px}
+/* price. Griffin Claw's own rules, plus the anchor line above the number. */
 .pricebox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
 .pricebox>div{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px}
-.pricebox .n{font-family:var(--sans);font-size:2rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1}
+.pricebox .n{font-family:var(--sans);font-size:2rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
 .pricebox .per{font-size:1rem;color:var(--mute)}
 .pricebox .l{font-size:.85rem;color:var(--mute);margin-top:7px;line-height:1.4}
+.pricebox .was{font-family:var(--sans);font-size:.66rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.pricebox .was s{text-decoration-color:var(--pink);text-decoration-thickness:2px}
 @media(max-width:600px){.pricebox{grid-template-columns:1fr}}
-.anchor{font-size:.9rem;color:var(--mute);margin:0 0 4px}
-.anchor s{color:var(--mute)}
-.proof{list-style:none;margin:10px 0 4px}
-.proof li{position:relative;padding:7px 0 7px 26px;font-size:.97rem;border-top:1px solid var(--line)}
-.proof li:first-child{border-top:0}
-.proof li::before{content:"";position:absolute;left:2px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--green-b)}
-.proof b{color:var(--ink)}
-.verdict{background:var(--green-t);border:1.5px solid var(--green);border-radius:12px;padding:17px 19px;font-size:.98rem;line-height:1.55;margin:14px 0}
-.verdict b{color:var(--ink)}
-.verdict p{margin:0 0 10px}
-.verdict p:last-child{margin:0}
-
-/* the one CTA, from the True North proposal */
-.demo a.cta{display:inline-block;background:var(--pink-d);color:#fff;font-family:var(--sans);font-weight:700;font-size:.82rem;box-shadow:0 6px 16px -6px rgba(206,54,114,.55);
- letter-spacing:.09em;text-transform:uppercase;padding:15px 30px;border-radius:999px;text-decoration:none;transition:all .18s;
- max-width:100%;text-indent:.09em;box-sizing:border-box}
-.demo a.cta:hover{background:var(--green);color:var(--ink);transform:translateY(-2px)}
-.demo a:not(.cta){color:var(--green);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-.demo a:not(.cta):hover{color:#fff}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-<a class="brand" href="https://glazedweb.com">
-<svg class="gmark gl" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
-<span class="bw">glazed<span>web</span></span>
-</a>
-<nav>
-<a href="#adds">What it adds</a>
-<a href="#found">What it fixes</a>
-<a href="#own">Ownership</a>
-<a href="#cost">Price</a>
-<a href="#next">Next</a>
-</nav>
+  <a class="brand" href="https://glazedweb.com">
+    <svg class="gmark gl" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+    <span class="bw">glazed<span>web</span></span>
+  </a>
+  <nav>
+    <a href="#adds">What it adds</a>
+    <a href="#found">What it fixes</a>
+    <a href="#why">Why</a>
+    <a href="#cost">Price</a>
+    <a href="#next">Next</a>
+  </nav>
 </div></header>
-<main>
+
 <div class="wrap">
-<div class="hero">
-<svg class="gmark mark" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
-<div class="k">Website proposal · Copper Athletic Club</div>
-<h1>Most bar websites get<br>looked at <em>once.</em></h1>
-<p class="sub">Somebody needs the hours, finds them, and never comes back. So we
-put the Detroit scores on it, and now what is pouring. Same logo, same voice,
-same headline the bar already has, plus two reasons to open the thing twice.
-And while we were in there, we fixed a handful of quiet problems.</p>
-<div class="forwho">
-Prepared by <b>Glazed Web</b>, Marshall, Michigan<br>
-September 2026 · The site is live at <b>copperac.glazedweb.com/demo</b>
-</div>
-<div class="tldr">
-<div class="k">The short version</div>
-<ul>
-<li><span class="n">01</span><div><b>A live Detroit board.</b> Scores and what is on the screens tonight, pulled from ESPN, refreshing itself. Nothing else around here has one.</div></li>
-<li><span class="n">02</span><div><b>The tap list is live.</b> Sixteen handles on the site right now, kept current by the bar from a phone. When a keg kicks, it comes off the site within a minute.</div></li>
-<li><span class="n">03</span><div><b>Open now, kitchen till 10.</b> A status line that reads the clock, so nobody drives over after the kitchen shuts.</div></li>
-<li><span class="n">04</span><div>The brand does not change. Same copper, same buck, same <b>A sports bar. Not a gym.</b></div></li>
-<li><span class="n">05</span><div><b>$2,000 to build, $150 a month</b> to keep, straight off our public menu, and you own all of it.</div></li>
-<li><span class="n">06</span><div>It is <b>already built and running</b>, with a sign-in where your events person adds the next trivia night herself.</div></li>
-</ul>
-</div>
-</div>
+  <div class="hero">
+    <svg class="gmark mark" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+    <div class="k">Website proposal · Copper Athletic Club</div>
+    <h1>Most bar websites get<br>looked at <em>once.</em></h1>
+    <p class="sub">Somebody needs the hours, finds them, and never comes back. So we
+    put the Detroit scores on it, and now what is pouring. Same logo, same voice,
+    same headline as the bar already has, plus two reasons to open the thing
+    twice. And while we were in there, we fixed a handful of quiet problems.</p>
+    <div class="forwho">
+      Prepared by <b>Glazed Web</b>, Marshall, Michigan<br>
+      September 2026 · The site is live at <b>copperac.glazedweb.com/demo</b>
+    </div>
+    <div class="tldr">
+      <div class="k">The short version</div>
+      <ul>
+        <li><span class="n">01</span><div><b>A live Detroit board.</b> Scores and what is on the screens tonight, pulled from ESPN, refreshing itself. Nothing else around here has one.</div></li>
+        <li><span class="n">02</span><div><b>The tap list is live.</b> Sixteen handles on the site right now, kept current by the bar from a phone. When a keg kicks, it comes off the site within a minute.</div></li>
+        <li><span class="n">03</span><div><b>Open now, kitchen till 10.</b> A status line that reads the clock, so nobody drives over after the kitchen shuts.</div></li>
+        <li><span class="n">04</span><div>The brand does not change. Same copper, same buck, same <b>A sports bar. Not a gym.</b></div></li>
+        <li><span class="n">05</span><div><b>$2,000 to build, $150 a month</b> to keep, straight off our public menu, and you own all of it.</div></li>
+        <li><span class="n">06</span><div>It is <b>already built and running</b>, with a sign-in where your events person adds the next trivia night herself.</div></li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<section id="adds" aria-labelledby="h-adds"><div class="wrap">
-<div class="k">Section one</div>
-<div class="rule"></div>
-<h2 id="h-adds">What it adds.</h2>
-<p>Start here, because this is the part that is genuinely new. None of these is
-a tidier version of something the current site has. The current setup cannot
-run any of them.</p>
-<div class="claim">
-<h4>The Board</h4>
-<p>Live results and what is on tonight for the Tigers, Lions, Pistons and Red Wings, laid out like the odds board over a sportsbook counter. It pulls straight from ESPN, so there is no account to keep, nothing to type in and nothing to forget. It refreshes itself, in season and out.</p>
-<p style="margin-top:10px;color:var(--mute)">A bar website normally gets looked at once: somebody needs the hours or the address, finds them, and never comes back. A board of Detroit scores is a reason to open it again, and it is the most sports-bar thing a sports bar site could possibly have. No template ships it.</p>
-</div>
-<div class="claim">
-<h4>On Tap, live from the bar</h4>
-<p>All sixteen handles, with the brewery, the strength and a line about each beer, under a green LIVE marker that only shows when the list is actually current. The bar keeps it from a phone: tap a beer, tap <em>86 it</em>, and it is off the website within a minute. Running low gets a flag. The next keg can be lined up before it goes on.</p>
-<p style="margin-top:10px;color:var(--mute)">The rule underneath is the honest one. If the board is ever empty or unreachable, the site does not show a guess; it shows <em>Taps rotate, ask what is pouring</em>, which is what the old site said every day of its life.</p>
-<p>
-<a class="verify loose" href="/demo/taps">The tap list on the site &#8599;</a>
-<a class="verify loose" href="https://copperac.glazedweb.com/api/status" target="_blank" rel="noopener">Ask the site what it is reading &#8599;</a>
-</p>
-</div>
-<div class="claim">
-<h4>Open now, kitchen till 10</h4>
-<p>A live status line that reads the clock in Marshall and says what is actually true: open with the kitchen on, then bar open with the kitchen shut after ten, then closed overnight. It appears on every page and nobody maintains it.</p>
-<p style="margin-top:10px;color:var(--mute)">It also fixes the one problem on the current site that turns a real customer around at the door, which is the first thing in the next section.</p>
-</div>
-<div class="demo">
-<div class="k">It is not a mockup</div>
-<h3>All of it is live right now</h3>
-<p>Seven pages, the printed menu word for word, the daily specials, live scores,
-the live tap list, working on a phone.</p>
-<a href="/demo">Open the site &#8599;</a>
-</div>
+<section id="adds"><div class="wrap">
+  <div class="k">Part one</div>
+  <div class="rule"></div>
+  <h2>What it adds.</h2>
+  <p>Start here, because this is the part that is genuinely new. None of these
+  is a tidier version of something the current site has. The current setup
+  cannot run any of them.</p>
+
+  <div class="claim">
+    <h4>The Board</h4>
+    <p>Live results and what is on tonight for the Tigers, Lions, Pistons and Red Wings, laid out like the odds board over a sportsbook counter. It pulls straight from ESPN, so there is no account to keep, nothing to type in and nothing to forget. It refreshes itself, in season and out.</p>
+    <p style="margin-top:10px;color:var(--mute)">A bar website normally gets looked at once: somebody needs the hours or the address, finds them, and never comes back. A board of Detroit scores is a reason to open it again, and it is the most sports-bar thing a sports bar site could possibly have. No template ships it.</p>
+  </div>
+
+  <div class="claim">
+    <h4>On Tap, live from the bar</h4>
+    <p>All sixteen handles, with the brewery, the strength and a line about each beer, under a green LIVE marker that only shows when the list is actually current. The bar keeps it from a phone: tap a beer, tap <em>86 it</em>, and it is off the website within a minute. Running low gets a flag. The next keg can be lined up before it goes on.</p>
+    <p style="margin-top:10px;color:var(--mute)">The rule underneath is the honest one. If the board is ever empty or unreachable, the site does not show a guess; it shows <em>Taps rotate, ask what is pouring</em>, which is what the old site said every day of its life.</p>
+    <a class="verify" href="/demo/taps">The tap list on the site ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>Open now, kitchen till 10</h4>
+    <p>A live status line that reads the clock in Marshall and says what is actually true: open with the kitchen on, then bar open with the kitchen shut after ten, then closed overnight. It appears on every page and nobody maintains it.</p>
+    <p style="margin-top:10px;color:var(--mute)">It also fixes the one problem on the current site that turns a real customer around at the door, which is the first thing in the next section.</p>
+  </div>
+
+  <div class="demo">
+    <div class="k">It is not a mockup</div>
+    <h3>All of it is live right now</h3>
+    <p>The board is on the homepage, the tap list has its own page, and the
+    status line is on every page. The printed menu word for word, the daily
+    specials, working on a phone.</p>
+    <a href="/demo">Open the site ↗</a>
+  </div>
 </div></section>
 
-<section id="found" aria-labelledby="h-found"><div class="wrap">
-<div class="k">Section two</div>
-<div class="rule"></div>
-<h2 id="h-found">What it fixes.</h2>
-<p>Six things, in the order they cost the bar something, found by going through
-the current site page by page in August and checked again on 8 September. Every
-one links to the page it is on, so none of it has to be taken on trust.</p>
-<div class="claim">
-<h4>The site never says when the kitchen closes</h4>
-<p>The hours page lists <b>11AM to 12AM</b> and stops there. The kitchen closes at ten. Someone reading that page at half nine has no way to know they have thirty minutes, and the Toast ordering page quietly says <span class="mono">Closes at 10PM</span> on a screen they never see. Both numbers are right. Nothing on the site puts them together.</p>
-<a class="verify" href="https://copperac.com/contact/" target="_blank" rel="noopener">Their hours page ↗</a>
-</div>
-<div class="claim">
-<h4>Google still thinks the events page is about Copper Bash 2023</h4>
-<p>The page itself is current. But the description search engines and link previews read has never been updated. It still says <span class="mono">Copper Bash 2023 - Join us Saturday, September 23rd for our annual Copper Bash.</span> Text the events link to someone and that is the blurb that comes up, three years later. Somebody edited that page on <b>30 July 2026</b>, so this is not neglect. It is a part of the page nobody can see from inside the editor.</p>
-<a class="verify" href="https://copperac.com/events/" target="_blank" rel="noopener">The events page ↗</a>
-<a class="verify" href="https://www.google.com/search?q=site%3Acopperac.com%2Fevents" target="_blank" rel="noopener">Or search Google for it ↗</a>
-</div>
-<div class="claim">
-<h4>The menu has not changed since October 2023</h4>
-<p>And the contact page since September 2023, going by the dates in their own sitemap. Those are the two pages a customer actually needs, and they are the two that have been hardest to touch. The printed menu in the bar today has moved on from what the website says.</p>
-<a class="verify" href="https://copperac.com/page-sitemap.xml" target="_blank" rel="noopener">Their sitemap ↗</a>
-</div>
-<div class="claim">
-<h4>Sharing the link posts a photo with no name on it</h4>
-<p>Paste copperac.com into a text and you get a 2021 photo of the taps. No logo, no headline, no address. It is the first thing a stranger sees of the place and it says nothing.</p>
-<a class="verify" href="https://copperac.com/wp-content/uploads/2021/02/CAC_Taps_web.jpg" target="_blank" rel="noopener">The actual file ↗</a>
-</div>
-<div class="claim">
-<h4>Two other companies get the last word on the homepage</h4>
-<p>Scroll to the very bottom and the page hands off to somebody else. First a Facebook panel, in Facebook’s white-and-blue, with a <b>Follow Page</b> button and a <b>Share</b> button and a video of wings. Then, under it, a Yelp waitlist in Yelp’s red. Neither one looks like the bar. They are the only interactive things on the site and they are the last thing anybody sees.</p>
-<p style="margin-top:10px;color:var(--mute)">The Facebook panel says <b>5,910 followers</b> right on it. That is the whole audience, and the website’s answer to them is a button that sends them back to Facebook. That is the argument for the Board and the tap list above: give people something here and they stay here.</p>
-<a class="verify" href="https://copperac.com/" target="_blank" rel="noopener">Scroll to the bottom ↗</a>
-</div>
-<div class="claim">
-<h4>The Copper Reserve looks like a different business</h4>
-<p>That page loads a blue Reserve logo alongside the black-and-copper one, so the room upstairs reads as somebody else’s bar.</p>
-<a class="verify" href="https://copperac.com/reserve/" target="_blank" rel="noopener">The Reserve page ↗</a>
-</div>
-<p class="note">There is more, but it is small: the homepage is titled
-<span class="mono">CAC Home</span>, two typos on the menus, prices written as
-10.00 with no dollar sign, three pages with no headline at all. Worth fixing,
-not worth a section.</p>
+<section id="found"><div class="wrap">
+  <div class="k">Part two</div>
+  <div class="rule"></div>
+  <h2>What it fixes.</h2>
+  <p>Six things, in the order they cost the bar something, found by going through
+  the current site page by page in August and checked again on 8 September. Every
+  one links to the page it is on, so none of it has to be taken on trust.</p>
+
+  <div class="claim">
+    <h4>The site never says when the kitchen closes</h4>
+    <p>The hours page lists <b>11AM to 12AM</b> and stops there. The kitchen closes at ten. Someone reading that page at half nine has no way to know they have thirty minutes, and the Toast ordering page quietly says <span class="mono">Closes at 10PM</span> on a screen they never see. Both numbers are right. Nothing on the site puts them together.</p>
+    <a class="verify" href="https://copperac.com/contact/" target="_blank" rel="noopener">Their hours page ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>Google still thinks the events page is about Copper Bash 2023</h4>
+    <p>The page itself is current. But the description search engines and link previews read has never been updated. It still says <span class="mono">Copper Bash 2023 - Join us Saturday, September 23rd for our annual Copper Bash.</span> Text the events link to someone and that is the blurb that comes up, three years later. Somebody edited that page on <b>30 July 2026</b>, so this is not neglect. It is a part of the page nobody can see from inside the editor.</p>
+    <a class="verify" href="https://copperac.com/events/" target="_blank" rel="noopener">The events page ↗</a>
+    <a class="verify" href="https://www.google.com/search?q=site%3Acopperac.com%2Fevents" target="_blank" rel="noopener">Or search Google for it ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>The menu has not changed since October 2023</h4>
+    <p>And the contact page since September 2023, going by the dates in their own sitemap. Those are the two pages a customer actually needs, and they are the two that have been hardest to touch. The printed menu in the bar today has moved on from what the website says.</p>
+    <a class="verify" href="https://copperac.com/page-sitemap.xml" target="_blank" rel="noopener">Their sitemap ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>Sharing the link posts a photo with no name on it</h4>
+    <p>Paste copperac.com into a text and you get a 2021 photo of the taps. No logo, no headline, no address. It is the first thing a stranger sees of the place and it says nothing.</p>
+    <a class="verify" href="https://copperac.com/wp-content/uploads/2021/02/CAC_Taps_web.jpg" target="_blank" rel="noopener">The actual file ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>Two other companies get the last word on the homepage</h4>
+    <p>Scroll to the very bottom and the page hands off to somebody else. First a Facebook panel, in Facebook’s white-and-blue, with a <b>Follow Page</b> button and a <b>Share</b> button and a video of wings. Then, under it, a Yelp waitlist in Yelp’s red. Neither one looks like the bar. They are the only interactive things on the site and they are the last thing anybody sees.</p>
+    <p style="margin-top:10px;color:var(--mute)">The Facebook panel says <b>5,910 followers</b> right on it. That is the whole audience, and the website’s answer to them is a button that sends them back to Facebook. That is the argument for the Board and the tap list above: give people something here and they stay here.</p>
+    <a class="verify" href="https://copperac.com/" target="_blank" rel="noopener">Scroll to the bottom ↗</a>
+  </div>
+
+  <div class="claim">
+    <h4>The Copper Reserve looks like a different business</h4>
+    <p>That page loads a blue Reserve logo alongside the black-and-copper one, so the room upstairs reads as somebody else’s bar. Right-click the logo and pick Inspect if you want to see the file name.</p>
+    <a class="verify" href="https://copperac.com/reserve/" target="_blank" rel="noopener">The Reserve page ↗</a>
+  </div>
+
+  <p class="note">There is more, but it is small: the homepage is titled
+  <span class="mono">CAC Home</span>, two typos on the menus, prices written as
+  10.00 with no dollar sign, three pages with no headline at all. Worth fixing,
+  not worth a section.</p>
 </div></section>
 
-<section id="why" aria-labelledby="h-why"><div class="wrap">
-<div class="k">Section three</div>
-<div class="rule"></div>
-<h2 id="h-why">Why it happens.</h2>
-<p>This is the part worth understanding, because it explains most of them at once
-and it is not about effort.</p>
-<p>The events page was edited on <strong>30 July 2026</strong>, and the visible
-page is fine. Somebody is in there keeping it going. Yet the blurb Google and
-Facebook read off that same page still describes Copper Bash 2023.</p>
-<p>That is the whole thing in one example. The editor shows you the part of the
-page you can see, and quietly keeps a second copy for search engines and link
-previews that you have to go looking for. So the visible half gets updated and
-the invisible half sits there for three years. The hours are the same shape of
-problem: someone typed them once, correctly, and there was nowhere to put the
-fact that the kitchen stops two hours earlier.</p>
-<p>You cannot fix that with more discipline. It has to be the site's job. On the
-rebuild, every fact lives in one place and every page reads it, so there is
-nowhere for a second copy to hide.</p>
+<section id="why"><div class="wrap">
+  <div class="k">Part three</div>
+  <div class="rule"></div>
+  <h2>Why it happens.</h2>
+  <p>This is the part worth understanding, because it explains most of them at once
+  and it is not about effort.</p>
+  <p>The events page was edited on <strong>30 July 2026</strong>, and the visible
+  page is fine. Somebody is in there keeping it going. Yet the blurb Google and
+  Facebook read off that same page still describes Copper Bash 2023.</p>
+  <p>That is the whole thing in one example. The editor shows you the part of the
+  page you can see, and quietly keeps a second copy of it for search engines and
+  link previews that you have to go looking for. So the visible half gets
+  updated and the invisible half sits there for three years. The hours are the
+  same shape of problem: someone typed them once, correctly, and there was
+  nowhere to put the fact that the kitchen stops two hours earlier.</p>
+  <p>You cannot fix that with more discipline. It has to be the site's job. On the
+  rebuild, every fact lives in one place and every page reads it, so there is
+  nowhere for a second copy to hide.</p>
 </div></section>
 
-<section id="own" aria-labelledby="h-own"><div class="wrap">
-<div class="k">Section four</div>
-<div class="rule"></div>
-<h2 id="h-own">You own it. All of it.</h2>
-<p>Written down, not implied. When the build fee is paid in full, these are yours: the design, the source code, the content, the accounts, the code repository, the hosting project, and every login to them. The domain stays registered in your name and transfers to any registrar you name, free, whenever you ask. After launch it is month to month, thirty days’ notice, no penalty, and the site keeps working on the way out the door. The terms are one plain-English page published at <a href="https://www.glazedweb.com/agreement" target="_blank" rel="noopener">glazedweb.com/agreement</a>, the same page every client gets.</p>
-<p>Nothing underneath the site is rented. No page-builder license, no form service, no plugin bill arriving in a year. <strong>If a feature can be written instead of rented, we write it.</strong> Online ordering stays on Toast because that is where your kitchen already is; every Order Online button on the new site goes to the same Toast page the old one does.</p>
-<h3>Three questions worth asking any web vendor, including us</h3>
-<p><strong>1.</strong> If we stop paying you, what do we keep? <strong>2.</strong> Whose name is the domain registered in? <strong>3.</strong> Can we leave in thirty days? Our answers are everything, yours, and yes. Ask whoever looks after the current site the same three, and hold us to ours in person.</p>
+<section id="built"><div class="wrap">
+  <div class="k">Part four</div>
+  <div class="rule"></div>
+  <h2>Everything else, side by side.</h2>
+  <p>Your brand stays yours. The copper, the buck, the black, your own
+  photographs, your own menu, and the headline you already had, because
+  <strong>A sports bar. Not a gym.</strong> is better than anything we would
+  have written. What changed is underneath it.</p>
+
+  <table class="cmp">
+    <thead><tr><th></th><th>copperac.com today</th><th>The rebuild</th></tr></thead>
+    <tbody>
+      <tr><td>Hours</td><td>One line, 11 to midnight, no mention of the kitchen</td><td><span class="tick">✓</span> Reads the clock and says <b>Open now, kitchen till 10</b>, then flips itself after ten. Nobody updates it.</td></tr>
+      <tr><td>Tonight</td><td>Nothing about what is on the screens</td><td><span class="tick">✓</span> Live Detroit scores and what is on tonight, straight from ESPN. No account, no upkeep.</td></tr>
+      <tr><td>On tap</td><td>Nothing. The chalkboard is the only copy</td><td><span class="tick">✓</span> Sixteen handles, live, kept by the bar from a phone, under a LIVE marker that cannot lie.</td></tr>
+      <tr><td>Events</td><td>A 2023 party still listed for Google</td><td><span class="tick">✓</span> Your events person adds the next one herself: photo, details, the Toast ticket link. It takes itself down when it passes.</td></tr>
+      <tr><td>Menu</td><td>Last touched October 2023</td><td><span class="tick">✓</span> The printed menu word for word, daily specials and happy hour with it, prices as <b>$12</b> rather than <b>12.00</b>. Prices can be changed by the club, not by us.</td></tr>
+      <tr><td>Ordering</td><td>A Toast link</td><td><span class="tick">✓</span> The same Toast link, because that is where the kitchen already is. Nothing about ordering changes.</td></tr>
+      <tr><td>Google</td><td>No hours, menu or ordering in the listing</td><td><span class="tick">✓</span> Full restaurant markup, so search can show hours, menu and an order button.</td></tr>
+      <tr><td>Sharing</td><td>A 2021 photo of the taps</td><td><span class="tick">✓</span> Your room, your logo, your line, at the size every app crops to, on every page.</td></tr>
+      <tr><td>Upstairs</td><td>A separate blue identity</td><td><span class="tick">✓</span> The Reserve runs the same copper-on-black as the bar.</td></tr>
+      <tr><td>Bottom of the page</td><td>A Facebook panel and a Yelp waitlist, in their colours</td><td><span class="tick">✓</span> Nothing bolted on and nothing sending people elsewhere. The Board and the tap list are yours and they match.</td></tr>
+      <tr><td>Speed</td><td>WordPress and a plugin stack</td><td><span class="tick">✓</span> Every page finished before the browser asks for it.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The one you can see in ten seconds</h3>
+  <p>This reads the clock in Marshall right now and shows what each site tells
+  somebody at this exact moment. Nobody maintains it.</p>
+  <div class="clock">
+    <div class="clockhead"><span class="k">Right now in Marshall</span><span class="ct" id="ct">…</span></div>
+    <div class="clockgrid">
+      <div class="cc"><div class="cl bad">copperac.com implies</div><div class="cb" id="oldsays">…</div><div class="cs" id="oldsub">…</div></div>
+      <div class="cc"><div class="cl good">The rebuild says</div><div class="cb" id="newsays">…</div><div class="cs" id="newsub">…</div></div>
+    </div>
+  </div>
+
+  <h3>What is behind the sign-in</h3>
+  <p>A page of the site called the workroom, locked to the club with one
+  passcode, built for whoever runs your events and social media. Nobody has to
+  call us to change what the site says.</p>
+  <table class="cmp">
+    <tr><td>Events</td><td colspan="2">Name, date and times, a price line, the Toast ticket link, a photo or flyer straight off the phone, a few bullets. Save, and the events page, the homepage card and the Google listing follow within seconds. A draft stays off the site until it is ready.</td></tr>
+    <tr><td>The menu</td><td colspan="2">Every item with a price box, a description box and an on-or-off switch. Clearing a price puts the printed one back. Nothing here can break the site.</td></tr>
+    <tr><td>Taps</td><td colspan="2">One tab that opens the tap board already signed in, no second code to remember.</td></tr>
+    <tr><td>Who to ask</td><td colspan="2">Your events person’s name and email, shown on the events page as the person to contact about hosting something.</td></tr>
+  </table>
+
+  <div class="demo">
+    <div class="k">It is not a mockup</div>
+    <h3>The whole thing is running</h3>
+    <p>Seven pages, the real menu, live scores, live taps, working on a phone. Go
+    and try to break it.</p>
+    <a href="/demo">Open the site ↗</a>
+  </div>
 </div></section>
 
-<section id="built" aria-labelledby="h-built"><div class="wrap">
-<div class="k">Section five</div>
-<div class="rule"></div>
-<h2 id="h-built">Everything else, side by side.</h2>
-<p>Your brand stays yours. The copper, the buck, the black, your own
-photographs, your own menu, and the headline you already had, because
-<strong>A sports bar. Not a gym.</strong> is better than anything we would have
-written. What changed is underneath it.</p>
-<table class="cmp">
-<thead><tr><th></th><th>copperac.com today</th><th>The rebuild</th></tr></thead>
-<tbody>
-<tr><td>Hours</td><td>One line, 11 to midnight, no mention of the kitchen</td><td><span class="tick">✓</span> Reads the clock and says <b>Open now, kitchen till 10</b>, then flips itself after ten. Nobody updates it.</td></tr>
-<tr><td>Tonight</td><td>Nothing about what is on the screens</td><td><span class="tick">✓</span> Live Detroit scores and what is on tonight, straight from ESPN. No account, no upkeep.</td></tr>
-<tr><td>On tap</td><td>Nothing. The chalkboard is the only copy</td><td><span class="tick">✓</span> Sixteen handles, live, kept by the bar from a phone, under a LIVE marker that cannot lie.</td></tr>
-<tr><td>Events</td><td>A 2023 party still listed for Google</td><td><span class="tick">✓</span> Your events person adds the next one herself: photo, details, the Toast ticket link. It takes itself down when it passes.</td></tr>
-<tr><td>Menu</td><td>Last touched October 2023</td><td><span class="tick">✓</span> The printed menu word for word, daily specials and happy hour with it, prices as <b>$12</b> rather than <b>12.00</b>. Prices can be changed by the club, not by us.</td></tr>
-<tr><td>Google</td><td>No hours, menu or ordering in the listing</td><td><span class="tick">✓</span> Full restaurant markup, so search can show hours, menu and an order button.</td></tr>
-<tr><td>Sharing</td><td>A 2021 photo of the taps</td><td><span class="tick">✓</span> Your room, your logo, your line, at the size every app crops to, on every page.</td></tr>
-<tr><td>Upstairs</td><td>A separate blue identity</td><td><span class="tick">✓</span> The Reserve runs the same copper-on-black as the bar.</td></tr>
-<tr><td>Bottom of the page</td><td>A Facebook panel and a Yelp waitlist, in their colours</td><td><span class="tick">✓</span> Nothing bolted on and nothing sending people elsewhere.</td></tr>
-<tr><td>Speed</td><td>WordPress and a plugin stack</td><td><span class="tick">✓</span> Every page finished before the browser asks for it.</td></tr>
-</tbody>
-</table>
-<h3>The one you can see in ten seconds</h3>
-<p>This reads the clock in Marshall right now and shows what each site tells
-somebody at this exact moment. Nobody maintains it.</p>
-<div class="clock">
-<div class="clockhead"><span class="k">Right now in Marshall</span><span class="ct" id="ct">…</span></div>
-<div class="clockgrid">
-<div class="cc"><div class="cl bad">copperac.com implies</div><div class="cb" id="oldsays">…</div><div class="cs" id="oldsub">…</div></div>
-<div class="cc"><div class="cl good">The rebuild says</div><div class="cb" id="newsays">…</div><div class="cs" id="newsub">…</div></div>
-</div>
-</div>
-<h3>What is behind the sign-in</h3>
-<p>A page of the site called the workroom, locked to the club with one passcode, built for whoever runs your events and social media. Nobody has to call us to change what the site says.</p>
-<ul class="proof">
-<li><b>Events.</b> Name, date and times, a price line, the Toast ticket link, a photo or flyer straight off the phone, a few bullets. Save, and the events page, the homepage card and the Google listing follow within seconds. A draft stays off the site until it is ready.</li>
-<li><b>The menu.</b> Every item with a price box, a description box and an on-or-off switch. Clearing a price puts the printed one back. Nothing here can break the site.</li>
-<li><b>Taps.</b> One tab that opens the tap board already signed in, no second code to remember.</li>
-<li><b>Who to ask.</b> Your events person’s name and email, shown on the events page as the person to contact about hosting something.</li>
-</ul>
-<div class="demo">
-<div class="k">It is not a mockup</div>
-<h3>The whole thing is running</h3>
-<p>Seven pages, the real menu, live scores, live taps, working on a phone. Go and
-try to break it.</p>
-<a href="/demo">Open the site ↗</a>
-</div>
+<section id="cost"><div class="wrap">
+  <div class="k">Part five</div>
+  <div class="rule"></div>
+  <h2>What it costs.</h2>
+  <p>Straight off our public menu, the same number anyone reading our site gets.
+  This is the Baker’s Dozen: the full multi-page site, priced in the open for
+  everyone.</p>
+
+  <div class="pricebox">
+    <div>
+      <div class="was">Published market figure <s>$3,900</s></div>
+      <div class="n">$<span class="price-num" data-from="3900" data-to="2000">2,000</span></div>
+      <div class="l">One-time build. Everything on this page, finished and launched on copperac.com. Half to start, half at launch, and you own all of it from the day the balance clears.</div>
+    </div>
+    <div>
+      <div class="was">Then, month to month</div>
+      <div class="n">$150<span class="per">/mo</span></div>
+      <div class="l">Hosting, SSL, security updates, backups, domain renewal where we hold it, the tap-board account, the workroom, and edits. A new special, a price change, new hours? Send a text. Taps and events you change yourselves.</div>
+    </div>
+  </div>
+  <p class="note">The struck-through figure is our own published market price for a build this size, on <a href="https://www.glazedweb.com" target="_blank" rel="noopener">glazedweb.com</a>. The menu price is what you pay.</p>
+
+  <p>That is <strong>$3,800</strong> across the first twelve months, then
+  <strong>$1,800 a year</strong>. The Board, the tap list, the workroom, the
+  enquiry forms and the search and listings work are all inside it. There is no
+  separate platform fee and no plugin bill underneath, and nothing is ever added
+  to your bill without you hearing the price first.</p>
+
+  <h3>You own it. All of it.</h3>
+  <p>Written down, not implied. When the build fee is paid in full, these are
+  yours: the design, the source code, the content, the accounts, the code
+  repository, the hosting project, and every login to them. The domain stays
+  registered in your name and transfers to any registrar you name, free,
+  whenever you ask. After launch it is month to month, thirty days’ notice, no
+  penalty, and the site keeps working on the way out the door. The terms are one
+  plain-English page at <a href="https://www.glazedweb.com/agreement" target="_blank" rel="noopener">glazedweb.com/agreement</a>,
+  the same page every client gets.</p>
+
+  <h3>Three questions worth asking any web vendor, including us</h3>
+  <table class="cmp">
+    <tr><td>If we stop paying, what do we keep?</td><td colspan="2">Everything. The site keeps working and you leave with the whole project, not an export.</td></tr>
+    <tr><td>Whose name is the domain in?</td><td colspan="2">Yours. It never moves out of it.</td></tr>
+    <tr><td>Can we leave in thirty days?</td><td colspan="2">Yes. No term, no exit fee. Ask whoever looks after the current site the same three, and hold us to ours in person.</td></tr>
+  </table>
 </div></section>
 
-<section id="cost" aria-labelledby="h-cost"><div class="wrap">
-<div class="k">Section six</div>
-<div class="rule"></div>
-<h2 id="h-cost">What it costs.</h2>
-<p>Straight off the public menu, the same number anyone reading our site gets. This is the Baker’s Dozen: the full multi-page site, priced in the open for everyone.</p>
-<p class="anchor">Our published market figure for a build this size is <s>$3,900</s>. The menu price is what you pay.<br><a class="verify loose" href="https://www.glazedweb.com" target="_blank" rel="noopener">The published menu &#8599;</a></p>
-<div class="pricebox">
-<div><div class="n">$2,000</div><div class="l">The build, once. Everything on this page, finished and launched on copperac.com. Half to start, half at launch, and you own all of it from the day the balance clears.</div></div>
-<div><div class="n">$150<span class="per">/mo</span></div><div class="l">Hosting, SSL, security updates, backups, domain renewal where we hold it, the tap-board account, the workroom, and edits. A new special, a price change, new hours? Send a text. Taps and events you change yourselves.</div></div>
-</div>
-<p>That is <strong>$3,800</strong> across the first twelve months, then <strong>$1,800 a year</strong>, and <strong>$11,000</strong> over five years. The Board, the tap list, the workroom, the enquiry forms and the search and listings work are all inside it. There is no separate platform fee and no plugin bill underneath.</p>
-<ul class="proof">
-<li><b>Month to month after launch.</b> Thirty days’ notice, no early termination penalty, and you leave with the whole site working.</li>
-<li><b>Two hours of edits a month are in the monthly.</b> Taps, events and menu prices are not edits and never count against it, because you change those yourselves. That is the whole point of the arrangement.</li>
-<li><b>Nothing is ever added to your bill without you hearing the price first.</b> That promise lives in the agreement, not only on this page.</li>
-</ul>
+<section id="next"><div class="wrap">
+  <div class="k">Part six</div>
+  <div class="rule"></div>
+  <h2>What happens next.</h2>
+
+  <div class="step">
+    <div class="no">1</div>
+    <div><h4>Have a look at it</h4><p>The whole thing is standing up at <a href="/demo">copperac.glazedweb.com/demo</a>. Open it on a phone, at the bar, on a Sunday morning. Check the hours against the clock and the taps against the chalkboard.</p></div>
+  </div>
+  <div class="step">
+    <div class="no">2</div>
+    <div><h4>Tell us what is wrong</h4><p>A dish described wrong, a price that has moved, a photo that is not yours any more, a line that does not sound like you. That list is worth more to us than a compliment and it is cheaper to fix now.</p></div>
+  </div>
+  <div class="step">
+    <div class="no">3</div>
+    <div><h4>Then a conversation</h4><p>Half an hour, at the bar, whenever suits. <a href="https://www.glazedweb.com/schedule" target="_blank" rel="noopener">Pick the time at glazedweb.com/schedule</a> and it lands in both calendars. Bring the skeptical questions, and bring your events person, because the best part of the meeting is her adding something to the events page from her own phone.</p></div>
+  </div>
+  <div class="step">
+    <div class="no">4</div>
+    <div><h4>If it is yes</h4><p>The agreement is already written and waiting at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a>: the plain-English terms every client gets, and an Exhibit A with your scope and your numbers. You type your name, both of us get the signed record by email, and nothing is owed before the invoice arrives. Pointing copperac.com at the new site is a ten-minute change wherever the domain is registered.</p></div>
+  </div>
+
+  <h3>What we would need from you</h3>
+  <p>Access to point the domain. The next event, so the events page does not
+  launch empty. A look at the prices on the printed menu, which we copied word
+  for word and would like confirmed. Your events person’s name and email. And
+  any photographs you love that are not on the site; the ones there now are
+  from 2019. That is genuinely the list.</p>
+
+  <p class="note" style="margin-top:22px">If the answer is no, that is a fine
+  answer and it cost you nothing. The six things in part two are still true and
+  still worth handing to whoever looks after the site today; the Copper Bash
+  line and the kitchen hours are each a few minutes to fix from inside WordPress
+  once someone knows where to look. Copper Athletic Club’s logo and photographs
+  belong to the club and are used here with permission, to show them their own
+  site.</p>
 </div></section>
 
-<section id="next" aria-labelledby="h-next"><div class="wrap">
-<div class="k">Section seven</div>
-<div class="rule"></div>
-<h2 id="h-next">What happens next.</h2>
-<div class="step"><div class="no">1</div><div><h4>Book the call</h4><p>Half an hour, at the bar, whenever suits. The site is already built, on our own time, before you owe anything, so the meeting is not a presentation. It is you opening it on your own phone, your events person adding something to the events page, and both of you telling us where we got it wrong.</p><p>If the answer at the end is no, that is a fine answer and it cost you nothing.</p></div></div>
-<div class="step"><div class="no">2</div><div><h4>What happens if it is yes</h4><p>The agreement is already written and it is waiting at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a>. Two documents: the plain-English terms every client gets, and an Exhibit A carrying your scope and your numbers. You type your name, both of us get the signed record by email, and the monthly starts from the card form on the same page. Nothing is owed before the invoice arrives.</p></div></div>
-<h3>What we would need from you</h3>
-<p>Access to point copperac.com at the new site, which is a ten-minute change wherever the domain is registered. The next event, so the events page does not launch empty. A look at the prices on the printed menu, which we copied word for word and would like confirmed. Your events person’s name and email. And any photographs you love that are not on the site; the ones there now are from 2019. That is genuinely the list.</p>
-<div class="verdict">
-<p><b>Two things we will do whether or not any of this goes anywhere.</b></p>
-<p><b>The six findings, handed over.</b> Everything in section two, with the link to each, goes to whoever looks after the current site today. The Copper Bash line and the kitchen hours are each a few minutes to fix from inside WordPress once someone knows where to look.</p>
-<p><b>The kitchen hours on Google.</b> Your Google listing shows the bar’s hours and nothing about the kitchen. We will sit with you and add the note, so the ten o’clock cutoff is on the listing people actually read from the car.</p>
-</div>
-<div class="demo">
-<div class="k">The one thing to do</div>
-<h3>Half an hour, at the bar.</h3>
-<p>Pick a time that suits. Bring the skeptical questions.</p>
-<a class="cta" href="https://www.glazedweb.com/schedule" target="_blank" rel="noopener">Book the call &#8599;</a>
-</div>
-<p class="note">Written by Kevin Hershock, who lives in Marshall. Glazed Web
-builds and looks after websites for businesses here, one at a time, by hand.
-Copper Athletic Club’s logo and photographs belong to the club and are used on
-this page with permission, to show them their own site.</p>
-</div></section>
-</main>
 <footer><div class="wrap">
-<div>
-<span class="bw" style="font-size:21px">glazed<span>web</span></span>
-Kevin Hershock · Marshall, Michigan<br>
-<a href="https://glazedweb.com" target="_blank" rel="noopener">glazedweb.com</a> · <a href="mailto:kevin@glazedweb.com">kevin@glazedweb.com</a>
-<div class="conf">Prepared for Copper Athletic Club · September 2026 · Valid 60 days</div>
-</div>
-<svg class="gmark gl-foot" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#201712"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
+  <div>
+    <span class="bw" style="font-size:21px">glazed<span>web</span></span>
+    Kevin Hershock · Marshall, Michigan<br>
+    <a href="https://glazedweb.com" target="_blank" rel="noopener">glazedweb.com</a> · <a href="mailto:kevin@glazedweb.com">kevin@glazedweb.com</a>
+    <div class="conf">Prepared for Copper Athletic Club · September 2026 · Valid 60 days</div>
+  </div>
+  <svg class="gmark gl-foot" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#201712"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
 </div></footer>
+
 <script>
 /* The live clock. Hours from copperac.com/contact: Sunday opens 9, otherwise 11,
    bar to midnight. Kitchen closes at 22:00, confirmed with the owner. Evaluated
@@ -509,6 +539,61 @@ function paint() {
 }
 paint();
 setInterval(paint, 30000);
+</script>
+<script>
+/* The build price melts. You glimpse the published market number as the card
+   comes up, then it counts down to ours as your eyes reach it, and scrolling
+   back up re-arms it. Lifted from the anchor proposal, which lifted it from the
+   menu-price counter in glazedweb's app/page.jsx: same 1100ms, same cubic
+   ease-out, same idle/primed/counting machine.
+
+   THE RENDERED NUMBER IS ALREADY THE REAL ONE. `data-to` is what is in the
+   markup, so with JavaScript off, under reduced motion, or if this never runs,
+   the card reads $2,000 and the struck-through anchor still sits above it. */
+(function () {
+  var el = document.querySelector('#cost .price-num');
+  if (!el) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var watch = el.closest('.n') || el;
+  var from = parseFloat(el.dataset.from);
+  var to = parseFloat(el.dataset.to);
+  if (!isFinite(from) || !isFinite(to)) return;
+  var fmt = function (v) { return Math.round(v).toLocaleString('en-US'); };
+  var status = 'idle', anim = 0, raf = 0;
+  function stop() { if (anim) cancelAnimationFrame(anim); anim = 0; }
+  function narrow() { return (window.innerWidth || 1) < 700; }
+  function count() {
+    var start;
+    var dur = narrow() ? 800 : 1100;
+    function tick(ts) {
+      if (start === undefined) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(from + (to - from) * ease);
+      if (p < 1) anim = requestAnimationFrame(tick);
+      else { anim = 0; status = 'done'; }
+    }
+    anim = requestAnimationFrame(tick);
+  }
+  function update() {
+    raf = 0;
+    var vh = window.innerHeight || 1;
+    var top = watch.getBoundingClientRect().top;
+    var startAt = narrow() ? 1 : 0.85;
+    var primeAt = narrow() ? 1.4 : 1;
+    if (top <= vh * startAt) {
+      if (status === 'idle' || status === 'primed') { status = 'counting'; count(); }
+    } else if (top <= vh * primeAt) {
+      if (status !== 'primed') { stop(); el.textContent = fmt(from); status = 'primed'; }
+    } else {
+      if (status !== 'idle') { stop(); el.textContent = fmt(to); status = 'idle'; }
+    }
+  }
+  function onScroll() { if (!raf) raf = requestAnimationFrame(update); }
+  update();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+})();
 </script>
 </body>
 </html>

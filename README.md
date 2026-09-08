@@ -65,15 +65,17 @@ deliberate: an approximation of the brand drifts the next time the real brand
 changes. If the Glazed system changes, change it there and copy it across rather
 than editing tokens here.
 
-Refreshed 8 Sep 2026 to the current proposal standard (`glaze/proposal.md`,
-with the True North proposal of 4 Sep as the reference): an ownership section
-with the three questions, a price section at the published menu price ($2,000
-build, $150 a month, anchored against the published $3,900 market figure), the
-workroom and the live tap list in "what it adds", and one action at the end,
-booking the call at glazedweb.com/schedule. The price card, proof list, verdict
-box and CTA styles were copied from the True North file. The agreement it
-links, glazedweb.com/agreement/copperac, is a Custom Order entry in the
-glazedweb repo's `lib/customOrders.js`.
+Rebuilt 8 Sep 2026 on the original layout, Kevin's call after a True North-style
+refresh earlier the same day read as a different document: six parts (what it
+adds, what it fixes, why, side by side, what it costs, what happens next), the
+Griffin Claw claim cards, comparison tables, clock widget and pink step discs.
+The price part is new: the published menu price ($2,000 build, $150 a month)
+in Griffin Claw's own price boxes, the build figure counting down from the
+published $3,900 market figure the way the anchor proposal's does (data-to is
+the real number in the markup), the ownership terms and the three questions.
+The one action at the end is booking the call at glazedweb.com/schedule; the
+agreement it links, glazedweb.com/agreement/copperac, is a Custom Order entry
+in the glazedweb repo's `lib/customOrders.js`.
 
 It is served on its own marketing host:
 
