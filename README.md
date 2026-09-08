@@ -63,9 +63,17 @@ Its stylesheet and all three animated donut marks are lifted **verbatim** from
 `pitch/griffin-claw/index.html` in the `griffin-claw-rebuild` repo. That is
 deliberate: an approximation of the brand drifts the next time the real brand
 changes. If the Glazed system changes, change it there and copy it across rather
-than editing tokens here. Griffin Claw's pricing calculator and price-box CSS
-were stripped rather than left unused, because this proposal has no prices in it
-by request.
+than editing tokens here.
+
+Refreshed 8 Sep 2026 to the current proposal standard (`glaze/proposal.md`,
+with the True North proposal of 4 Sep as the reference): an ownership section
+with the three questions, a price section at the published menu price ($2,000
+build, $150 a month, anchored against the published $3,900 market figure), the
+workroom and the live tap list in "what it adds", and one action at the end,
+booking the call at glazedweb.com/schedule. The price card, proof list, verdict
+box and CTA styles were copied from the True North file. The agreement it
+links, glazedweb.com/agreement/copperac, is a Custom Order entry in the
+glazedweb repo's `lib/customOrders.js`.
 
 It is served on its own marketing host:
 
