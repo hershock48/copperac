@@ -1,7 +1,9 @@
 import { unstable_cache } from "next/cache";
 
 /**
- * The Board: live Detroit sports results and upcoming games.
+ * The Board: live results and upcoming games for the four Detroit clubs and,
+ * since 8 Sep 2026 at the owner's ask, Michigan and Michigan State in
+ * football, basketball and hockey.
  *
  * Data comes from ESPN's public site API: no key, no account, no vendor
  * lock-in. Fetched on the server and cached for 15 minutes, so the page stays
@@ -12,14 +14,21 @@ import { unstable_cache } from "next/cache";
 
 export type BoardGame = {
   id: string;
-  league: League["label"];
+  /** The Copper side of the game: TIGERS, LIONS, ... MICHIGAN, MICH STATE */
+  league: Team["label"];
+  /** MLB, NFL, NBA, NHL for the clubs; FOOTBALL, BASKETBALL, HOCKEY for the schools */
   leagueKey: string;
+  /** true for the two schools, which play three sports under one name */
+  school: boolean;
+  /** Our side's abbreviation on the row: DET, MICH or MSU */
+  us: string;
   date: string; // ISO
-  /** Detroit's opponent, e.g. "CLE" */
+  /** The opponent, e.g. "CLE" */
   opp: string;
   oppName: string;
-  /** true when Detroit is at home */
+  /** true when our side is at home */
   home: boolean;
+  /** Our side's score; the field name predates the schools joining */
   detScore: number | null;
   oppScore: number | null;
   /** W / L / T once final */
@@ -31,19 +40,41 @@ export type BoardGame = {
   venue: string | null;
 };
 
-type League = {
+type Team = {
   key: string;
-  label: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS";
+  label: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS" | "MICHIGAN" | "MICH STATE";
   sport: string;
   path: string;
+  /** ESPN's team segment: the abbreviation for the clubs, the numeric id for the schools */
+  team: string;
+  /** How ESPN abbreviates our side in a competition, the fallback when ids do not line up */
+  abbr: string;
+  school: boolean;
 };
 
-const LEAGUES: League[] = [
-  { key: "mlb", label: "TIGERS", sport: "MLB", path: "baseball/mlb" },
-  { key: "nfl", label: "LIONS", sport: "NFL", path: "football/nfl" },
-  { key: "nba", label: "PISTONS", sport: "NBA", path: "basketball/nba" },
-  { key: "nhl", label: "RED WINGS", sport: "NHL", path: "hockey/nhl" },
+/*
+  One row per team per sport. ESPN's college endpoints answer by numeric team
+  id (Michigan 130, Michigan State 127; checked 8 Sep 2026: football and hockey
+  returned full schedules, basketball an empty list until its season loads,
+  which the normaliser treats as "no games", not "failed"). A school's three
+  rows share a label, so the card at the bottom of the board shows whichever
+  sport plays next.
+*/
+const TEAMS: Team[] = [
+  { key: "mlb", label: "TIGERS", sport: "MLB", path: "baseball/mlb", team: "det", abbr: "DET", school: false },
+  { key: "nfl", label: "LIONS", sport: "NFL", path: "football/nfl", team: "det", abbr: "DET", school: false },
+  { key: "nba", label: "PISTONS", sport: "NBA", path: "basketball/nba", team: "det", abbr: "DET", school: false },
+  { key: "nhl", label: "RED WINGS", sport: "NHL", path: "hockey/nhl", team: "det", abbr: "DET", school: false },
+  { key: "um-fb", label: "MICHIGAN", sport: "FOOTBALL", path: "football/college-football", team: "130", abbr: "MICH", school: true },
+  { key: "um-bb", label: "MICHIGAN", sport: "BASKETBALL", path: "basketball/mens-college-basketball", team: "130", abbr: "MICH", school: true },
+  { key: "um-hk", label: "MICHIGAN", sport: "HOCKEY", path: "hockey/mens-college-hockey", team: "130", abbr: "MICH", school: true },
+  { key: "msu-fb", label: "MICH STATE", sport: "FOOTBALL", path: "football/college-football", team: "127", abbr: "MSU", school: true },
+  { key: "msu-bb", label: "MICH STATE", sport: "BASKETBALL", path: "basketball/mens-college-basketball", team: "127", abbr: "MSU", school: true },
+  { key: "msu-hk", label: "MICH STATE", sport: "HOCKEY", path: "hockey/mens-college-hockey", team: "127", abbr: "MSU", school: true },
 ];
+
+/** Card order at the bottom of the board; one card per label, whatever sport is next. */
+const CARD_ORDER: Team["label"][] = ["TIGERS", "LIONS", "PISTONS", "RED WINGS", "MICHIGAN", "MICH STATE"];
 
 const ET = "America/Detroit";
 
@@ -87,8 +118,8 @@ type EspnEvent = {
 
 type EspnSchedule = { team?: { id?: string | number }; events?: EspnEvent[] };
 
-async function fetchLeague(league: League): Promise<BoardGame[]> {
-  const url = `https://site.api.espn.com/apis/site/v2/sports/${league.path}/teams/det/schedule`;
+async function fetchTeam(league: Team): Promise<BoardGame[]> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/${league.path}/teams/${league.team}/schedule`;
   let json: EspnSchedule;
   try {
     // MLB's full-season payload is ~3.4MB, over Next's 2MB data-cache ceiling,
@@ -124,7 +155,7 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
 
     const competitors: EspnCompetitor[] = comp?.competitors ?? [];
     const det = competitors.find(
-      (c) => (detId && String(c?.team?.id) === String(detId)) || c?.team?.abbreviation === "DET"
+      (c) => (detId && String(c?.team?.id) === String(detId)) || c?.team?.abbreviation === league.abbr
     );
     const opp = competitors.find((c) => c !== det);
     if (!det || !opp) continue;
@@ -149,6 +180,8 @@ async function fetchLeague(league: League): Promise<BoardGame[]> {
       id: String(ev.id),
       league: league.label,
       leagueKey: league.sport,
+      school: league.school,
+      us: league.abbr,
       date: ev.date,
       opp: opp?.team?.abbreviation ?? "TBD",
       oppName: opp?.team?.displayName ?? "",
@@ -173,7 +206,7 @@ export type Board = {
   recent: BoardGame[];
   upcoming: BoardGame[];
   live: BoardGame[];
-  /** Each Detroit club's next game, so all four always show even out of season */
+  /** Each team's next game, so all six always show even out of season */
   nextByTeam: BoardGame[];
   /** ISO timestamp the board was assembled, shown as "as of" on the rail */
   builtAt: string;
@@ -182,7 +215,7 @@ export type Board = {
 };
 
 async function buildBoard(): Promise<Board> {
-  const all = (await Promise.all(LEAGUES.map(fetchLeague))).flat();
+  const all = (await Promise.all(TEAMS.map(fetchTeam))).flat();
   const now = Date.now();
 
   const isFinal = (g: BoardGame) => g.result !== null;
@@ -192,17 +225,16 @@ async function buildBoard(): Promise<Board> {
   const recent = all
     .filter(isFinal)
     .sort((a, b) => +new Date(b.date) - +new Date(a.date))
-    .slice(0, 5);
+    .slice(0, 6);
 
   const live = all.filter(isLive);
 
   const upcoming = all
     .filter((g) => !isFinal(g) && !isLive(g) && new Date(g.date).getTime() > now - 60 * 60 * 1000)
     .sort((a, b) => +new Date(a.date) - +new Date(b.date))
-    .slice(0, 6);
+    .slice(0, 8);
 
-  const order = ["TIGERS", "LIONS", "PISTONS", "RED WINGS"] as const;
-  const nextByTeam = order
+  const nextByTeam = CARD_ORDER
     .map((label) =>
       all
         .filter((g) => g.league === label && !isFinal(g) && new Date(g.date).getTime() > now)
@@ -225,7 +257,9 @@ async function buildBoard(): Promise<Board> {
  * for 15 minutes. This keeps the homepage statically rendered while the scores
  * still refresh on their own.
  */
-const cachedBoard = unstable_cache(buildBoard, ["copper-detroit-board"], {
+// Key bumped when the game shape changed (8 Sep 2026: us, school), so a
+// cached board from before the change cannot render blank labels.
+const cachedBoard = unstable_cache(buildBoard, ["copper-board-v2"], {
   revalidate: 900,
 });
 

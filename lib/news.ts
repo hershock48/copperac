@@ -50,9 +50,9 @@ import { unstable_cache } from "next/cache";
 
 export type NewsItem = {
   id: string;
-  /** TIGERS | LIONS | PISTONS | RED WINGS */
+  /** TIGERS | LIONS | PISTONS | RED WINGS | MICHIGAN | MICH STATE */
   team: string;
-  /** MLB | NFL | NBA | NHL */
+  /** MLB | NFL | NBA | NHL | CFB | CBB */
   league: string;
   headline: string;
   href: string | null;
@@ -62,17 +62,27 @@ export type NewsItem = {
 type Club = {
   /** ESPN's sport/league path segment */
   path: string;
-  team: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS";
-  league: "MLB" | "NFL" | "NBA" | "NHL";
+  team: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS" | "MICHIGAN" | "MICH STATE";
+  league: "MLB" | "NFL" | "NBA" | "NHL" | "CFB" | "CBB";
   /** Matched against article categories and, failing that, the text */
   needles: string[];
 };
 
+/*
+  The two schools joined on 8 Sep 2026 with the board. Their needles are the
+  nicknames on purpose: "michigan" alone would file every Michigan State
+  story under Michigan, and the reverse. College news is one national feed
+  per sport, so the two schools share a fetch (see buildNews).
+*/
 const CLUBS: Club[] = [
   { path: "baseball/mlb", team: "TIGERS", league: "MLB", needles: ["detroit tigers", "tigers"] },
   { path: "football/nfl", team: "LIONS", league: "NFL", needles: ["detroit lions", "lions"] },
   { path: "basketball/nba", team: "PISTONS", league: "NBA", needles: ["detroit pistons", "pistons"] },
   { path: "hockey/nhl", team: "RED WINGS", league: "NHL", needles: ["detroit red wings", "red wings"] },
+  { path: "football/college-football", team: "MICHIGAN", league: "CFB", needles: ["michigan wolverines", "wolverines"] },
+  { path: "basketball/mens-college-basketball", team: "MICHIGAN", league: "CBB", needles: ["michigan wolverines", "wolverines"] },
+  { path: "football/college-football", team: "MICH STATE", league: "CFB", needles: ["michigan state", "spartans"] },
+  { path: "basketball/mens-college-basketball", team: "MICH STATE", league: "CBB", needles: ["michigan state", "spartans"] },
 ];
 
 /** The slice of ESPN's news payload we read. All optional, on purpose. */
@@ -142,8 +152,9 @@ function concernsClub(a: EspnArticle, club: Club): boolean {
   return tagged && teamCategoryCount(a) <= ROUNDUP_TEAM_TAGS;
 }
 
-async function fetchClubNews(club: Club): Promise<NewsItem[]> {
-  const url = `https://site.api.espn.com/apis/site/v2/sports/${club.path}/news?limit=50`;
+/** One fetch per ESPN path; every club on that path reads from it. */
+async function fetchPathNews(path: string, clubs: Club[]): Promise<NewsItem[]> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/${path}/news?limit=50`;
   let json: EspnNews;
   try {
     // no-store on the raw request, then the small derived list is cached below, the same
@@ -170,7 +181,9 @@ async function fetchClubNews(club: Club): Promise<NewsItem[]> {
   for (const a of raw) {
     const headline = (a.headline ?? a.title ?? "").trim();
     if (!headline) continue;
-    if (!concernsClub(a, club)) continue;
+    // First club it concerns wins; a story about both schools files under one.
+    const club = clubs.find((c) => concernsClub(a, c));
+    if (!club) continue;
 
     const href = a.links?.web?.href ?? null;
     items.push({
@@ -195,7 +208,10 @@ export type NewsFeed = {
 };
 
 async function buildNews(): Promise<NewsFeed> {
-  const all = (await Promise.all(CLUBS.map(fetchClubNews))).flat();
+  const paths = [...new Set(CLUBS.map((c) => c.path))];
+  const all = (
+    await Promise.all(paths.map((p) => fetchPathNews(p, CLUBS.filter((c) => c.path === p))))
+  ).flat();
 
   // Dedupe by id, then by headline, the same story can appear under two categories.
   const seen = new Set<string>();
@@ -226,7 +242,7 @@ async function buildNews(): Promise<NewsFeed> {
     q.push(n);
     queues.set(n.team, q);
   }
-  const order = ["TIGERS", "LIONS", "PISTONS", "RED WINGS"];
+  const order = ["TIGERS", "LIONS", "PISTONS", "RED WINGS", "MICHIGAN", "MICH STATE"];
   const woven: NewsItem[] = [];
   const LIMIT = 12;
   for (let round = 0; woven.length < LIMIT; round += 1) {
@@ -247,7 +263,7 @@ async function buildNews(): Promise<NewsFeed> {
 
 /**
  * Ten minutes. Headlines turn over faster than scores settle, but a bar's wall does not
- * need to be a live wire and every revalidation is four upstream requests.
+ * need to be a live wire and every revalidation is six upstream requests.
  */
 const cachedNews = unstable_cache(buildNews, ["copper-detroit-news"], { revalidate: 600 });
 

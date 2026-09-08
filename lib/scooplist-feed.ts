@@ -31,6 +31,16 @@ import "server-only";
  *    silently running on its snapshot with nothing saying so.
  */
 
+/**
+ * The cache tag on the feed fetch. A site that wants the board to update
+ * in seconds rather than at the next poll gives Scooplist a hook URL
+ * (create-org --site-hook) and, in that route, calls
+ * revalidateTag(SCOOPLIST_FEED_TAG, "max") plus revalidatePath for the
+ * pages that render it. copperac/app/api/scooplist/revalidate is the
+ * reference. Without a hook the revalidate window below is the floor.
+ */
+export const SCOOPLIST_FEED_TAG = "scooplist-case";
+
 export type FeedSize = { label: string; price: string };
 
 export type FeedFlavor = {
@@ -127,7 +137,7 @@ export async function fetchScooplistCase<S extends Record<string, SectionSpec<un
   let feed: Feed;
   try {
     const res = await fetch(`${base}${path}`, {
-      next: { revalidate: config.revalidate ?? 60 },
+      next: { revalidate: config.revalidate ?? 60, tags: [SCOOPLIST_FEED_TAG] },
       signal: AbortSignal.timeout(config.timeoutMs ?? 3000),
     });
     if (!res.ok) return fallbackResult();

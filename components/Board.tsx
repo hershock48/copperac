@@ -26,7 +26,7 @@ export default async function Board() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <Eyebrow>Detroit, on our screens</Eyebrow>
+            <Eyebrow>Detroit, Michigan and State, on our screens</Eyebrow>
             <Heading className="mt-3">The Board</Heading>
           </div>
           <div className="board-rail display flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-cream-dim/70">
@@ -69,7 +69,7 @@ export default async function Board() {
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
           <Panel
             title={board.live.length ? "On now" : "Last out"}
-            note={board.live.length ? "Playing right now" : "Recent Detroit results"}
+            note={board.live.length ? "Playing right now" : "Recent results"}
           >
             {(board.live.length ? board.live : board.recent).map((g) => (
               <Row key={g.id} g={g} final />
@@ -84,10 +84,14 @@ export default async function Board() {
         </div>
 
         {board.nextByTeam.length > 0 && (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {board.nextByTeam.map((g) => (
               <div key={`team-${g.id}`} className="board-team">
-                <span className="board-team-name">{g.league}</span>
+                {/* A school plays three sports under one name, so its card says which is next. */}
+                <span className="board-team-name">
+                  {g.league}
+                  {g.school ? ` · ${g.leagueKey}` : ""}
+                </span>
                 <span className="board-team-game">
                   {g.home ? "vs" : "@"} {g.opp}
                 </span>
@@ -98,8 +102,9 @@ export default async function Board() {
         )}
 
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/70">
-          Every Detroit game goes up on the wall. Most nights we&apos;ll put yours on a screen
-          too, just ask. When Detroit has a big one, it takes the room.
+          Every Detroit game goes up on the wall, and so do Michigan and Michigan State. Most
+          nights we&apos;ll put yours on a screen too, just ask. When Detroit has a big one, it
+          takes the room.
         </p>
       </div>
     </section>
@@ -194,7 +199,7 @@ function NewsCrawl({ items }: { items: NewsItem[] }) {
       style={{ "--news-chars": runChars(items.map((n) => n.team + n.headline)) } as React.CSSProperties}
     >
       <span className="news-crawl-label" aria-hidden="true">
-        Detroit
+        Headlines
       </span>
       <div className="news-crawl-window">
         <div className="news-crawl-track">
@@ -268,7 +273,7 @@ function Row({ g, final = false }: { g: BoardGame; final?: boolean }) {
       <span className="board-league">{g.leagueKey}</span>
 
       <span className="board-matchup">
-        <b className="text-cream">DET</b>
+        <b className="text-cream">{g.us}</b>
         <span className="board-at">{g.home ? "vs" : "@"}</span>
         <b>{g.opp}</b>
         {/* When it was played. "Last out" lists results newest-first, but with

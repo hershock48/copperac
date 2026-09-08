@@ -17,6 +17,11 @@
 # the bar enters what is pouring, so the site's LIVE label never points at a
 # guess.
 #
+# The --site-hook is where Scooplist POSTs after every change to the case,
+# signed with the handoff key, so the site refreshes in seconds instead of
+# at its next poll. copperac.vercel.app is the deployment itself, so it keeps
+# working when copperac.com goes live on the same project.
+#
 # When it finishes, the bar's sign-in link is
 #   https://scooplist.glazedweb.com/login/copperac
 # and https://copperac.vercel.app/api/status should report cocktails: live.
@@ -49,7 +54,8 @@ try {
   node tools/create-org.mjs --url https://scooplist.glazedweb.com `
     --slug copperac --name "Copper Athletic Club" --pin $pin `
     --preset tavern --categories "taps:On Tap,cocktails:Cocktails" `
-    --locations "marshall:Copper Athletic Club"
+    --locations "marshall:Copper Athletic Club" `
+    --site-hook https://copperac.vercel.app/api/scooplist/revalidate
   if ($LASTEXITCODE -ne 0) { throw "create-org failed (exit $LASTEXITCODE)." }
 } finally {
   Pop-Location
@@ -73,7 +79,8 @@ Write-Host ""
 Write-Host "Done."
 Write-Host "  The handoff key printed above goes into the copperac Vercel project as"
 Write-Host "  SCOOPLIST_HANDOFF_KEY (then redeploy). It is what lets the workroom's Taps"
-Write-Host "  tab sign the planner into Scooplist without the PIN."
+Write-Host "  tab sign the planner into Scooplist without the PIN, and what signs the"
+Write-Host "  case-changed ping Scooplist now sends to /api/scooplist/revalidate."
 Write-Host "  Bar sign-in:  https://scooplist.glazedweb.com/login/copperac   (PIN: the one you chose)"
 Write-Host "  TV board:     https://scooplist.glazedweb.com/board/copperac/marshall"
 Write-Host "  Site check:   https://copperac.vercel.app/api/status  (expect cocktails: live)"

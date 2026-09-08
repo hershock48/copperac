@@ -286,7 +286,9 @@ runs their social media and events. Two screens behind one passcode:
   Scooplist's `/api/handoff`, which verifies it and sets its own session.
   Needs `SCOOPLIST_HANDOFF_KEY` on this project, printed once when the org
   is created or re-run with `tools/setup-scooplist.ps1`. `GET /api/status`
-  reports it under `workroom.tapsHandoff`.
+  reports it under `workroom.tapsHandoff`. The same key signs the
+  case-changed ping Scooplist sends to `app/api/scooplist/revalidate`
+  (below), so one secret covers both directions.
 - **Menu.** A price, a description and an on/off switch per item, main menu
   and Sunday brunch. Names and sections stay in `lib/menu.ts`, because the
   printed menu is still the truth for shape. Clearing a price restores the
@@ -400,6 +402,20 @@ bar's own Scooplist org (`copperac` on `scooplist.glazedweb.com`, location
 fetches the feed server-side (60s revalidate, 3s timeout) through the
 drop-in client in `lib/scooplist-feed.ts`.
 
+**The bar's change reaches the site in seconds, not minutes.** Scooplist
+POSTs to `app/api/scooplist/revalidate` after every case or drink write
+(its `lib/notify.ts`; the org's `siteHook` is set by create-org's
+`--site-hook`, which `tools/setup-scooplist.ps1` passes). The request is
+signed with the handoff key (`x-scooplist-signature` = HMAC-SHA256 of
+"copperac\n{timestamp}", five-minute skew), and on a good signature the
+route drops the feed's data-cache entry (tag `scooplist-case`) and
+revalidates every page. Before this (8 Sep 2026) a beer added at the bar
+waited on three polling layers, the site's 60s fetch cache, the pages' 60s
+regeneration and Scooplist's edge cache, and could take several minutes to
+show; Kevin noticed. Polling stays as the floor: with no hook set, or the
+ping lost, the site is as current as it was before. `GET
+/api/scooplist/revalidate` reports whether the key is set.
+
 The old rule, "no invented tap list, because the taps rotate", survives as
 the fallback rule. Per section:
 
@@ -433,12 +449,13 @@ where the chips and dips live). Daily specials and happy hour are constants
 in `lib/site.ts`; the monthly chalkboard is too, with the month it belongs
 to, and it renders only while that month is current.
 
-**Status 2 Sep 2026: the org does not exist yet.** scooplist.glazedweb.com is
-in multi-org mode and healthy, but no business has been created on it (True
-North's included), so `/api/status` reports both sections on fallback and the
-site shows the printed cocktails and the taps-rotate panel. Run the script
-above, then hand the bar `scooplist.glazedweb.com/login/copperac` and the PIN.
-The site picks the feed up on its own within a minute.
+**Status 8 Sep 2026: live.** The org exists (slug `copperac`, display name
+"Copper Athletic Club", location `marshall`), the bar keeps the case, and
+`/api/status` reports both sections live from Scooplist (seventeen taps as
+of today). The bar signs in at `scooplist.glazedweb.com/login/copperac`;
+the planner reaches the same board from the workroom's Taps tab. Re-running
+the setup script is how the PIN gets rotated and how the site hook was
+added; it keeps the handoff key unless asked to rotate it.
 
 `/taps` ("On Tap" in the header) is the dedicated page, built 2 Sep 2026 the
 day the bar put all sixteen handles into Scooplist and the owner asked for a
