@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/ui";
+import { HomeButton } from "@/components/HomeLink";
 
 // Without this the 404 inherits the root metadata, so it served the homepage's
 // title, description and rel=canonical while returning a 404 status.
@@ -22,7 +23,7 @@ export default function NotFound() {
         still right where you left them.
       </p>
       <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-        <Button href="/">Back Home</Button>
+        <HomeButton>Back Home</HomeButton>
         <Button href="/menu" variant="outline">
           See the Menu
         </Button>

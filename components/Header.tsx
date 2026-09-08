@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { NAV, SITE } from "@/lib/site";
+import HomeLink from "@/components/HomeLink";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink-line bg-ink/95 backdrop-blur supports-[backdrop-filter]:bg-ink/80">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
-        <Link href="/" className="flex shrink-0 items-center" aria-label={`${SITE.name} home`}>
+        <HomeLink className="flex shrink-0 items-center" aria-label={`${SITE.name} home`}>
           <Image
             src="/img/logo.png"
             alt={SITE.name}
@@ -31,7 +32,7 @@ export default function Header() {
             priority
             className="h-12 w-auto"
           />
-        </Link>
+        </HomeLink>
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Main">
           {NAV.map((item) => {
