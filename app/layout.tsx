@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | Copper Athletic Club",
   },
   description:
-    `A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan. Order online or call ${SITE.phone}.`,
+    `A Detroit sports bar in downtown Marshall, Michigan: memorabilia on every wall, cold taps, burgers and Sunday brunch. Order online or call ${SITE.phone}.`,
   keywords: [
     "sports bar Marshall MI",
     "Copper Athletic Club",
@@ -44,10 +44,10 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     title: "Copper Athletic Club | Sports Bar in Marshall, MI",
     description:
-      "A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan.",
+      "A Detroit sports bar in downtown Marshall, Michigan: memorabilia on every wall, cold taps, burgers and Sunday brunch.",
     // Designed share card, not a raw photo: 1200x630 (the ratio every scraper
     // crops to) and JPG, because some previewers still won't render WebP.
-    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Copper Athletic Club: a sports bar, not a gym. Downtown Marshall, Michigan." }],
+    images: [{ url: "/og/home.jpg", width: 1200, height: 630, alt: "Copper Athletic Club, a Detroit sports bar in downtown Marshall, Michigan." }],
   },
   twitter: {
     // Only the card type is set here. Title, description and image are

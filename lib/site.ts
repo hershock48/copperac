@@ -1,10 +1,12 @@
 export const SITE = {
   name: "Copper Athletic Club",
   shortName: "Copper AC",
-  // Still the tagline of record: it carries "sports bar" for search and link
-  // previews, and it is in the manifest and the page titles. It is no longer
-  // the hero h1, which now runs the deadpan spec version of the same joke.
-  tagline: "A sports bar. Not a gym.",
+  // "A sports bar. Not a gym." is retired everywhere, owner's request (via
+  // Kevin, 8 Sep 2026): it had already left the hero, and on this date it
+  // left the descriptions, the manifest and all six link-card images too
+  // (tools/og-cards.mjs). This is the hero's own line, and it still carries
+  // "sports bar" for search and link previews.
+  tagline: "A Detroit sports bar in downtown Marshall",
   // Confirmed by Kevin, 9 Aug 2026: seven in the main bar, four upstairs in the
   // Copper Reserve, eleven in the building. It took three passes to land here
   // (14 was mine and invented, then 9, then 7 plus 4), which is the whole

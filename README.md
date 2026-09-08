@@ -153,7 +153,10 @@ better brag, which for a sports bar it arguably is; that is a one-word change.
 This is how the 14 outlived its own correction by half a day, so they are named
 here rather than left to be rediscovered:
 
-- `public/og/home.jpg`, the share-preview image, rebuilt from `cop-og/gen.mjs`.
+- `public/og/*.jpg`, the six share-preview images, rebuilt from
+  `tools/og-cards.mjs` (in the repo since 8 Sep 2026; the earlier generator
+  lived outside it and was lost, which is how "A sports bar. Not a gym."
+  stayed baked into every card for weeks after the owner asked for it to go).
   There is no way to grep a JPEG.
 - The Copper card in the glazedweb portfolio, in that repo's `app/page.jsx`.
 

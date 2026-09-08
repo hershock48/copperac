@@ -22,7 +22,7 @@ const restaurantSchema = {
   name: SITE.name,
   alternateName: "Copper AC",
   description:
-    "A sports bar, not a gym. Detroit sports memorabilia, cold taps, burgers and Sunday brunch in downtown Marshall, Michigan.",
+    "A Detroit sports bar in downtown Marshall, Michigan: memorabilia on every wall, cold taps, burgers and Sunday brunch.",
   url: SITE.url,
   telephone: "+1-269-558-8222",
   email: SITE.email,
