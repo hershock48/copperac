@@ -74,6 +74,15 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 nav{display:flex;gap:20px;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
 nav a{color:var(--mute);text-decoration:none}
 nav a:hover{color:var(--pink-d)}
+/* The one action the header sells. Lives outside <nav> so the 720px rule
+   that hides the section anchors cannot take it with them. Griffin Claw's
+   own rules. */
+.hright{display:flex;align-items:center;gap:20px}
+.hdemo{display:inline-block;background:var(--pink-d);color:#fff;font-weight:700;font-size:.72rem;letter-spacing:.09em;
+ text-transform:uppercase;padding:10px 18px;border-radius:999px;text-decoration:none;white-space:nowrap;
+ box-shadow:0 6px 16px -6px rgba(232,77,138,.55);transition:all .18s}
+.hdemo:hover{background:var(--green);color:var(--ink);transform:translateY(-1px)}
+@media(max-width:400px){.hdemo{font-size:.66rem;padding:9px 13px;letter-spacing:.06em}}
 @media(max-width:720px){nav{display:none}.brand .bw~span{display:none}}
 
 /* hero */
@@ -204,13 +213,16 @@ footer .gmark{height:78px;width:auto}
     <svg class="gmark gl" viewBox="0 0 200 250" overflow="visible" aria-hidden="true"><defs><linearGradient id="dgGrad" x1="0" y1="92" x2="0" y2="165" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5FA850"></stop><stop offset="100%" stop-color="#43813A"></stop></linearGradient><linearGradient id="lgGrad" x1="0" y1="92" x2="0" y2="215" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D9EDA0"></stop><stop offset="55%" stop-color="#BFE07A"></stop><stop offset="100%" stop-color="#A3CE55"></stop></linearGradient><radialGradient id="pinkGrad" cx="40%" cy="34%" r="75%"><stop offset="0%" stop-color="#F887B2"></stop><stop offset="55%" stop-color="#E84D8A"></stop><stop offset="100%" stop-color="#CE3672"></stop></radialGradient><linearGradient id="creepGrad" x1="0" y1="90" x2="0" y2="124" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E3F2B0"></stop><stop offset="100%" stop-color="#C3E181"></stop></linearGradient></defs><g class="goo"><g fill="url(#dgGrad)"><ellipse cx="100" cy="110" rx="38" ry="15"></ellipse><path class="wobB" d="M 86 100 C 86 116, 87 130, 88 142 C 88 148, 91 149, 92 142 C 93 130, 92 114, 92 100 Z"></path><path d="M 114 100 C 114 112, 115 124, 116 134 C 116 140, 119 141, 120 134 C 121 124, 120 110, 120 100 Z"></path></g><g fill="url(#lgGrad)"><path class="wob1" d="M 64 100 C 63 120, 65 138, 66 152 C 66 164, 68 172, 74 173 C 80 172, 83 165, 82 154 C 84 136, 85 116, 86 100 Z"></path><path class="wob2" d="M 92 100 C 91 128, 93 152, 94 172 C 94 188, 97 199, 104 200 C 111 199, 114 190, 112 174 C 113 150, 114 124, 114 100 Z"></path><path class="wob3" d="M 120 100 C 119 116, 120 130, 121 142 C 121 152, 123 159, 129 160 C 134 159, 137 153, 135 144 C 136 130, 137 114, 137 100 Z"></path></g></g><path class="string" d="M 104 199 L 104 209" stroke="#BFE07A" stroke-width="2.5" stroke-linecap="round" fill="none"></path><g class="droplet"><circle cx="104" cy="213" r="7" fill="#BFE07A"></circle><circle cx="102" cy="211" r="2" fill="#F1F8DC" opacity="0.9"></circle></g><circle class="droplet2" cx="74" cy="186" r="4.5" fill="#BFE07A"></circle><circle cx="100" cy="70" r="52" fill="url(#pinkGrad)"></circle><path d="M 56 98 A 52 52 0 0 0 144 98 C 142 94, 138 92, 134 94 C 130 97, 129 102, 125 104 C 119 106, 116 98, 110 96 C 104 94, 103 102, 98 105 C 93 107, 90 100, 84 97 C 78 95, 76 100, 71 102 C 66 103, 62 100, 56 98 Z" fill="url(#creepGrad)"></path><path d="M 68 106 A 42 42 0 0 0 84 116" fill="none" stroke="#F1F8DC" stroke-width="4" stroke-linecap="round" opacity="0.85"></path><path d="M 97 144 Q 103 151 109 144" fill="none" stroke="#55974A" stroke-width="4" stroke-linecap="round"></path><g stroke="#F1F8DC" fill="none" stroke-linecap="round"><path d="M 97 128 C 96 148, 97 166, 100 182" stroke-width="4.5" opacity="0.85"></path><path d="M 69 118 C 68 132, 70 146, 71 156" stroke-width="3.5" opacity="0.8"></path><path d="M 124 114 C 123 124, 125 138, 126 148" stroke-width="3.5" opacity="0.8"></path></g><circle cx="100" cy="192" r="2.5" fill="#F1F8DC" opacity="0.9"></circle><circle cx="100" cy="72" r="13" fill="#FDF6EC"></circle><circle cx="100" cy="72" r="13" fill="none" stroke="#C22F6B" stroke-width="3" opacity="0.3"></circle><path class="sheen" d="M 62 46 A 44 44 0 0 1 82 28" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></path><circle class="sheen" cx="92" cy="26" r="3.5" fill="#FFFFFF"></circle></svg>
     <span class="bw">glazed<span>web</span></span>
   </a>
-  <nav>
-    <a href="#adds">What it adds</a>
-    <a href="#found">What it fixes</a>
-    <a href="#why">Why</a>
-    <a href="#cost">Price</a>
-    <a href="#next">Next</a>
-  </nav>
+  <div class="hright">
+    <nav>
+      <a href="#adds">What it adds</a>
+      <a href="#found">What it fixes</a>
+      <a href="#cost">Price</a>
+      <a href="#next">Next</a>
+      <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">The agreement</a>
+    </nav>
+    <a class="hdemo" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Launch ↗</a>
+  </div>
 </div></header>
 
 <div class="wrap">
@@ -467,19 +479,27 @@ footer .gmark{height:78px;width:auto}
   </div>
   <div class="step">
     <div class="no">3</div>
-    <div><h4>Then a conversation</h4><p>Half an hour, at the bar, whenever suits. <a href="https://www.glazedweb.com/schedule" target="_blank" rel="noopener">Pick the time at glazedweb.com/schedule</a> and it lands in both calendars. Bring the skeptical questions, and bring your events person, because the best part of the meeting is her adding something to the events page from her own phone.</p></div>
+    <div><h4>Launch</h4><p>Everything from here lives on one page, yours: <a href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">glazedweb.com/build/copperac</a>. Where things stand, the short list of what only you can supply, what happens in what order, and where your stuff is. We keep it current as things land, so if a circle is still open there, we have not received it yet. No meeting to schedule and nothing to remember; the page remembers. Questions along the way are a text or an email, whenever suits.</p></div>
   </div>
   <div class="step">
     <div class="no">4</div>
-    <div><h4>If it is yes</h4><p>The agreement is already written and waiting at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a>: the plain-English terms every client gets, and an Exhibit A with your scope and your numbers. You type your name, both of us get the signed record by email, and nothing is owed before the invoice arrives. Pointing copperac.com at the new site is a ten-minute change wherever the domain is registered.</p></div>
+    <div><h4>Accept the agreement</h4><p>It is already written and waiting at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a>: the plain-English terms every client gets, and an Exhibit A with your scope and your numbers. You type your name and both of us get the signed record by email. The build fee is paid on the same page by card, in full or half now and half at launch, or we invoice it; the monthly begins once the site is live on copperac.com, and not before.</p></div>
   </div>
 
   <h3>What we would need from you</h3>
-  <p>Access to point the domain. The next event, so the events page does not
-  launch empty. A look at the prices on the printed menu, which we copied word
-  for word and would like confirmed. Your events person’s name and email. And
-  any photographs you love that are not on the site; the ones there now are
-  from 2019. That is genuinely the list.</p>
+  <p>Seven things, none of them long, and every one is on your build page with
+  the reason it is needed, in the order they block other work. Your name and
+  the business’s registered name come first, because the agreement waits on
+  them and nothing else does. The list lives there and not here on purpose:
+  one copy, ticked as it arrives, so it can never say two different things.</p>
+
+  <div class="demo">
+    <div class="k">The one thing to do</div>
+    <h3>Everything from here is on one page.</h3>
+    <p>Where things stand, what we need from you, what happens in what order,
+    and where your stuff is.</p>
+    <a href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Launch ↗</a>
+  </div>
 
   <p class="note" style="margin-top:22px">If the answer is no, that is a fine
   answer and it cost you nothing. The six things in part two are still true and

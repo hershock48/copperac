@@ -73,9 +73,17 @@ The price part is new: the published menu price ($2,000 build, $150 a month)
 in Griffin Claw's own price boxes, the build figure counting down from the
 published $3,900 market figure the way the anchor proposal's does (data-to is
 the real number in the markup), the ownership terms and the three questions.
-The one action at the end is booking the call at glazedweb.com/schedule; the
-agreement it links, glazedweb.com/agreement/copperac, is a Custom Order entry
-in the glazedweb repo's `lib/customOrders.js`.
+The one action is **Launch** (10 Sep 2026, Kevin: "integrate a launch
+element into the coppers proposal", the True North pattern): the header
+pill, step three and the closing panel all open glazedweb.com/build/copperac,
+the client's project page (`glaze/project-page.md`; the `project` block on
+the copperac entry in the glazedweb repo's `lib/customOrders.js`). That page
+holds the homework list with a reason on every line and boxes we tick, so
+"what we would need from you" here points at it instead of restating it.
+Its first circle sends him to the agreement, glazedweb.com/agreement/copperac,
+step four. No scheduler link remains in the letter. When an item on the
+cutover list below is resolved, tick the matching `needs` entry in the
+registry in the same commit.
 
 It is served on its own marketing host:
 
