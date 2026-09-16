@@ -110,8 +110,8 @@ export default function MenuEditor() {
 
       {state.backend === "memory" && (
         <p className="wr-warn" role="status">
-          <strong>No database is connected yet</strong>, so anything saved here is held only in memory and can be
-          forgotten by the next restart. Connect a database in Vercel (Storage, then Neon) and this warning goes away.
+          <strong>Permanent saving is unavailable.</strong> Contact Glazed Web to connect storage.
+          Published sites refuse saves until it is connected. Local demo edits disappear after a restart.
         </p>
       )}
 

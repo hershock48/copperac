@@ -1,3 +1,4 @@
+import { unavailableWrite } from "@/lib/workroom/write-guard";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
 import { getStore, newId, type StoredImage } from "@/lib/workroom/store";
@@ -20,6 +21,8 @@ const DATA_URL = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/;
 
 export async function POST(req: Request) {
   if (!(await isWorkroomAuthed())) return NextResponse.json({ error: "Locked." }, { status: 401 });
+  const unavailable = unavailableWrite();
+  if (unavailable) return unavailable;
   const body = (await req.json().catch(() => null)) as { dataUrl?: unknown } | null;
   const dataUrl = typeof body?.dataUrl === "string" ? body.dataUrl : "";
   const m = dataUrl.match(DATA_URL);

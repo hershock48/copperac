@@ -13,11 +13,9 @@ import "server-only";
  *              database the parked ordering system would use; different
  *              tables, no overlap.
  *
- *   memory     so local dev and the build need nothing. Deployed, this only
- *              holds within one warm lambda, so a saved event can vanish on
- *              the next cold start. Every workroom screen says so in plain
- *              words when it is on memory, because a screen that half-saves
- *              silently is worse than one that says what is wrong.
+ *   memory     for local development and build-time reads. Production writes
+ *              are rejected so a temporary save cannot be mistaken for a
+ *              durable owner edit.
  *
  * Photos live here too, as base64 in their own table, served by
  * app/img/events/[id]. A bar's events run to a handful a month and a resized
@@ -76,9 +74,11 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
       return rows().get(id) ?? null;
     },
     async put(row) {
+      requireDurableWrite();
       rows().set(row.id, row);
     },
     async remove(id) {
+      requireDurableWrite();
       rows().delete(id);
     },
     async list(limit = 1000) {
@@ -95,6 +95,7 @@ const memoryStore: Store = {
     return (bag().content.get(key) as never) ?? null;
   },
   async setValue(key, value) {
+    requireDurableWrite();
     bag().content.set(key, value);
   },
 };
@@ -111,12 +112,10 @@ export function connectionVar(): string | null {
   const env = process.env;
   if (env.DATABASE_URL) return "DATABASE_URL";
   if (env.POSTGRES_URL) return "POSTGRES_URL";
-  const keys = Object.keys(env).sort();
-  return (
-    keys.find((k) => k.endsWith("_DATABASE_URL") && env[k]) ??
-    keys.find((k) => k.endsWith("_POSTGRES_URL") && env[k]) ??
-    null
-  );
+  const keys = Object.keys(env).filter(k => (k.endsWith("_DATABASE_URL") || k.endsWith("_POSTGRES_URL")) && env[k]);
+  // Never choose an arbitrary client database when several integrations exist.
+  const values = new Set(keys.map(k => env[k]));
+  return values.size === 1 ? keys.sort()[0] : null;
 }
 
 function connectionString(): string | undefined {
@@ -130,19 +129,20 @@ type PgPool = {
 
 const JSON_TABLES = ["workroom_content", "workroom_events", "workroom_images"] as const;
 
-async function pgPool(): Promise<PgPool> {
+export async function workroomDatabase(): Promise<PgPool> {
   const g = globalThis as typeof globalThis & {
     __copperWorkroomPool?: PgPool;
     __copperWorkroomReady?: Promise<unknown>;
   };
-  if (!g.__copperWorkroomPool) {
+  if (!g.__copperWorkroomReady) {
+    g.__copperWorkroomReady = (async () => {
     const { Pool } = await import("pg");
     const cs = connectionString();
-    const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
+    if (!cs) throw new Error("Persistent workroom storage is not configured.");
     g.__copperWorkroomPool = new Pool({
       connectionString: cs,
-      ssl: local ? undefined : { rejectUnauthorized: false },
       max: 3,
+      connectionTimeoutMillis: 7000,
     }) as unknown as PgPool;
     /*
       The init takes an advisory lock because the customer pages read this
@@ -153,12 +153,9 @@ async function pgPool(): Promise<PgPool> {
     */
     const creates = JSON_TABLES.map(
       (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
-    ).join("\n");
-    g.__copperWorkroomReady = g.__copperWorkroomPool
-      .query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`)
-      .catch((err: unknown) => {
-        const code = (err as { code?: string } | null)?.code;
-        if (code === "23505" || code === "42P07") return;
+    ).join("\n") + "\nCREATE TABLE IF NOT EXISTS copper_login_attempts (id text PRIMARY KEY, attempts integer NOT NULL, started bigint NOT NULL);";
+    await g.__copperWorkroomPool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`);
+    })().catch((err: unknown) => {
         g.__copperWorkroomPool = undefined;
         g.__copperWorkroomReady = undefined;
         throw err;
@@ -171,23 +168,23 @@ async function pgPool(): Promise<PgPool> {
 function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Collection<T> {
   return {
     async get(id) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       const { rows } = await pool.query(`SELECT data FROM ${table} WHERE key = $1`, [id]);
       return rows.length ? (rows[0].data as T) : null;
     },
     async put(row) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       await pool.query(
         `INSERT INTO ${table} (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2`,
         [row.id, JSON.stringify(row)]
       );
     },
     async remove(id) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       await pool.query(`DELETE FROM ${table} WHERE key = $1`, [id]);
     },
     async list(limit = 1000) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       const { rows } = await pool.query(
         `SELECT data FROM ${table} ORDER BY (data->>'createdAt')::bigint DESC NULLS LAST LIMIT $1`,
         [limit]
@@ -202,12 +199,12 @@ const postgresStore: Store = {
   events: pgCollection<WorkroomEvent>("workroom_events"),
   images: pgCollection<StoredImage>("workroom_images"),
   async getValue(key) {
-    const pool = await pgPool();
+    const pool = await workroomDatabase();
     const { rows } = await pool.query(`SELECT data FROM workroom_content WHERE key = $1`, [key]);
     return rows.length ? (rows[0].data as never) : null;
   },
   async setValue(key, value) {
-    const pool = await pgPool();
+    const pool = await workroomDatabase();
     await pool.query(
       `INSERT INTO workroom_content (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2`,
       [key, JSON.stringify(value)]
@@ -217,4 +214,8 @@ const postgresStore: Store = {
 
 export function getStore(): Store {
   return connectionString() ? postgresStore : memoryStore;
+}
+
+function requireDurableWrite() {
+  if (process.env.NODE_ENV === "production") throw new Error("Persistent storage is required for workroom edits.");
 }

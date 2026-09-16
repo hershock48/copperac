@@ -1,26 +1,10 @@
 import "server-only";
 
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { issueSession, sessionRole, SESSION_SECONDS } from "./session";
 
-/**
- * The workroom door.
- *
- * Ported from anchor's `lib/workroom/auth.ts`, the newest copy in the
- * studio's workroom family, and kept as it is there:
- *
- *   - A PASSCODE, whatever WORKROOM_PASSCODE says, at least four characters.
- *     The login route's limiter (five misses per ten minutes per address)
- *     is what makes a short code survivable on the public internet.
- *   - THE COOKIE CARRIES A HASH, never the passcode. A stolen cookie opens
- *     the door until it expires; it never hands over the code itself.
- *   - UNSET IN PRODUCTION IS A CLOSED DOOR, not a known fallback. The
- *     fallback below exists for local development only.
- *
- * A gate, not a vault. Behind it: the events list and the menu prices, both
- * of which the site publishes anyway, with the built-in value one clear and
- * save away. Nothing here moves money.
- */
+/** Signed expiring owner sessions. Production requires a separate session secret. */
 
 const COOKIE = "copperac_workroom";
 const DEV_FALLBACK = "workroom-dev";
@@ -52,30 +36,37 @@ export function passcodeMatches(candidate: string, passcode: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+function sessionSecret(): string | null {
+  let secret = process.env.WORKROOM_SESSION_SECRET?.trim();
+  if (!secret && process.env.NODE_ENV !== "production") {
+    const local = globalThis as typeof globalThis & { __copperSessionSecret?: string };
+    secret = local.__copperSessionSecret ||= randomBytes(32).toString("hex");
+  }
+  if (!secret || secret.length < 32) return null;
+  // Bind the reusable primitive to this application, even if configuration is reused.
+  return createHmac("sha256", secret).update("copperac-workroom-v2").digest("hex");
+}
+
+export function workroomSessionReady() { return Boolean(workroomPasscode() && sessionSecret()); }
+
 export async function isWorkroomAuthed(): Promise<boolean> {
-  const passcode = workroomPasscode();
-  if (passcode === null) return false;
+  const passcode = workroomPasscode(), secret = sessionSecret();
+  if (!passcode || !secret) return false;
   const jar = await cookies();
-  const got = jar.get(COOKIE)?.value;
-  if (!got) return false;
-  const a = Buffer.from(got);
-  const b = Buffer.from(token(passcode));
-  return a.length === b.length && timingSafeEqual(a, b);
+  return sessionRole(jar.get(COOKIE)?.value, secret, { staff: null, owner: passcode }) === "owner";
 }
 
 export async function setWorkroomCookie(passcode: string): Promise<void> {
+  const expected = workroomPasscode(), secret = sessionSecret();
+  if (!expected || !secret || !passcodeMatches(passcode, expected)) throw new Error("Workroom session unavailable.");
   const jar = await cookies();
-  jar.set(COOKIE, token(passcode), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    // A working day and the evening after it.
-    maxAge: 60 * 60 * 18,
-    path: "/",
+  jar.set(COOKIE, issueSession("owner", expected, secret), {
+    httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production",
+    maxAge: SESSION_SECONDS, path: "/",
   });
 }
 
 export async function clearWorkroomCookie(): Promise<void> {
   const jar = await cookies();
-  jar.set(COOKIE, "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 });
+  jar.set(COOKIE, "", { httpOnly: true, sameSite: "strict", path: "/", maxAge: 0 });
 }

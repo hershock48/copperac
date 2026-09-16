@@ -1,3 +1,4 @@
+import { unavailableWrite } from "@/lib/workroom/write-guard";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
@@ -13,6 +14,8 @@ const CONTROL = /[\x00-\x1f\x7f]/g;
 
 export async function PUT(req: Request) {
   if (!(await isWorkroomAuthed())) return NextResponse.json({ error: "Locked." }, { status: 401 });
+  const unavailable = unavailableWrite();
+  if (unavailable) return unavailable;
   const body = (await req.json().catch(() => null)) as { contact?: Record<string, unknown> } | null;
   const raw = body?.contact;
   if (!raw || typeof raw !== "object") return NextResponse.json({ error: "Malformed." }, { status: 400 });

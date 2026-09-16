@@ -476,4 +476,41 @@ page for a board nobody keeps is worse than no page.
 
 ---
 
+## Workroom deployment requirements (September 2026 review)
+
+Production owner sign-in requires `WORKROOM_PASSCODE`, a separate random
+`WORKROOM_SESSION_SECRET` of at least 32 characters, and persistent Postgres.
+Sessions expire after 18 hours; rotating either credential invalidates them.
+Existing cookies from the earlier implementation require a fresh sign-in.
+The shared owner login counter permits five attempts per ten-minute window.
+
+Set an explicit `DATABASE_URL` when multiple database integrations exist.
+Database TLS uses the provider's connection configuration; certificate
+verification is no longer disabled in code. Initial schema setup creates the
+workroom tables and `copper_login_attempts`, so the deployment database role
+must have the appropriate permissions. Production saves without durable storage
+return an error. Memory writes are for local development only.
+
+`/api/status` reports session configuration and the selected storage backend;
+these configuration indicators do not prove database health. Inquiry success
+requires a Resend acceptance ID and the request times out after 12 seconds.
+Provider acceptance does not prove delivery to the owner's inbox.
+
+Before deploying this review, verify actual database saves survive a restart,
+owner sign-in and credential rotation, and a controlled inquiry reaches the
+owner's inbox with the correct reply address. Complete mobile owner testing
+and handover. These external checks have not been completed by local tests.
+Toast remains the customer ordering path; the parked ordering and kitchen
+implementation remains restricted to the pitch host.
+
+Local checks:
+
+```text
+node --test --test-isolation=none lib/__tests__/launch-readiness.cjs lib/__tests__/ordering-pricing.mjs
+node node_modules/typescript/bin/tsc --noEmit
+```
+
+Set `STUDIO_BUILD_CHECK=1` when running `next build --webpack` to use the
+separate `.next-check` output without disturbing the development preview.
+
 Built by [Glazed Web](https://glazedweb.com). Logo and photography used with permission of Copper Athletic Club.

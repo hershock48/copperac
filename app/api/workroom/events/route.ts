@@ -1,3 +1,4 @@
+import { unavailableWrite } from "@/lib/workroom/write-guard";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
@@ -41,6 +42,8 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   if (!(await isWorkroomAuthed())) return locked();
+  const unavailable = unavailableWrite();
+  if (unavailable) return unavailable;
   const body = (await req.json().catch(() => null)) as { event?: Record<string, unknown> } | null;
   const raw = body?.event;
   if (!raw || typeof raw !== "object") return NextResponse.json({ error: "Malformed." }, { status: 400 });
@@ -88,6 +91,8 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   if (!(await isWorkroomAuthed())) return locked();
+  const unavailable = unavailableWrite();
+  if (unavailable) return unavailable;
   const body = (await req.json().catch(() => null)) as { id?: unknown } | null;
   const id = typeof body?.id === "string" ? body.id : "";
   if (!id) return NextResponse.json({ error: "Malformed." }, { status: 400 });
