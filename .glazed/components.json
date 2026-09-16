@@ -26,6 +26,19 @@
       "verifiedOn": "2026-09-16",
       "verification": "Source hash matches reference; deployment not inspected",
       "deployment": "unknown"
+    },
+    {
+      "sourceCommit": "052f26b1054e4d650fcaeeecd525ed51dcc5edd6",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "deployment": "unknown",
+      "sha256LF": "a1d159ec006729ea1556830baa19bb644a42d761916445918ff6fc1214c9fe37",
+      "id": "owner-save",
+      "verification": "Source hash matches reference; client build and disposable browser save flow passed; deployment not inspected",
+      "version": "1.0.0",
+      "localChanges": false,
+      "file": "lib/workroom/owner-save.ts",
+      "verifiedOn": "2026-09-16",
+      "sourcePath": "glaze/assets/owner-save/1.0.0/owner-save.ts"
     }
   ]
 }

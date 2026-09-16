@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveOwnerDraft, isMenuSaveState } from "@/lib/workroom/owner-save";
 import { priceError } from "@/lib/workroom/menu-def";
 import type { MenuEditorState } from "@/lib/content";
 
@@ -21,6 +22,7 @@ export default function MenuEditor() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
+  const saving = useRef(false);
   const [saved, setSaved] = useState("");
   const [failed, setFailed] = useState("");
 
@@ -54,6 +56,7 @@ export default function MenuEditor() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (saving.current) return;
     setSaved("");
     setFailed("");
     const found: Record<string, string> = {};
@@ -66,27 +69,21 @@ export default function MenuEditor() {
       setFailed("Check the marked prices.");
       return;
     }
+    saving.current = true;
     setBusy(true);
     try {
-      const res = await fetch("/api/workroom/menu", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: draft }),
-      });
-      const data = (await res.json().catch(() => ({}))) as Partial<MenuEditorState> & { error?: string; errors?: Record<string, string> };
-      if (res.ok && data.menus) {
-        adopt(data as MenuEditorState);
-        setSaved("Saved. The menu shows it within a few seconds.");
-      } else if (data.errors) {
-        setErrors(data.errors);
-        setFailed(data.error || "Check the marked prices.");
+      const result = await saveOwnerDraft<MenuEditorState>("/api/workroom/menu", { items: draft }, (value): value is MenuEditorState => isMenuSaveState(value, Object.keys(draft)));
+      if (result.kind === "saved") {
+        adopt(result.data);
+        setSaved(result.data.backend === "memory" ? "Saved for this demo session. These edits disappear after a restart." : result.message);
       } else {
-        setFailed(data.error || "That did not save. Your typing is still on screen.");
+        if (result.errors) setErrors(result.errors);
+        setFailed(result.message);
       }
-    } catch {
-      setFailed("That did not save. Your typing is still on screen.");
+    } finally {
+      saving.current = false;
+      setBusy(false);
     }
-    setBusy(false);
   }
 
   if (loadError) {
@@ -115,7 +112,8 @@ export default function MenuEditor() {
         </p>
       )}
 
-      <form onSubmit={save} noValidate>
+      <form onSubmit={save} noValidate aria-busy={busy}>
+        <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }} aria-label="Menu edits">
         {state.menus.map((m) => (
           <section key={m.id} aria-labelledby={`wr-m-${m.id}`}>
             <h2 className="wr-h2" id={`wr-m-${m.id}`} style={{ fontSize: 18, marginTop: 40 }}>
@@ -180,6 +178,7 @@ export default function MenuEditor() {
           </section>
         ))}
 
+        </fieldset>
         <div className="wr-save-row wr-save-sticky">
           <button className="wr-btn" type="submit" disabled={busy}>
             {busy ? "Saving…" : "Save and publish"}
@@ -191,7 +190,7 @@ export default function MenuEditor() {
           )}
           {failed && (
             <span className="wr-error" role="alert">
-              {failed}
+              {failed} {" "}<a href="/workroom/menu" target="_blank" rel="noreferrer">Check latest menu ↗</a>
             </span>
           )}
         </div>
