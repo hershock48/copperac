@@ -1,107 +1,46 @@
-import { unavailableWrite } from "@/lib/workroom/write-guard";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
-import { getStore, newId } from "@/lib/workroom/store";
-import { getEventsContact } from "@/lib/content";
-import { eventErrors, type EventDraft, type WorkroomEvent } from "@/lib/workroom/events-def";
-
-/**
- * The events the planner writes. GET lists them all (drafts included);
- * PUT creates or updates one; DELETE removes one and its photo.
- *
- * Validation runs the same eventErrors the screen ran; this pass is the one
- * that counts. Every method checks the gate itself: a route that trusts its
- * caller lets anyone on the internet put an event on the club's site.
- */
+import { getStore } from "@/lib/workroom/store";
+import { contentRevision } from "@/lib/workroom/content-cas";
+import { eventId, parseEventDraft, type WorkroomEvent } from "@/lib/workroom/events-def";
+import { editableEvent, eventListing } from "@/lib/workroom/event-service";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
 const locked = () => NextResponse.json({ error: "Locked." }, { status: 401 });
-
-// Control characters out, newlines kept: the details field is one bullet per
-// line, and nothing else a keyboard produces belongs in a string the site prints.
-const CONTROL = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g;
-
-function clean(v: unknown, max: number): string {
-  return typeof v === "string" ? v.replace(CONTROL, "").replace(/\r\n?/g, "\n").slice(0, max) : "";
-}
-
-async function listing() {
-  const store = getStore();
-  const events = (await store.events.list()).sort((a, b) =>
-    (a.date + a.startTime).localeCompare(b.date + b.startTime)
-  );
-  return { events, contact: await getEventsContact(), backend: store.backend };
-}
-
-export async function GET() {
-  if (!(await isWorkroomAuthed())) return locked();
-  return NextResponse.json(await listing());
-}
-
+const conflict = () => NextResponse.json({ error: "This event changed. Compare the latest saved copy before trying again." }, { status: 409 });
+const unavailable = () => process.env.NODE_ENV === "production" && getStore().backend === "memory" ? NextResponse.json({ error: "Persistent storage is required." }, { status: 503 }) : null;
+export async function GET() { if (!(await isWorkroomAuthed())) return locked(); return NextResponse.json(await eventListing()); }
 export async function PUT(req: Request) {
   if (!(await isWorkroomAuthed())) return locked();
-  const unavailable = unavailableWrite();
-  if (unavailable) return unavailable;
-  const body = (await req.json().catch(() => null)) as { event?: Record<string, unknown> } | null;
-  const raw = body?.event;
-  if (!raw || typeof raw !== "object") return NextResponse.json({ error: "Malformed." }, { status: 400 });
-
-  const draft: EventDraft = {
-    title: clean(raw.title, 80).replace(/\n/g, " ").trim(),
-    date: clean(raw.date, 10).trim(),
-    startTime: clean(raw.startTime, 5).trim(),
-    endTime: clean(raw.endTime, 5).trim(),
-    price: clean(raw.price, 60).replace(/\n/g, " ").trim(),
-    ticketUrl: clean(raw.ticketUrl, 500).replace(/\s/g, ""),
-    details: clean(raw.details, 1000).trim(),
-    imageId: clean(raw.imageId, 40).trim(),
-    imageAlt: clean(raw.imageAlt, 200).replace(/\n/g, " ").trim(),
-    published: raw.published !== false,
-  };
-  const errors = eventErrors(draft);
-  if (Object.keys(errors).length > 0) {
-    return NextResponse.json({ error: "Check the marked boxes.", errors }, { status: 400 });
-  }
-
-  const store = getStore();
-  if (draft.imageId && !(await store.images.get(draft.imageId))) {
-    return NextResponse.json({ error: "That photo did not finish uploading. Add it again." }, { status: 400 });
-  }
-
-  const id = typeof raw.id === "string" && raw.id ? raw.id : null;
-  const existing = id ? await store.events.get(id) : null;
-  if (id && !existing) return NextResponse.json({ error: "That event is gone. Reload the list." }, { status: 404 });
-
-  const now = Date.now();
-  const event: WorkroomEvent = {
-    id: existing?.id ?? newId("evt"),
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: now,
-    ...draft,
-  };
-  await store.events.put(event);
-  // A photo swapped out is a photo nobody reads any more.
-  if (existing?.imageId && existing.imageId !== event.imageId) await store.images.remove(existing.imageId);
-
+  const blocked = unavailable(); if (blocked) return blocked;
+  const body = await req.json().catch(() => null), raw = body?.event;
+  if (!eventId(raw?.id)) return NextResponse.json({ error: "A valid event identifier is required." }, { status: 400 });
+  const parsed = parseEventDraft(raw); if (!parsed) return NextResponse.json({ error: "Provide every event field." }, { status: 400 });
+  if (Object.keys(parsed.errors).length) return NextResponse.json({ error: "Check the marked fields.", errors: parsed.errors }, { status: 400 });
+  const store = getStore(), existing = await store.events.get(raw.id);
+  if (existing ? existing.archivedAt || body.revision !== contentRevision(existing) : body.revision !== null) return conflict();
+  if (parsed.draft.imageId && !(await store.images.get(parsed.draft.imageId))) return NextResponse.json({ error: "That photo is unavailable. Add it again." }, { status: 400 });
+  const now = Date.now(), event: WorkroomEvent = { id: raw.id, createdAt: existing?.createdAt ?? now, updatedAt: now, ...parsed.draft };
+  if (!(await store.compareAndSetEvent(event.id, existing, event))) return conflict();
+  // Images remain immutable and retained. Another post or audit snapshot may use one.
   revalidatePath("/", "layout");
-  return NextResponse.json({ ok: true, event, ...(await listing()) });
+  return NextResponse.json({ ok: true, event: editableEvent(event), ...(await eventListing()) });
 }
-
-export async function DELETE(req: Request) {
+async function archiveOrRestore(req: Request, archive: boolean) {
   if (!(await isWorkroomAuthed())) return locked();
-  const unavailable = unavailableWrite();
-  if (unavailable) return unavailable;
-  const body = (await req.json().catch(() => null)) as { id?: unknown } | null;
-  const id = typeof body?.id === "string" ? body.id : "";
-  if (!id) return NextResponse.json({ error: "Malformed." }, { status: 400 });
-  const store = getStore();
-  const existing = await store.events.get(id);
-  if (existing) {
-    await store.events.remove(id);
-    if (existing.imageId) await store.images.remove(existing.imageId);
-  }
+  const blocked = unavailable(); if (blocked) return blocked;
+  const body = await req.json().catch(() => null);
+  if (!eventId(body?.id)) return NextResponse.json({ error: "A valid event identifier is required." }, { status: 400 });
+  const store = getStore(), existing = await store.events.get(body.id);
+  if (!existing || body.revision !== contentRevision(existing) || Boolean(existing.archivedAt) === archive) return conflict();
+  const event: WorkroomEvent = { ...existing, published: false, updatedAt: Date.now() };
+  if (archive) event.archivedAt = Date.now(); else delete event.archivedAt;
+  if (!(await store.compareAndSetEvent(event.id, existing, event))) return conflict();
   revalidatePath("/", "layout");
-  return NextResponse.json({ ok: true, ...(await listing()) });
+  return NextResponse.json({ ok: true, event: editableEvent(event), ...(await eventListing()) });
 }
+/** Removal is reversible: keep the row/photo and take it off the site. */
+export async function DELETE(req: Request) { return archiveOrRestore(req, true); }
+/** Restored events return as drafts; the owner chooses when to publish again. */
+export async function POST(req: Request) { return archiveOrRestore(req, false); }

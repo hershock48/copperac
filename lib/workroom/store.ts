@@ -23,6 +23,7 @@ import "server-only";
  * is not worth the extra dashboard step. The upload route caps the size.
  */
 
+import { compareEvent } from "./event-cas";
 import { compareContent, compareMemory, CONTENT_HISTORY_SCHEMA, type ContentAudit } from "./content-cas";
 import type { WorkroomEvent } from "./events-def";
 
@@ -50,6 +51,8 @@ export type Store = {
   setValue(key: string, value: unknown): Promise<void>;
   compareAndSetValue(key: string, expected: unknown, value: unknown): Promise<boolean>;
   contentHistory(key: string): Promise<ContentAudit[]>;
+  compareAndSetEvent(key: string, expected: WorkroomEvent | null, value: WorkroomEvent): Promise<boolean>;
+  eventHistory(): Promise<ContentAudit[]>;
 };
 
 export function newId(prefix: string): string {
@@ -91,6 +94,17 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
 }
 
 const memoryStore: Store = {
+  async compareAndSetEvent(key, expected, value) {
+    requireDurableWrite();
+    const tables = bag().tables;
+    if (!tables.has("workroom_events")) tables.set("workroom_events", new Map());
+    const rows = tables.get("workroom_events")!;
+    const content = new Map<string, unknown>([["event:" + key, rows.get(key) ?? null]]);
+    if (!compareMemory(content, bag().history ||= [], "event:" + key, expected, value)) return false;
+    rows.set(key, structuredClone(value));
+    return true;
+  },
+  async eventHistory() { return structuredClone((bag().history || []).filter(entry => entry.key.startsWith("event:")).slice(-10).reverse()); },
   async compareAndSetValue(key, expected, value) { requireDurableWrite(); return compareMemory(bag().content, bag().history ||= [], key, expected, value); },
   async contentHistory(key) { return structuredClone((bag().history || []).filter(entry => entry.key === key).slice(-10).reverse()); },
   backend: "memory",
@@ -200,6 +214,12 @@ function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Colle
 }
 
 const postgresStore: Store = {
+  async compareAndSetEvent(key, expected, value) { const pool = await workroomDatabase(); return compareEvent((sql, params) => pool.query(sql, params), key, expected, value); },
+  async eventHistory() {
+    const pool = await workroomDatabase();
+    const { rows } = await pool.query("SELECT id,key,changed_at,actor,before_data,after_data FROM workroom_content_history WHERE key LIKE 'event:%' ORDER BY changed_at DESC,id DESC LIMIT 10");
+    return rows.map(r => ({ id: String(r.id), key: String(r.key), changedAt: new Date(String(r.changed_at)).toISOString(), actor: String(r.actor), before: r.before_data, after: r.after_data }));
+  },
   async compareAndSetValue(key, expected, value) { const pool = await workroomDatabase(); return compareContent((sql, params) => pool.query(sql, params), key, expected, value); },
   async contentHistory(key) {
     const pool = await workroomDatabase();

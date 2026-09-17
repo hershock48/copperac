@@ -514,3 +514,11 @@ Set `STUDIO_BUILD_CHECK=1` when running `next build --webpack` to use the
 separate `.next-check` output without disturbing the development preview.
 
 Built by [Glazed Web](https://glazedweb.com). Logo and photography used with permission of Copper Athletic Club.
+
+## Event, contact and photo save contract
+
+Event edits and contact details require the latest saved revision. Accepted changes and their before/after history commit together; a stale window cannot overwrite a newer save. Keep the editor, API, content loader, store and shared files in the same deployment. Old open editors without revisions are rejected and need a fresh tab.
+
+The event editor holds its draft on failed or uncertain saves and disables the fields during saves/uploads. New drafts retain one identifier across retries. Archive removes an event from the public site while retaining its record and photo; Restore as draft does not publish it. Uploads decode real JPEG/PNG/WebP bytes with Sharp 0.35.4 and retain immutable normalized images, including photos used by other posts or history. Unused photo cleanup and full history restoration are not implemented. Unsaved browser drafts do not survive a reload. Dates/times use Michigan rules; overnight end times are not supported.
+
+Run `npm ci --prefix tools/workroom-tests` and `npm test --prefix tools/workroom-tests` after installing application development dependencies. Event/contact/photo route tests, local SQL rollback tests, production builds and isolated production-route/browser fixtures passed. The fixture database uses a local PGlite adapter; verify actual hosted PostgreSQL/TLS, restart/concurrent writes, public-page updates, photos and owner handover before rollout.

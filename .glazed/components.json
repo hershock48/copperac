@@ -65,6 +65,58 @@
       "verifiedOn": "2026-09-16",
       "verification": "Source matches reference; shared SQL/validator tests, local route checks and client build passed; deployment not inspected",
       "deployment": "unknown"
+    },
+    {
+      "id": "event-cas",
+      "version": "1.0.0",
+      "file": "lib/workroom/event-cas.ts",
+      "sha256LF": "f1af08977904d84e47f6f9001a0cc350a69d5fd62ed0dc0910ea534708ed202d",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "5c041d8848d73a97b5ac182e56d3c44cc8d445d9",
+      "sourcePath": "glaze/assets/event-cas/1.0.0/event-cas.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; event/contact/photo integration tests, production build and isolated production-route/browser checks passed; hosted deployment not inspected",
+      "deployment": "unknown"
+    },
+    {
+      "id": "owner-request",
+      "version": "1.0.0",
+      "file": "lib/workroom/owner-request.ts",
+      "sha256LF": "105e2a757809ae17ade1465b62e42386dfe628010b0d6b72ab68faaf294f1dbf",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "5c041d8848d73a97b5ac182e56d3c44cc8d445d9",
+      "sourcePath": "glaze/assets/owner-request/1.0.0/owner-request.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; event/contact/photo integration tests, production build and isolated production-route/browser checks passed; hosted deployment not inspected",
+      "deployment": "unknown"
+    },
+    {
+      "id": "event-fields",
+      "version": "1.0.0",
+      "file": "lib/workroom/events-def.ts",
+      "sha256LF": "d70a1d5b6fd9191068f4c9327d11711358a801518c895c1274041bc35d2a8445",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "5c041d8848d73a97b5ac182e56d3c44cc8d445d9",
+      "sourcePath": "glaze/assets/event-fields/1.0.0/events-def.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; event/contact/photo integration tests, production build and isolated production-route/browser checks passed; hosted deployment not inspected",
+      "deployment": "unknown"
+    },
+    {
+      "id": "event-photo",
+      "version": "1.0.0",
+      "file": "lib/workroom/event-photo.ts",
+      "sha256LF": "052fba5939f34451ecb18d8c1938567dddb308425f046a30965bca179f0230ed",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "5c041d8848d73a97b5ac182e56d3c44cc8d445d9",
+      "sourcePath": "glaze/assets/event-photo/1.0.0/event-photo.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; event/contact/photo integration tests, production build and isolated production-route/browser checks passed; hosted deployment not inspected",
+      "deployment": "unknown"
     }
   ]
 }

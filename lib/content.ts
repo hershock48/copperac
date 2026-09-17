@@ -95,7 +95,7 @@ export function toSiteEvent(e: WorkroomEvent): CACEvent {
     checked-in seed, seed rows yielding to a workroom row of the same slug. */
 async function allSiteEvents(): Promise<CACEvent[]> {
   const stored = await getStore().events.list();
-  const fromWorkroom = stored.filter((e) => e.published).map(toSiteEvent);
+  const fromWorkroom = stored.filter((e) => e.published && !e.archivedAt).map(toSiteEvent);
   const taken = new Set(fromWorkroom.map((e) => e.slug));
   return [...fromWorkroom, ...EVENTS.filter((e) => !taken.has(e.slug))];
 }

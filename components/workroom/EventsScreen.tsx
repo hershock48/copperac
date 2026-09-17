@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   blankEvent,
   contactErrors,
@@ -8,9 +8,12 @@ import {
   type EventDraft,
   type EventErrors,
   type EventsContact,
-  type WorkroomEvent,
+  type EditableEvent,
+  type EventsListing,
+  isEventsListing, isEditableEvent, isEventsContact, revisionToken,
 } from "@/lib/workroom/events-def";
 import { resizeToJpegDataUrl } from "./resize";
+import { ownerRequest } from "@/lib/workroom/owner-request";
 
 /**
  * The events screen: the list, one editor at a time, and who handles events.
@@ -25,8 +28,8 @@ import { resizeToJpegDataUrl } from "./resize";
  * cookie is good.
  */
 
-type Listing = { events: WorkroomEvent[]; contact: EventsContact; backend: "postgres" | "memory" };
-type Editing = { id: string | null; draft: EventDraft };
+type Listing = EventsListing;
+type Editing = { id: string; revision: string | null; isNew: boolean; draft: EventDraft };
 
 function todayDetroit(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Detroit" }).format(new Date());
@@ -55,13 +58,14 @@ export default function EventsScreen() {
   const [failed, setFailed] = useState("");
   const [uploading, setUploading] = useState(false);
   const [showPast, setShowPast] = useState(false);
+  const working = useRef(false);
 
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch("/api/workroom/events", { headers: { Accept: "application/json" } });
         const data = (await res.json().catch(() => ({}))) as Partial<Listing> & { error?: string };
-        if (!res.ok || !data.events) {
+        if (!res.ok || !isEventsListing(data)) {
           setLoadError(data.error || "Could not load the events.");
           return;
         }
@@ -73,104 +77,62 @@ export default function EventsScreen() {
   }, []);
 
   function startNew() {
-    setEditing({ id: null, draft: blankEvent() });
-    setErrors({});
-    setNote("");
-    setFailed("");
+    if (working.current) return;
+    setEditing({ id: "evt_" + crypto.randomUUID().replaceAll("-", ""), revision: null, isNew: true, draft: blankEvent() });
+    setErrors({}); setNote(""); setFailed("");
   }
-
-  function startEdit(e: WorkroomEvent) {
-    const { id, createdAt, updatedAt, ...draft } = e;
-    void createdAt;
-    void updatedAt;
-    setEditing({ id, draft });
-    setErrors({});
-    setNote("");
-    setFailed("");
+  function startEdit(e: EditableEvent) {
+    if (working.current || editing) return;
+    const { id, createdAt, updatedAt, revision, archivedAt, ...draft } = e;
+    void createdAt; void updatedAt; void archivedAt;
+    setEditing({ id, revision, isNew: false, draft }); setErrors({}); setNote(""); setFailed("");
   }
-
   function set<K extends keyof EventDraft>(key: K, value: EventDraft[K]) {
-    if (!editing) return;
-    setEditing({ ...editing, draft: { ...editing.draft, [key]: value } });
+    setEditing(current => current ? { ...current, draft: { ...current.draft, [key]: value } } : null);
     setNote("");
   }
-
+  async function mutate(method: "PUT" | "DELETE" | "POST", target: Editing | EditableEvent) {
+    if (working.current) return;
+    working.current = true; setBusy(true); setFailed(""); setNote("");
+    const id = target.id;
+    try {
+      const body = "draft" in target && method === "PUT" ? { event: { ...target.draft, id }, revision: target.revision } : { id, revision: target.revision };
+      const result = await ownerRequest<Listing & { event: EditableEvent }>("/api/workroom/events", method, body,
+        (value): value is Listing & { event: EditableEvent } => {
+          if (!isEventsListing(value)) return false;
+          const acknowledged = (value as Listing & { event?: unknown }).event;
+          return isEditableEvent(acknowledged) && acknowledged.id === id && value.events.some(e => e.id === id) && (method === "DELETE" ? Boolean(acknowledged.archivedAt) : !acknowledged.archivedAt) && (method !== "POST" || !acknowledged.published);
+        });
+      if (result.kind === "saved") {
+        setListing(result.data); setEditing(null);
+        setNote(result.data.backend === "memory" ? "Saved for this local demo session. Changes disappear after a restart." : method === "DELETE" ? "Archived. You can restore it below." : method === "POST" ? "Restored as a draft. Open it to publish again." : "Saved. Check the public page to confirm how it looks.");
+      } else { setErrors(result.errors || {}); setFailed(result.message); }
+    } finally { working.current = false; setBusy(false); }
+  }
   async function save(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editing) return;
-    setFailed("");
-    const found = eventErrors(editing.draft);
-    setErrors(found);
-    if (Object.keys(found).length > 0) {
-      setFailed("Check the marked boxes.");
-      return;
-    }
-    setBusy(true);
-    try {
-      const res = await fetch("/api/workroom/events", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: { ...editing.draft, id: editing.id ?? undefined } }),
-      });
-      const data = (await res.json().catch(() => ({}))) as Partial<Listing> & { error?: string; errors?: EventErrors };
-      if (res.ok && data.events) {
-        setListing(data as Listing);
-        setEditing(null);
-        setNote(editing.draft.published ? "Saved. The site shows it within a few seconds." : "Saved as a draft. It is not on the site.");
-      } else if (data.errors) {
-        setErrors(data.errors);
-        setFailed(data.error || "Check the marked boxes.");
-      } else {
-        setFailed(data.error || "That did not save. Your typing is still on screen.");
-      }
-    } catch {
-      setFailed("That did not save. Your typing is still on screen.");
-    }
-    setBusy(false);
+    e.preventDefault(); if (!editing || working.current) return;
+    const found = eventErrors(editing.draft); setErrors(found); setFailed("");
+    if (Object.keys(found).length) { setFailed("Check the marked fields."); return; }
+    await mutate("PUT", editing);
   }
-
   async function remove() {
-    if (!editing?.id) return;
-    if (!window.confirm("Take this event off the site and delete it?")) return;
-    setBusy(true);
-    try {
-      const res = await fetch("/api/workroom/events", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editing.id }),
-      });
-      const data = (await res.json().catch(() => ({}))) as Partial<Listing> & { error?: string };
-      if (res.ok && data.events) {
-        setListing(data as Listing);
-        setEditing(null);
-        setNote("Deleted.");
-      } else {
-        setFailed(data.error || "That did not delete.");
-      }
-    } catch {
-      setFailed("Could not reach the site.");
-    }
-    setBusy(false);
+    if (!editing || editing.isNew || working.current) return;
+    if (!window.confirm("Archive this event? It will come off the site, and you can restore it below.")) return;
+    await mutate("DELETE", editing);
   }
-
   async function pickPhoto(file: File | undefined) {
-    if (!file || !editing) return;
-    setUploading(true);
-    setFailed("");
+    if (!file || !editing || working.current) return;
+    const targetId = editing.id;
+    working.current = true; setUploading(true); setFailed("");
     try {
-      const dataUrl = await resizeToJpegDataUrl(file);
-      const res = await fetch("/api/workroom/events/image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataUrl }),
-      });
-      const data = (await res.json().catch(() => ({}))) as { id?: string; error?: string };
-      if (res.ok && data.id) set("imageId", data.id);
-      else setFailed(data.error || "That photo did not upload.");
-    } catch {
-      setFailed("That photo could not be read. Try a JPEG or PNG.");
-    }
-    setUploading(false);
+      let dataUrl: string;
+      try { dataUrl = await resizeToJpegDataUrl(file); }
+      catch { setFailed("The photo could not be read. Your draft and previous photo are still here. Try a JPEG, PNG or WebP."); return; }
+      const result = await ownerRequest<{ id: string; url: string }>("/api/workroom/events/image", "POST", { dataUrl },
+        (value): value is { id: string; url: string } => Boolean(value) && typeof value === "object" && /^img_[a-z0-9]{1,80}$/.test(String((value as { id?: unknown }).id)) && (value as { url?: unknown }).url === "/img/events/" + (value as { id?: unknown }).id);
+      if (result.kind === "saved") setEditing(current => current?.id === targetId ? { ...current, draft: { ...current.draft, imageId: result.data.id } } : current);
+      else setFailed(result.message);
+    } finally { working.current = false; setUploading(false); }
   }
 
   if (loadError) {
@@ -183,8 +145,9 @@ export default function EventsScreen() {
   if (!listing) return <p className="wr-muted">Loading…</p>;
 
   const today = todayDetroit();
-  const upcoming = listing.events.filter((e) => e.date >= today);
-  const past = listing.events.filter((e) => e.date < today).reverse();
+  const upcoming = listing.events.filter((e) => !e.archivedAt && e.date >= today);
+  const archived = listing.events.filter(e => e.archivedAt);
+  const past = listing.events.filter((e) => !e.archivedAt && e.date < today).reverse();
 
   return (
     <>
@@ -202,6 +165,8 @@ export default function EventsScreen() {
         </p>
       )}
 
+      <details><summary>Recent event changes</summary>{listing.history.length ? <ol>{listing.history.map(entry => <li key={entry.id}>{entry.title}: {entry.action} <time dateTime={entry.changedAt}>{new Intl.DateTimeFormat("en-US", { timeZone: "America/Detroit", dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.changedAt))}</time></li>)}</ol> : <p className="wr-muted">No change history recorded yet.</p>}</details>
+      {failed && !editing && <p className="wr-error" role="alert">{failed} <a href="/workroom" target="_blank" rel="noreferrer">Check latest saved copy ↗</a></p>}
       {note && !editing && (
         <p className="wr-saved" role="status">
           {note}
@@ -217,11 +182,11 @@ export default function EventsScreen() {
       )}
 
       {editing && (
-        <form className="wr-panel" onSubmit={save} noValidate aria-label={editing.id ? "Edit event" : "New event"}>
+        <form className="wr-panel" onSubmit={save} noValidate aria-label={!editing.isNew ? "Edit event" : "New event"}>
           <h2 className="wr-h2" style={{ marginTop: 0 }}>
-            {editing.id ? "Edit event" : "New event"}
+            {!editing.isNew ? "Edit event" : "New event"}
           </h2>
-          <div className="wr-form">
+          <fieldset disabled={busy || uploading} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }} aria-label="Event fields"><div className="wr-form">
             <Field id="title" label="Name" error={errors.title}>
               <input
                 id="title"
@@ -256,7 +221,7 @@ export default function EventsScreen() {
             </Field>
 
             <div className="wr-field">
-              <span className="wr-label">Photo or flyer</span>
+              <label className="wr-label" htmlFor="photo">Photo or flyer</label>
               <div className="wr-photo">
                 {editing.draft.imageId ? (
                   // Plain img on purpose: a just-uploaded photo has no dimensions to give next/image.
@@ -269,7 +234,7 @@ export default function EventsScreen() {
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     disabled={uploading}
-                    onChange={(e) => pickPhoto(e.target.files?.[0])}
+                    onChange={(e) => { const file = e.target.files?.[0]; e.currentTarget.value = ""; void pickPhoto(file); }}
                     aria-describedby="photo-help"
                   />
                   <p className="wr-help" id="photo-help">
@@ -293,23 +258,23 @@ export default function EventsScreen() {
               <input type="checkbox" checked={editing.draft.published} onChange={(e) => set("published", e.target.checked)} />
               On the site
             </label>
-          </div>
+          </div></fieldset>
 
           <div className="wr-save-row">
             <button className="wr-btn" type="submit" disabled={busy || uploading}>
-              {busy ? "Saving…" : "Save and publish"}
+              {busy ? "Saving…" : editing.draft.published ? "Save and publish" : "Save draft"}
             </button>
-            <button className="wr-btn wr-btn-ghost" type="button" onClick={() => setEditing(null)} disabled={busy}>
-              Cancel
+            <button className="wr-btn wr-btn-ghost" type="button" onClick={() => setEditing(null)} disabled={busy || uploading}>
+              Close without saving
             </button>
-            {editing.id && (
-              <button className="wr-link wr-link-danger" type="button" onClick={remove} disabled={busy}>
-                Delete this event
+            {!editing.isNew && (
+              <button className="wr-link wr-link-danger" type="button" onClick={remove} disabled={busy || uploading}>
+                Archive this event
               </button>
             )}
             {failed && (
               <span className="wr-error" role="alert">
-                {failed}
+                {failed} <a href="/workroom" target="_blank" rel="noreferrer">Check latest saved copy ↗</a>
               </span>
             )}
           </div>
@@ -325,7 +290,7 @@ export default function EventsScreen() {
       ) : (
         <ul className="wr-list">
           {upcoming.map((e) => (
-            <EventRow key={e.id} event={e} onClick={() => startEdit(e)} />
+            <EventRow key={e.id} event={e} disabled={busy || uploading || Boolean(editing)} onClick={() => startEdit(e)} />
           ))}
         </ul>
       )}
@@ -338,22 +303,23 @@ export default function EventsScreen() {
           {showPast && (
             <ul className="wr-list" style={{ marginTop: 10 }}>
               {past.map((e) => (
-                <EventRow key={e.id} event={e} past onClick={() => startEdit(e)} />
+                <EventRow key={e.id} event={e} past disabled={busy || uploading || Boolean(editing)} onClick={() => startEdit(e)} />
               ))}
             </ul>
           )}
         </>
       )}
 
-      <ContactPanel initial={listing.contact} />
+      {archived.length > 0 && <details style={{ marginTop: 24 }}><summary>Archived events ({archived.length})</summary><ul>{archived.map(event => <li key={event.id}>{event.title} <button className="wr-link" type="button" disabled={busy || uploading || Boolean(editing)} onClick={() => mutate("POST", event)}>Restore as draft</button></li>)}</ul></details>}
+      <ContactPanel initial={listing.contact} initialRevision={listing.contactRevision} />
     </>
   );
 }
 
-function EventRow({ event, past, onClick }: { event: WorkroomEvent; past?: boolean; onClick: () => void }) {
+function EventRow({ event, past, disabled, onClick }: { event: EditableEvent; past?: boolean; disabled?: boolean; onClick: () => void }) {
   return (
     <li className="wr-card">
-      <button type="button" className="wr-row" onClick={onClick}>
+      <button type="button" className="wr-row" onClick={onClick} disabled={disabled}>
         {event.imageId ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img className="wr-thumb" src={`/img/events/${event.imageId}`} alt="" />
@@ -408,35 +374,27 @@ function Field({
   );
 }
 
-function ContactPanel({ initial }: { initial: EventsContact }) {
+function ContactPanel({ initial, initialRevision }: { initial: EventsContact; initialRevision: string }) {
   const [form, setForm] = useState<EventsContact>(initial);
+  const [revision, setRevision] = useState(initialRevision);
+  const saving = useRef(false);
   const [errors, setErrors] = useState<Partial<Record<keyof EventsContact, string>>>({});
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState("");
   const [failed, setFailed] = useState("");
 
   async function save(e: React.FormEvent) {
-    e.preventDefault();
-    setSaved("");
-    setFailed("");
-    const found = contactErrors(form);
-    setErrors(found);
-    if (Object.keys(found).length > 0) return;
-    setBusy(true);
+    e.preventDefault(); if (saving.current) return;
+    setSaved(""); setFailed(""); const found = contactErrors(form); setErrors(found);
+    if (Object.keys(found).length) return;
+    saving.current = true; setBusy(true);
     try {
-      const res = await fetch("/api/workroom/events/contact", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact: form }),
-      });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; errors?: typeof errors };
-      if (res.ok && data.ok) setSaved("Saved.");
-      else if (data.errors) setErrors(data.errors);
-      else setFailed(data.error || "That did not save.");
-    } catch {
-      setFailed("Could not reach the site.");
-    }
-    setBusy(false);
+      type SavedContact = { contact: EventsContact; revision: string; backend: "memory" | "postgres" };
+      const result = await ownerRequest<SavedContact>("/api/workroom/events/contact", "PUT", { contact: form, revision },
+        (value): value is SavedContact => Boolean(value) && typeof value === "object" && isEventsContact((value as SavedContact).contact) && revisionToken((value as SavedContact).revision) && ["memory", "postgres"].includes((value as SavedContact).backend));
+      if (result.kind === "saved") { setForm(result.data.contact); setRevision(result.data.revision); setSaved(result.data.backend === "memory" ? "Saved for this local demo session. Changes disappear after a restart." : "Saved."); }
+      else { setErrors(result.errors || {}); setFailed(result.message); }
+    } finally { saving.current = false; setBusy(false); }
   }
 
   return (
@@ -447,17 +405,17 @@ function ContactPanel({ initial }: { initial: EventsContact }) {
       <p className="wr-muted" style={{ marginBottom: 14 }}>
         Shown on the events page as the person to ask. Leave it blank and the page shows the bar&apos;s phone instead.
       </p>
-      <div className="wr-two">
+      <fieldset disabled={busy} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }} aria-label="Contact fields"><div className="wr-two">
         <Field id="c-name" label="Name" error={errors.name}>
-          <input id="c-name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input id="c-name" type="text" value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); setSaved(""); }} />
         </Field>
         <Field id="c-email" label="Email" error={errors.email}>
-          <input id="c-email" type="email" inputMode="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <input id="c-email" type="email" inputMode="email" value={form.email} onChange={(e) => { setForm({ ...form, email: e.target.value }); setSaved(""); }} />
         </Field>
         <Field id="c-phone" label="Phone" help="Optional." error={errors.phone}>
-          <input id="c-phone" type="tel" inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input id="c-phone" type="tel" inputMode="tel" value={form.phone} onChange={(e) => { setForm({ ...form, phone: e.target.value }); setSaved(""); }} />
         </Field>
-      </div>
+      </div></fieldset>
       <div className="wr-save-row">
         <button className="wr-btn" type="submit" disabled={busy}>
           {busy ? "Saving…" : "Save"}
@@ -469,7 +427,7 @@ function ContactPanel({ initial }: { initial: EventsContact }) {
         )}
         {failed && (
           <span className="wr-error" role="alert">
-            {failed}
+            {failed} <a href="/workroom" target="_blank" rel="noreferrer">Check latest saved copy ↗</a>
           </span>
         )}
       </div>
