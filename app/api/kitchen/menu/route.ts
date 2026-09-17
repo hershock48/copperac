@@ -4,23 +4,25 @@
 // shapes that would corrupt orders; content is theirs to get wrong.
 
 import { NextRequest, NextResponse } from "next/server";
-import { isKitchenAuthed } from "@/lib/ordering/auth";
+import { kitchenRole } from "@/lib/ordering/auth";
 import { invalidateMenuCache, loadMenuDoc, validateMenuDoc } from "@/lib/ordering/menu";
 import { getStore } from "@/lib/ordering/store";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!(await isKitchenAuthed())) {
-    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  const role = await kitchenRole();
+  if (role !== "owner") {
+    return NextResponse.json({ error: role ? "Owner access is required to edit menu prices." : "Not signed in." }, { status: role ? 403 : 401 });
   }
   const doc = await loadMenuDoc(getStore());
   return NextResponse.json({ doc });
 }
 
 export async function PUT(req: NextRequest) {
-  if (!(await isKitchenAuthed())) {
-    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  const role = await kitchenRole();
+  if (role !== "owner") {
+    return NextResponse.json({ error: role ? "Owner access is required to edit menu prices." : "Not signed in." }, { status: role ? 403 : 401 });
   }
   let doc: unknown;
   try {

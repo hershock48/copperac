@@ -28,6 +28,10 @@ function age(ms: number): string {
 
 export default function KitchenClient({ sections }: { sections: OrderableSection[] }) {
   const [authed, setAuthed] = useState(false);
+  const [role, setRole] = useState<"staff" | "owner" | null>(null);
+  const [authPending, setAuthPending] = useState(false);
+  const authPendingRef = useRef(false);
+  const authEpoch = useRef(0);
   const [audioReady, setAudioReady] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
@@ -71,17 +75,24 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   }, []);
 
   const poll = useCallback(async () => {
+    if (authPendingRef.current) return;
+    const epoch = authEpoch.current;
     try {
       const [ordersRes, stateRes] = await Promise.all([
         fetch("/api/kitchen/orders", { cache: "no-store" }),
         fetch("/api/kitchen/state", { cache: "no-store" }),
       ]);
-      if (ordersRes.status === 401) {
+      const ordersData = ordersRes.ok ? await ordersRes.json() : null;
+      const stateData = stateRes.ok ? await stateRes.json() : null;
+      if (epoch !== authEpoch.current || authPendingRef.current) return;
+      if (ordersRes.status === 401 || stateRes.status === 401) {
+        authEpoch.current++;
+        setOrders([]); setState(null); setRole(null); setTab("menu");
         setAuthed(false);
         return;
       }
       if (ordersRes.ok) {
-        const data = await ordersRes.json();
+        const data = ordersData;
         setOrders(data.orders);
         setBackend(data.backend);
         const fresh = (data.orders as Order[]).filter((o) => o.status === "new");
@@ -93,7 +104,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         knownRef.current = new Set((data.orders as Order[]).map((o) => o.id));
       }
       if (stateRes.ok) {
-        const data = await stateRes.json();
+        const data = stateData;
         setNow(Date.now());
         setState(data.state);
         setPrinters(data.printers ?? []);
@@ -108,15 +119,26 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // stays locked until a tap either way (browser rule), so the board shows a
   // "turn sound on" chip until someone touches it.
   useEffect(() => {
-    fetch("/api/kitchen/state", { cache: "no-store" }).then((r) => {
-      if (r.ok) setAuthed(true);
-    }).catch(() => {});
+    let active = true;
+    const epoch = authEpoch.current;
+    fetch("/api/kitchen/login", { cache: "no-store", signal: AbortSignal.timeout(12000) })
+      .then(async (r) => { if (!r.ok) throw Error(); return r.json(); })
+      .then((data) => {
+        if (!active || epoch !== authEpoch.current) return;
+        if (data.authed && (data.role === "staff" || data.role === "owner")) {
+          setRole(data.role); setAuthed(true);
+        } else if (!data.configured) {
+          setPinError("Staff sign-in is not configured. Ask the owner to finish kitchen setup.");
+        }
+      }).catch(() => {
+        if (active && epoch === authEpoch.current) setPinError("Could not check your session. Try signing in again.");
+      });
+    return () => { active = false; };
   }, []);
 
   const ensureAudio = useCallback(() => {
     audioRef.current ??= new AudioContext();
-    audioRef.current.resume();
-    setAudioReady(true);
+    void audioRef.current.resume().then(() => setAudioReady(true)).catch(() => setAudioReady(false));
   }, []);
 
   useEffect(() => {
@@ -133,20 +155,39 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   }, [authed, poll]);
 
   async function login() {
-    setPinError("");
-    const r = await fetch("/api/kitchen/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin }),
-    });
-    if (r.ok) {
-      // The login tap is the user gesture that unlocks audio for the shift.
-      ensureAudio();
-      setAuthed(true);
-      setPin("");
-    } else {
-      setPinError("Wrong PIN.");
-    }
+    if (authPendingRef.current) return;
+    authPendingRef.current = true; authEpoch.current++;
+    setAuthPending(true); setPinError("");
+    // Audio permission must begin on the tap; an audio failure cannot block sign-in.
+    try { ensureAudio(); } catch { /* The sound button remains available. */ }
+    try {
+      const r = await fetch("/api/kitchen/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }), signal: AbortSignal.timeout(12000),
+      });
+      const data = await r.json();
+      if (r.ok && data.ok === true && data.role === "staff") {
+        setRole("staff"); setAuthed(true); setPin(""); setTab("menu");
+      } else {
+        setPinError(typeof data.error === "string" ? data.error : "Sign-in could not be confirmed. Reload to check your session.");
+      }
+    } catch { setPinError("Sign-in could not be confirmed. Check your connection, or reload to check your session."); }
+    finally { authPendingRef.current = false; setAuthPending(false); }
+  }
+
+  async function logout() {
+    if (authPendingRef.current) return;
+    authPendingRef.current = true; authEpoch.current++;
+    setAuthPending(true); setPinError("");
+    try {
+      const r = await fetch("/api/kitchen/login", { method: "DELETE", signal: AbortSignal.timeout(12000) });
+      const data = await r.json();
+      if (!r.ok || data.ok !== true) throw Error();
+      authEpoch.current++;
+      setAuthed(false); setRole(null); setOrders([]); setState(null); setPrinters([]);
+      setBackend(null); setTab("menu"); setPin(""); knownRef.current = new Set();
+    } catch { setPinError("Sign-out could not be confirmed. Try again or reload to check your session."); }
+    finally { authPendingRef.current = false; setAuthPending(false); }
   }
 
   async function patchState(patch: Record<string, unknown>) {
@@ -181,6 +222,8 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         <label className="mt-8 block text-left text-sm text-cream-dim">
           Kitchen PIN
           <input
+            disabled={authPending}
+            maxLength={12}
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}
@@ -196,10 +239,12 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         <button
           type="button"
           onClick={login}
+          disabled={authPending}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light"
         >
-          Open the board
+          {authPending ? "Signing in…" : "Open the board"}
         </button>
+        <a href="/workroom" className="mt-5 inline-block text-sm text-cream underline">Owner sign-in</a>
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/60">
           Signing in turns the sound on. Keep this open behind the bar; it rings until an order is accepted.
         </p>
@@ -219,6 +264,13 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         </p>
       )}
 
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-cream-dim">
+        <span>{role === "owner" ? "Owner access" : "Kitchen staff access"}</span>
+        <button type="button" onClick={logout} disabled={authPending} className="rounded-sm border border-ink-line px-4 py-3 text-cream">
+          {authPending ? "Signing out…" : "Sign out of kitchen and workroom"}
+        </button>
+      </div>
+      {pinError && <p role="alert" className="mb-4 text-sm text-[#d9736b]">{pinError}</p>}
       {/* Tab rail */}
       <div className="mb-8 flex flex-wrap gap-2">
         {(
@@ -227,7 +279,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
             ["orders", newCount > 0 ? `Orders · ${newCount} new` : "Orders"],
             ["editor", "Edit Menu"],
           ] as const
-        ).map(([key, label]) => (
+        ).filter(([key]) => key !== "editor" || role === "owner").map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -250,7 +302,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         )}
       </div>
 
-      {tab === "editor" ? (
+      {tab === "editor" && role === "owner" ? (
         <MenuEditor />
       ) : tab === "orders" ? (
         <>

@@ -1,0 +1,27 @@
+# Kitchen access verification
+
+September 17, 2026. Mike's Place and Copper's parked ordering demo now use the existing client-owned workroom-session 1.0.0 primitive for signed staff sessions. The immutable primitive, version and source hash are unchanged. The integration and database-backed attempt limits belong to each client. This does not certify the rest of the kitchen workflow or a live deployment.
+
+## Staff and owner access
+
+Staff enter a separately configured KITCHEN_PIN. Production requires 6–12 digits, different from WORKROOM_PASSCODE, plus the existing separate WORKROOM_SESSION_SECRET of at least 32 characters. Published street-number demo codes work only in development. Missing or invalid setup closes staff sign-in; missing or failed persistent login storage returns 503 without a session.
+
+Staff cookies contain signed, random, server-expiring tokens rather than the PIN. Each application derives a distinct kitchen signing key from the root secret; workroom and kitchen tokens cannot substitute for one another. Cookies are HttpOnly, SameSite=Strict and Secure in production, with an 18-hour lifetime. Rotating the staff PIN invalidates staff tokens; rotating the root signing secret invalidates both kitchen and workroom tokens. Existing raw-PIN cookies are rejected. Browser sign-out expires both cookies on that device; a copied token remains valid until its server expiry or credential rotation.
+
+An already signed-in workroom owner can open the kitchen without the staff PIN. Staff never gain workroom access. Copper's parked menu-price editor and its GET/PUT API now require owner access; staff retain the existing order, sold-out, busy and pause controls. Mike's prices remain in its owner workroom. Copper's public ordering still uses Toast, and its existing host gate still blocks kitchen/ordering APIs on client domains. No Toast settings changed.
+
+## Attempt limits and browser behavior
+
+The existing client login-attempt table has a separate kitchen row. One atomic PostgreSQL statement reserves each attempt across devices/instances; five attempts total, including successful and malformed attempts, are permitted per ten-minute window. Successful staff sign-in does not reset that window. The bounded counter cannot overflow and owner login uses its separate row. Caller IP headers do not create new buckets. This limit can temporarily block a legitimate staff login after repeated guesses; an existing session or separate owner login remains available. Memory counters are development-only.
+
+Login reads at most 1,024 JSON bytes. Explicit cross-site requests and mismatched browser Origin/public Host are rejected; the public host comparison also works when Next reconstructs an internal request URL. The browser disables pending sign-in fields, retains the entered PIN on failure, distinguishes incorrect PINs from setup/storage/limit failures, and bounds sign-in/sign-out requests to twelve seconds without automatic retries. An uncertain result tells the user to reload to check the session. Sign-out clears the displayed queue, and stale in-flight polls cannot restore it. Owner sign-in uses the workroom; return to the kitchen after signing in.
+
+## Evidence and remaining work
+
+Final client suites comprise 44 Mike tests and 34 Copper integration tests plus nine Copper launch-readiness tests. Nineteen new kitchen tests cover raw/forged/cross-app/cross-role tokens, server expiry, credential rotation, production configuration, owner/staff separation, logout, wrong origins, internal Next URL reconstruction, bounded invalid input, storage failures and atomic reservations. Independent module instances share the limit; actual local PGlite close/reopen retains it while leaving the owner bucket unchanged. Both production Webpack/TypeScript builds and targeted ESLint pass. All 25 existing shared component copies/manifests still match their pins.
+
+Production Next/PGlite browser fixtures verified Mike's disabled pending fields, an actual sign-in storage failure, retained input succeeding on retry, staff access across reload, owner access via the workroom, and sign-out locking both surfaces. Copper's fixture verified staff exclusion from menu editing, owner entry to that editor, sign-out and the 320px layout. The fixture translates its local address to Copper's pitch Host/Origin consistently; it does not change deployed host rules. Fixture databases and credentials were disposable, mail/printers were disabled, and the test servers/tabs were closed.
+
+Before rollout, configure the real private PIN/secret/database and verify the intended PostgreSQL/TLS/schema privileges, multiple connections, restart persistence, exact hosting proxy behavior and staff devices. PGlite serializes a single local connection. Deploy the login, auth wrapper, UI and Copper menu authorization together; open staff browsers must sign in again. Do not record a verified live version until installation evidence exists.
+
+R09 still needs atomic kitchen state updates, allowed order transitions, truthful cancellation/refund behavior and reliable save feedback. Copper's separate parked menu editor still needs its own conflict/audit and draft-save review. Notification reconciliation and physical printer completion remain separate work. Staff access currently permits the legacy order actions; this release does not certify those actions or enable card payments. No live deployment or customer message was performed.

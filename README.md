@@ -256,9 +256,9 @@ Decisions worth knowing before touching it:
 - **Ordering hours derive from the posted hours** (last order 9:30 PM, kitchen
   closes at 10), computed per request in America/Detroit, never at build time.
   `ORDERING_DEMO_ALWAYS_OPEN=1` overrides for pitching outside kitchen hours.
-- `/kitchen` is noindex and out of the sitemap; the PIN is a gate for
-  passers-by, not a vault, and the comment in `lib/ordering/auth.ts` says
-  exactly where that line is.
+- `/kitchen` is noindex and out of the sitemap. Staff use signed expiring sessions
+  and a persistent attempt limit; the parked menu-price editor requires owner
+  access. See [kitchen access verification](docs/kitchen-access-release.md).
 
 ## Before launch
 
@@ -272,7 +272,7 @@ Decisions worth knowing before touching it:
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
 - The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel, it is parked for now (see the ordering section above), so none of them block launch
 - [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
-- [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
+- [ ] **Ordering: configure staff sign-in** with a 6–12 digit `KITCHEN_PIN`, separate `WORKROOM_SESSION_SECRET` and persistent database. Published demo PINs are development-only.
 - [ ] **Ordering: set `ORDERING_DEMO_ALWAYS_OPEN=1` on the demo deploy, and REMOVE it at go-live** so real guests get real hours
 - [ ] **Ordering: wire Stripe Connect before real money** (see the PAYMENT SEAM comment in `app/api/ordering/order/route.ts`; until then checkout is demo mode and says so)
 - [ ] **Ordering: Michigan tax consult before launch**, whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
