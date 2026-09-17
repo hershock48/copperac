@@ -3,8 +3,9 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
 import { getStore } from "@/lib/workroom/store";
-import { MENU_OVERRIDES_KEY, menuEditorState } from "@/lib/content";
-import { normalizePrice, priceError, type MenuOverrides } from "@/lib/workroom/menu-def";
+import { MENU_OVERRIDES_KEY, menuEditorState, menuEditorSnapshot } from "@/lib/content";
+import { normalizePrice, priceError } from "@/lib/workroom/menu-def";
+import { prepareMenuSave } from "@/lib/workroom/menu-write";
 
 /**
  * The menu edits. GET is what the editor renders; PUT saves.
@@ -28,42 +29,12 @@ export async function PUT(req: Request) {
   if (!(await isWorkroomAuthed())) return locked();
   const unavailable = unavailableWrite();
   if (unavailable) return unavailable;
-  const body = (await req.json().catch(() => null)) as { items?: Record<string, unknown> } | null;
-  if (!body?.items || typeof body.items !== "object") return NextResponse.json({ error: "Malformed." }, { status: 400 });
-
-  // Only keys this build's menu knows are even looked at.
-  const state = await menuEditorState();
-  const builtIn = new Map<string, { price: string; desc: string }>();
-  for (const m of state.menus) for (const s of m.sections) for (const i of s.items) builtIn.set(i.key, { price: i.builtInPrice, desc: i.builtInDesc });
-
-  const overrides: MenuOverrides = {};
-  const errors: Record<string, string> = {};
-  for (const [key, raw] of Object.entries(body.items)) {
-    const base = builtIn.get(key);
-    if (!base || !raw || typeof raw !== "object") continue;
-    const r = raw as Record<string, unknown>;
-    const price = typeof r.price === "string" ? r.price.replace(/^\$/, "").trim() : base.price;
-    const desc = typeof r.desc === "string" ? r.desc.replace(/[\r\n]+/g, " ").trim().slice(0, 400) : base.desc;
-    const hidden = r.hidden === true;
-    const err = priceError(price);
-    if (err) {
-      errors[key] = err;
-      continue;
-    }
-    const o: MenuOverrides[string] = {};
-    // An empty price on an item that has a built-in one means "back to the
-    // built-in". Pie of the Month has none built in, and stays that way.
-    const normalized = price === "" ? base.price : normalizePrice(price);
-    if (normalized !== base.price) o.price = normalized;
-    if (desc !== base.desc) o.desc = desc;
-    if (hidden) o.hidden = true;
-    if (Object.keys(o).length > 0) overrides[key] = o;
-  }
-  if (Object.keys(errors).length > 0) {
-    return NextResponse.json({ error: "Check the marked prices.", errors }, { status: 400 });
-  }
-
-  await getStore().setValue(MENU_OVERRIDES_KEY, overrides);
+  if (process.env.NODE_ENV === "production" && getStore().backend === "memory") return NextResponse.json({ error: "Persistent storage is required." }, { status: 503 });
+  const body: unknown = await req.json().catch(() => null);
+  const { raw, state } = await menuEditorSnapshot();
+  const plan = prepareMenuSave(state, body, { normalizePrice, priceError });
+  if (!plan.ok) return NextResponse.json({ error: plan.error, errors: plan.errors }, { status: plan.status });
+  if (!(await getStore().compareAndSetValue(MENU_OVERRIDES_KEY, raw, plan.overrides))) return NextResponse.json({ error: "This menu changed. Compare the latest copy before saving." }, { status: 409 });
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true, ...(await menuEditorState()) });
 }

@@ -16,6 +16,11 @@ import type { MenuEditorState } from "@/lib/content";
 
 type Draft = Record<string, { price: string; desc: string; hidden: boolean }>;
 
+function validMetadata(value: unknown): value is MenuEditorState {
+  if (!value || typeof value !== "object") return false;
+  const state = value as Partial<MenuEditorState>;
+  return typeof state.revision === "string" && /^[a-f0-9]{64}$/.test(state.revision) && Array.isArray(state.history) && state.history.every(entry => typeof entry?.id === "string" && typeof entry.changedAt === "string" && Number.isFinite(Date.parse(entry.changedAt)));
+}
 export default function MenuEditor() {
   const [state, setState] = useState<MenuEditorState | null>(null);
   const [draft, setDraft] = useState<Draft>({});
@@ -38,7 +43,7 @@ export default function MenuEditor() {
       try {
         const res = await fetch("/api/workroom/menu", { headers: { Accept: "application/json" } });
         const data = (await res.json().catch(() => ({}))) as Partial<MenuEditorState> & { error?: string };
-        if (!res.ok || !data.menus) {
+        if (!res.ok || !isMenuSaveState({ ...data, ok: true }) || !validMetadata(data)) {
           setLoadError(data.error || "Could not load the menu.");
           return;
         }
@@ -72,7 +77,7 @@ export default function MenuEditor() {
     saving.current = true;
     setBusy(true);
     try {
-      const result = await saveOwnerDraft<MenuEditorState>("/api/workroom/menu", { items: draft }, (value): value is MenuEditorState => isMenuSaveState(value, Object.keys(draft)));
+      const result = await saveOwnerDraft<MenuEditorState>("/api/workroom/menu", { items: draft, revision: state?.revision }, (value): value is MenuEditorState => isMenuSaveState(value, Object.keys(draft)) && validMetadata(value));
       if (result.kind === "saved") {
         adopt(result.data);
         setSaved(result.data.backend === "memory" ? "Saved for this demo session. These edits disappear after a restart." : result.message);
@@ -112,6 +117,7 @@ export default function MenuEditor() {
         </p>
       )}
 
+      <details><summary>Recent menu saves</summary>{state.history?.length ? <ol>{state.history.map(entry => <li key={entry.id}>Owner saved the menu <time dateTime={entry.changedAt}>{new Intl.DateTimeFormat("en-US", { timeZone: "America/Detroit", dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.changedAt))}</time></li>)}</ol> : <p className="wr-muted">No saved edit history recorded yet.</p>}</details>
       <form onSubmit={save} noValidate aria-busy={busy}>
         <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }} aria-label="Menu edits">
         {state.menus.map((m) => (
@@ -140,6 +146,7 @@ export default function MenuEditor() {
                           {(i.edited || changed) && <span className="wr-chip wr-chip-on">Edited</span>}
                         </div>
                         <textarea
+                          maxLength={Math.max(400, i.builtInDesc.length)}
                           aria-label={`${i.name} description`}
                           value={v.desc}
                           placeholder={i.builtInDesc || "No description on the printed menu"}

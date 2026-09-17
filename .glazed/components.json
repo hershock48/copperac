@@ -39,6 +39,32 @@
       "file": "lib/workroom/owner-save.ts",
       "verifiedOn": "2026-09-16",
       "sourcePath": "glaze/assets/owner-save/1.0.0/owner-save.ts"
+    },
+    {
+      "id": "content-cas",
+      "version": "1.0.0",
+      "file": "lib/workroom/content-cas.ts",
+      "sha256LF": "9a9090350fcda86545ae97df7333c755ad9192b245844b4d6263ea8bb9b43cbb",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "cc1066d442b245103348689b7772e7c15cc14e6d",
+      "sourcePath": "glaze/assets/content-cas/1.0.0/content-cas.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; shared SQL/validator tests, local route checks and client build passed; deployment not inspected",
+      "deployment": "unknown"
+    },
+    {
+      "id": "menu-write",
+      "version": "1.0.0",
+      "file": "lib/workroom/menu-write.ts",
+      "sha256LF": "f537fb10b2b759d32aa84e08b47a4586d8b8d512ebeb6bc49371778ee1977aea",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "cc1066d442b245103348689b7772e7c15cc14e6d",
+      "sourcePath": "glaze/assets/menu-write/1.0.0/menu-write.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-16",
+      "verification": "Source matches reference; shared SQL/validator tests, local route checks and client build passed; deployment not inspected",
+      "deployment": "unknown"
     }
   ]
 }

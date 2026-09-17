@@ -23,6 +23,7 @@ import "server-only";
  * is not worth the extra dashboard step. The upload route caps the size.
  */
 
+import { compareContent, compareMemory, CONTENT_HISTORY_SCHEMA, type ContentAudit } from "./content-cas";
 import type { WorkroomEvent } from "./events-def";
 
 type Row = { id: string; createdAt: number };
@@ -47,6 +48,8 @@ export type Store = {
   /** One named jsonb value. Null when nothing has been saved under the key. */
   getValue<T>(key: string): Promise<T | null>;
   setValue(key: string, value: unknown): Promise<void>;
+  compareAndSetValue(key: string, expected: unknown, value: unknown): Promise<boolean>;
+  contentHistory(key: string): Promise<ContentAudit[]>;
 };
 
 export function newId(prefix: string): string {
@@ -55,7 +58,7 @@ export function newId(prefix: string): string {
 
 /* ------------------------------ memory ------------------------------ */
 
-type Bag = { content: Map<string, unknown>; tables: Map<string, Map<string, Row>> };
+type Bag = { history?: ContentAudit[]; content: Map<string, unknown>; tables: Map<string, Map<string, Row>> };
 
 function bag(): Bag {
   const g = globalThis as typeof globalThis & { __copperWorkroomBag?: Bag };
@@ -88,6 +91,8 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
 }
 
 const memoryStore: Store = {
+  async compareAndSetValue(key, expected, value) { requireDurableWrite(); return compareMemory(bag().content, bag().history ||= [], key, expected, value); },
+  async contentHistory(key) { return structuredClone((bag().history || []).filter(entry => entry.key === key).slice(-10).reverse()); },
   backend: "memory",
   events: memoryCollection<WorkroomEvent>("workroom_events"),
   images: memoryCollection<StoredImage>("workroom_images"),
@@ -154,7 +159,7 @@ export async function workroomDatabase(): Promise<PgPool> {
     const creates = JSON_TABLES.map(
       (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
     ).join("\n") + "\nCREATE TABLE IF NOT EXISTS copper_login_attempts (id text PRIMARY KEY, attempts integer NOT NULL, started bigint NOT NULL);";
-    await g.__copperWorkroomPool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`);
+    await g.__copperWorkroomPool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}\n${CONTENT_HISTORY_SCHEMA}`);
     })().catch((err: unknown) => {
         g.__copperWorkroomPool = undefined;
         g.__copperWorkroomReady = undefined;
@@ -195,6 +200,12 @@ function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Colle
 }
 
 const postgresStore: Store = {
+  async compareAndSetValue(key, expected, value) { const pool = await workroomDatabase(); return compareContent((sql, params) => pool.query(sql, params), key, expected, value); },
+  async contentHistory(key) {
+    const pool = await workroomDatabase();
+    const { rows } = await pool.query('SELECT id,key,changed_at,actor,before_data,after_data FROM workroom_content_history WHERE key=$1 ORDER BY changed_at DESC,id DESC LIMIT 10', [key]);
+    return rows.map(r => ({ id: String(r.id), key: String(r.key), changedAt: new Date(String(r.changed_at)).toISOString(), actor: String(r.actor), before: r.before_data, after: r.after_data }));
+  },
   backend: "postgres",
   events: pgCollection<WorkroomEvent>("workroom_events"),
   images: pgCollection<StoredImage>("workroom_images"),
