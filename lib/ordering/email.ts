@@ -1,4 +1,4 @@
-// Guest email: order confirmation and refund notice.
+// Guest email: courtesy order confirmation. Cancellation never claims a refund.
 //
 // Sends through Resend's REST API with the same delivery posture as the
 // enquiry form (see glaze.md): when RESEND_API_KEY is unset, the email is
@@ -88,22 +88,6 @@ Pickup at the bar: ${SITE.street}, ${SITE.city}. Questions? Call ${SITE.phone}.`
   );
 }
 
-export async function sendRefundNotice(order: Order): Promise<void> {
-  if (!order.guestEmail) return;
-  await send(
-    order.guestEmail,
-    `Refund for order #${order.number} at Copper Athletic Club`,
-    `Hi ${order.guestName},
-
-Your refund of ${money(order.totalCents)} for order #${order.number} has been issued.
-
-${order.paid
-  ? "Card refunds usually appear on your statement in 5 to 10 business days, depending on your bank."
-  : "This order was not charged online, so there is nothing further to do."}
-
-Sorry it did not work out this time. Questions? Call ${SITE.phone}.`
-  );
-}
 
 // Referenced so a future non-Copper build remembers this file is Copper-fitted:
 // the venue name and numbers above come from lib/site.ts, and the multi-tenant

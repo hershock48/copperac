@@ -530,3 +530,7 @@ Current menu prices are verified at submission; changed amounts require another 
 ## Recovering checkout submissions
 
 A stable submission reference and atomic order/print/email-intent write prevent duplicate orders on retry. See [recovery controls, rollout and remaining notification work](docs/order-acceptance-release.md).
+
+## Kitchen actions and recovery
+
+Kitchen controls and fulfillment actions now use saved revisions and recoverable action references. Owner cancellation preserves payment records and requires a reason. See [verification, rollout and remaining operating requirements](docs/kitchen-operations-release.md).

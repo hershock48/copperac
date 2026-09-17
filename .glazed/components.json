@@ -156,6 +156,32 @@
       "verifiedOn": "2026-09-17",
       "verification": "Source matches canonical copy; client route/race/storage tests, local database restart, production builds and browser lost-response recovery passed. Intended-host/provider delivery unverified.",
       "deployment": "unknown"
+    },
+    {
+      "id": "kitchen-operations",
+      "version": "1.0.0",
+      "file": "lib/ordering/kitchen-operations.ts",
+      "sha256LF": "9c465831ea1b6a54cc6cb9b22c35e563fdbb52aa0b0178a449eb7e0bd7664dfa",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "318b17a09252ddf06b64b5c0b00370d05e96cca0",
+      "sourcePath": "glaze/assets/kitchen-operations/1.0.0/kitchen-operations.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match; client route/SQL/race tests, database close/reopen, production build and isolated browser lost-response/cancellation checks passed. Intended-host persistence, providers and physical printing unverified.",
+      "deployment": "unknown"
+    },
+    {
+      "id": "kitchen-request",
+      "version": "1.0.0",
+      "file": "lib/ordering/kitchen-request.ts",
+      "sha256LF": "f03596e650af0a7cef1169b6bb97cfb90d5c3a1596862f7330ccce83dffedb4b",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "318b17a09252ddf06b64b5c0b00370d05e96cca0",
+      "sourcePath": "glaze/assets/kitchen-request/1.0.0/kitchen-request.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match; client route/SQL/race tests, database close/reopen, production build and isolated browser lost-response/cancellation checks passed. Intended-host persistence, providers and physical printing unverified.",
+      "deployment": "unknown"
     }
   ]
 }

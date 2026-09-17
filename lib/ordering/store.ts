@@ -21,9 +21,10 @@
 // to query it, not before.
 
 import type { Pool } from "pg";
+import { OPERATION_SCHEMA, getReceipt, commitOperation, commitMemory, type Receipt, type Candidate } from "./kitchen-operations";
 import { ATTEMPT_SCHEMA, settleMemory, settlePostgres, type Attempt, type AttemptResult } from "./order-acceptance";
 
-export type OrderStatus = "new" | "accepted" | "done" | "refunded";
+export type OrderStatus = "new" | "accepted" | "done" | "cancelled" | "refunded";
 
 export type OrderLine = {
   itemId: string;
@@ -39,8 +40,7 @@ export type Order = {
   number: number; // Increasing ticket sequence; retries/rollbacks may leave gaps.
   guestName: string;
   guestPhone: string;
-  // Optional; when present the guest gets a confirmation email and, if it
-  // comes to it, the refund notice with the 5-10 business day expectation.
+  // Optional courtesy confirmation; delivery is tracked separately from fulfillment.
   guestEmail: string;
   note: string;
   lines: OrderLine[];
@@ -67,6 +67,11 @@ export type Order = {
   status: OrderStatus;
   createdAt: number; // epoch ms
   acceptedAt: number | null;
+  completedAt?: number;
+  cancelledAt?: number;
+  cancellationReason?: string;
+  lastOperationId?: string;
+  revision?: string; // API snapshot only; omitted from stored orders.
 };
 
 export type PrintJob = {
@@ -79,6 +84,8 @@ export type PrintJob = {
 };
 
 export type KitchenState = {
+  lastOperationId?: string;
+  revision?: string; // API snapshot only; omitted from stored state.
   unavailable: string[]; // orderable item ids currently 86'd
   busyMinutes: 0 | 15 | 30;
   pausedUntil: number | null; // epoch ms; always set with a timer, never forever
@@ -98,10 +105,11 @@ export interface OrderStore {
   getOrder(id: string): Promise<Order | null>;
   // Active = new or accepted, oldest first: the kitchen works top down.
   listActiveOrders(): Promise<Order[]>;
-  setOrderStatus(id: string, status: OrderStatus): Promise<void>;
+  getOperation(id: string): Promise<Receipt | null>;
+  commitKitchen(receipt: Receipt, candidate: Candidate | null): Promise<Receipt>;
   nextTicketNumber(): Promise<number>;
   getState(): Promise<KitchenState>;
-  setState(state: KitchenState): Promise<void>;
+  getStateRecord(): Promise<KitchenState | null>;
   // Printing. Jobs are queued at order time and drained by each printer's
   // polls; stale queued jobs are skipped at poll time via the TTL so a
   // printer that was off for an hour does not print cold orders.
@@ -123,7 +131,8 @@ type MemoryBag = {
   attempts: Map<string, Attempt>;
   confirmations: Map<string, { status: string; order: Order }>;
   orders: Map<string, Order>;
-  state: KitchenState;
+  state: KitchenState | null;
+  operations?: Map<string, Receipt>;
   ticket: number;
   printJobs: PrintJob[];
   printersSeen: Record<string, number>;
@@ -136,7 +145,7 @@ function memoryBag(): MemoryBag {
     g.__copperOrdering = {
       attempts: new Map(), confirmations: new Map(),
       orders: new Map(),
-      state: { ...DEFAULT_STATE },
+      state: null, operations: new Map(),
       ticket: 0,
       printJobs: [],
       printersSeen: {},
@@ -159,32 +168,35 @@ const memoryStore: OrderStore = {
     entry.status = "attempted"; return true;
   },
   async getOrder(id) {
-    return memoryBag().orders.get(id) ?? null;
+    return structuredClone(memoryBag().orders.get(id) ?? null);
   },
   async listActiveOrders() {
     return [...memoryBag().orders.values()]
-      .filter((o) => o.status !== "done" && o.status !== "refunded")
-      .sort((a, b) => a.createdAt - b.createdAt);
+      .filter((o) => o.status === "new" || o.status === "accepted")
+      .sort((a, b) => a.createdAt - b.createdAt).map(o => structuredClone(o));
   },
-  async setOrderStatus(id, status) {
-    requireDurableWrite();
-    const o = memoryBag().orders.get(id);
-    if (o) {
-      o.status = status;
-      if (status === "accepted" && o.acceptedAt === null) o.acceptedAt = Date.now();
+  async getOperation(id) { return structuredClone(memoryBag().operations?.get(id) ?? null); },
+  async commitKitchen(receipt, candidate) {
+    requireDurableWrite(); const bag=memoryBag(); bag.operations ??= new Map();
+    const current=candidate?.table === "ordering_state" ? bag.state : candidate ? bag.orders.get(String(candidate.key)) ?? null : null;
+    const result=commitMemory(bag.operations,current,receipt,candidate);
+    if(result.changed && candidate) {
+      if(candidate.table === "ordering_state") bag.state=result.value as KitchenState;
+      else {
+        const order=result.value as Order; bag.orders.set(String(candidate.key),order);
+        if(order.status === "cancelled") for(const job of bag.printJobs) if(job.orderId===order.id && job.status==="queued")job.status="failed";
+      }
     }
+    return result.receipt;
   },
   async nextTicketNumber() {
     requireDurableWrite();
     return ++memoryBag().ticket;
   },
   async getState() {
-    return memoryBag().state;
+    return structuredClone(memoryBag().state ?? DEFAULT_STATE);
   },
-  async setState(state) {
-    requireDurableWrite();
-    memoryBag().state = state;
-  },
+  async getStateRecord() { return structuredClone(memoryBag().state); },
   async enqueuePrintJob(job) {
     requireDurableWrite();
     memoryBag().printJobs.push(job);
@@ -266,7 +278,8 @@ CREATE TABLE IF NOT EXISTS ordering_orders (
           data jsonb NOT NULL
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
-${ATTEMPT_SCHEMA}`);
+${ATTEMPT_SCHEMA}
+${OPERATION_SCHEMA}`);
     })().catch(async (error: unknown) => {
       const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
       await failed?.end().catch(() => {}); throw error;
@@ -290,23 +303,12 @@ const postgresStore: OrderStore = {
   async listActiveOrders() {
     const pool = await pgPool();
     const r = await pool.query(
-      `SELECT data FROM ordering_orders WHERE status NOT IN ('done', 'refunded') ORDER BY created_at ASC LIMIT 100`
+      `SELECT data FROM ordering_orders WHERE status IN ('new', 'accepted') ORDER BY created_at ASC LIMIT 100`
     );
     return r.rows.map((row) => row.data as Order);
   },
-  async setOrderStatus(id, status) {
-    const pool = await pgPool();
-    await pool.query(
-      `UPDATE ordering_orders
-       SET status = $2,
-           data = data || jsonb_build_object('status', $2::text)
-                       || CASE WHEN $2 = 'accepted' AND (data->>'acceptedAt') IS NULL
-                               THEN jsonb_build_object('acceptedAt', $3::bigint)
-                               ELSE '{}'::jsonb END
-       WHERE id = $1`,
-      [id, status, Date.now()]
-    );
-  },
+  async getOperation(id) { const pool=await pgPool(); return getReceipt((sql,params)=>pool.query(sql,params),id); },
+  async commitKitchen(receipt,candidate) { const pool=await pgPool(); return commitOperation((sql,params)=>pool.query(sql,params),receipt,candidate); },
   async nextTicketNumber() {
     const pool = await pgPool();
     const r = await pool.query(`SELECT nextval('ordering_ticket') AS n`);
@@ -317,13 +319,9 @@ const postgresStore: OrderStore = {
     const r = await pool.query(`SELECT data FROM ordering_state WHERE id = 1`);
     return r.rows[0] ? (r.rows[0].data as KitchenState) : { ...DEFAULT_STATE };
   },
-  async setState(state) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_state (id, data) VALUES (1, $1)
-       ON CONFLICT (id) DO UPDATE SET data = $1`,
-      [JSON.stringify(state)]
-    );
+  async getStateRecord() {
+    const pool=await pgPool(); const result=await pool.query("SELECT data FROM ordering_state WHERE id=1");
+    return result.rows[0]?.data ?? null;
   },
   async enqueuePrintJob(job) {
     const pool = await pgPool();

@@ -52,7 +52,7 @@ type Confirmation = {
   totalCents: number;
   emailedTo: string;
   payAtPickup: boolean;
-  status: "new" | "accepted" | "done" | "refunded";
+  status: "new" | "accepted" | "done" | "cancelled" | "refunded";
 };
 
 function money(cents: number): string {
@@ -103,13 +103,14 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   // Confirmation polling: the "Accepted" flip is the product moment, worth a
   // 5 second poll for the few minutes anyone watches this screen.
   useEffect(() => {
-    if (!confirmation || confirmation.status === "done" || confirmation.status === "refunded") return;
+    if (!confirmation || confirmation.status === "done" || confirmation.status === "cancelled" || confirmation.status === "refunded") return;
     const t = setInterval(async () => {
       try {
         const r = await fetch(`/api/ordering/order?id=${confirmation.id}`, { cache: "no-store" });
         if (r.ok) {
           const data = await r.json();
-          setConfirmation((c) => (c ? { ...c, status: data.status } : c));
+          if (["new","accepted","done","cancelled","refunded"].includes(data.status) && data.number === confirmation.number)
+            setConfirmation((c) => (c?.id === confirmation.id ? { ...c, status: data.status } : c));
         }
       } catch {
         /* transient; next tick retries */
@@ -668,25 +669,27 @@ function Checkout({
 /* -------------------------- confirmation -------------------------- */
 
 function Confirmed({ confirmation }: { confirmation: Confirmation }) {
-  if (confirmation.status === "refunded") {
+  if (confirmation.status === "cancelled" || confirmation.status === "refunded") {
     return (
       <div className="mx-auto max-w-lg py-10 text-center">
         <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">Order #{confirmation.number}</p>
-        <p className="display mt-4 text-4xl uppercase text-cream">Refunded</p>
+        <p className="display mt-4 text-4xl uppercase text-cream">Order cancelled</p>
         <p className="mt-6 text-base leading-relaxed text-cream-dim">
-          Your {money(confirmation.totalCents)} is on its way back. Card refunds usually show up in 5 to 10
-          business days, depending on your bank.{confirmation.emailedTo ? " A confirmation is in your email." : ""}
+          The kitchen will not prepare this order. This screen does not confirm a refund.
+          If you paid at the counter or have a payment question, contact the bar.
         </p>
+        <a href="/order" className="display mt-8 inline-block rounded-sm border border-copper px-6 py-3 text-sm uppercase text-cream">Start another order</a>
       </div>
     );
   }
-  const accepted = confirmation.status !== "new";
+  const completed = confirmation.status === "done";
+  const accepted = confirmation.status === "accepted" || completed;
   return (
     <div className="mx-auto max-w-lg py-10 text-center">
       <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">Order in</p>
       <p className="display mt-4 text-7xl text-cream tabular-nums">#{confirmation.number}</p>
       <p className="mt-6 text-base leading-relaxed text-cream-dim">
-        {accepted
+        {completed ? "This order has been marked picked up. Thank you." : accepted
           ? `The kitchen has it. See you in about ${confirmation.quotedMinutes} minutes.`
           : `Sent to the kitchen. Ready in about ${confirmation.quotedMinutes} minutes.`}
       </p>
@@ -699,11 +702,11 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
           aria-hidden
         />
         <p className="text-sm text-cream-dim">
-          {accepted ? "Accepted by the kitchen" : "Waiting for the kitchen to accept"}
+          {completed ? "Picked up" : accepted ? "Accepted by the kitchen" : "Waiting for the kitchen to accept"}
         </p>
       </div>
       <p className="mt-8 text-sm text-cream-dim/70">
-        {confirmation.payAtPickup
+        {completed ? `Total ${money(confirmation.totalCents)}` : confirmation.payAtPickup
           ? `Total ${money(confirmation.totalCents)} · cash or card at the counter`
           : `Total ${money(confirmation.totalCents)} · pay at pickup in this demo`}
       </p>

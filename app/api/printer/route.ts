@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { configuredPrinters } from "@/lib/ordering/printing";
 import { getStore } from "@/lib/ordering/store";
+import { prepare, revisionOf, type Command } from "@/lib/ordering/kitchen-operations";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +69,9 @@ export async function DELETE(req: NextRequest) {
   if (printed && printer.role === "kitchen") {
     const order = await store.getOrder(job.orderId);
     if (order && order.status === "new") {
-      await store.setOrderStatus(order.id, "accepted");
+      const command: Command = { operationId: job.id, kind: "order", orderId: order.id, status: "accepted", revision: revisionOf(order) };
+      const action = prepare(command, order, "printer", revisionOf(command));
+      await store.commitKitchen(action.receipt, action.candidate);
     }
   }
   return NextResponse.json({ ok: true });

@@ -5,6 +5,7 @@ function load(file,mocks={},env={}){
  const mod={exports:{}};const source=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  new vm.Script(source,{filename:file}).runInNewContext({module:mod,exports:mod.exports,process:{env},Buffer,structuredClone,Request,Response,URL,AbortSignal,crypto:crypto.webcrypto,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='node:crypto')return crypto;throw Error('Unexpected dependency '+name);}});return mod.exports;
 }
+const kitchen=load('lib/ordering/kitchen-operations.ts');
 const core=load('lib/ordering/order-acceptance.ts'),quotes=load('lib/ordering/order-quote.ts'),pricing=load('lib/ordering/pricing.ts');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const http={NextResponse:{json:Response.json}};
@@ -90,11 +91,11 @@ test('committed keys, receipts and queued intents survive a local database close
 test('ordering storage shares initialization, propagates failures and does not disable TLS verification',async()=>{
  const env={NODE_ENV:'production',DATABASE_URL:'postgres://fixture.invalid/test'};let created=0,ended=0,fail=true;
  class Pool{constructor(options){created++;assert.equal(options.ssl,undefined);assert.equal(options.connectionTimeoutMillis,7000);}async query(sql){if(sql.includes('CREATE TABLE')){if(fail)throw Error('schema offline');return {rows:[]};}return {rows:[]};}async end(){ended++;}}
- const store=load('lib/ordering/store.ts',{'./order-acceptance':core,pg:{Pool}},env).getStore();
+ const store=load('lib/ordering/store.ts',{'./order-acceptance':core,'./kitchen-operations':kitchen,pg:{Pool}},env).getStore();
  const failed=await Promise.allSettled([store.getState(),store.getState()]);assert(failed.every(r=>r.status==='rejected'));assert.equal(created,1);assert.equal(ended,1);
  fail=false;await Promise.all([store.getState(),store.getState()]);assert.equal(created,2);
- const ambiguous=load('lib/ordering/store.ts',{'./order-acceptance':core},{NODE_ENV:'production',A_DATABASE_URL:'postgres://a',B_POSTGRES_URL:'postgres://b'});assert.throws(()=>ambiguous.getStore());
- const memory=load('lib/ordering/store.ts',{'./order-acceptance':core},{NODE_ENV:'production'}).getStore();const x=settlement();await assert.rejects(memory.settleAttempt(x.attempt,x.order,x.jobs));await assert.rejects(memory.setState({unavailable:[],busyMinutes:0,pausedUntil:null}));
+ const ambiguous=load('lib/ordering/store.ts',{'./order-acceptance':core,'./kitchen-operations':kitchen},{NODE_ENV:'production',A_DATABASE_URL:'postgres://a',B_POSTGRES_URL:'postgres://b'});assert.throws(()=>ambiguous.getStore());
+ const memory=load('lib/ordering/store.ts',{'./order-acceptance':core,'./kitchen-operations':kitchen},{NODE_ENV:'production'}).getStore();const x=settlement();await assert.rejects(memory.settleAttempt(x.attempt,x.order,x.jobs));await assert.rejects(memory.commitKitchen(kitchen.rejected(crypto.randomUUID(),'b'.repeat(64),'state','staff','fixture'),null));
 });
 test('client recovery keeps unknown/mismatched replies unresolved and retries one immutable request only',async()=>{
  const client=load('lib/ordering/order-recovery.ts',{'./order-quote':quotes});const h=harness(),body=payload(),submission={id:body.attemptId,body:JSON.stringify(body)};
