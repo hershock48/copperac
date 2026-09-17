@@ -526,3 +526,7 @@ Run `npm ci --prefix tools/workroom-tests` and `npm test --prefix tools/workroom
 ## Checkout quote review
 
 Current menu prices are verified at submission; changed amounts require another guest review. See [integration, tests and remaining operating requirements](docs/order-quote-release.md). This is a demo/pay-at-pickup adapter, with no online card charge.
+
+## Recovering checkout submissions
+
+A stable submission reference and atomic order/print/email-intent write prevent duplicate orders on retry. See [recovery controls, rollout and remaining notification work](docs/order-acceptance-release.md).

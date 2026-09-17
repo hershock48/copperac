@@ -13,10 +13,13 @@
 // and it is also the pitch, so it is written in the bar's voice, not buried.
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import { priceOptions, type OptionPick } from "@/lib/ordering/pricing";
-import { orderLineKey, orderTotals, quoteWasReviewed, isQuoteForSubmission, type OrderTotals } from "@/lib/ordering/order-quote";
+import { orderLineKey, orderTotals, type OrderTotals } from "@/lib/ordering/order-quote";
+
+import { recoverSubmission, validSubmissionId, type Submission } from "@/lib/ordering/order-recovery";
+const RECOVERY_KEY = "copperac-pending-order-v1";
 
 type LiveState = {
   open: boolean;
@@ -64,6 +67,17 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [placing, setPlacing] = useState(false);
   const submitting = useRef(false);
+  const attemptRef = useRef<Submission | null>(null);
+  const [recovery, setRecovery] = useState<Submission | null>(null);
+  useEffect(() => {
+    const first = setTimeout(() => {
+      try {
+        const id = sessionStorage.getItem(RECOVERY_KEY);
+        if (validSubmissionId(id)) { const prior = { id, body: null }; attemptRef.current = prior; setRecovery(prior); }
+      } catch { /* A new submission checks storage again before sending. */ }
+    }, 0);
+    return () => clearTimeout(first);
+  }, []);
   const [error, setError] = useState("");
 
   const refreshLive = useCallback(async () => {
@@ -107,7 +121,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const unavailable = useMemo(() => new Set(live?.unavailable ?? []), [live]);
 
   function addToCart(line: Omit<CartLine, "key" | "qty">) {
-    if (submitting.current) return;
+    if (submitting.current || attemptRef.current) return;
     const key = orderLineKey(line.itemId, line.options);
     setCart((c) => {
       const existing = c.find((l) => l.key === key);
@@ -120,7 +134,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   }
 
   function setQty(key: string, qty: number) {
-    if (submitting.current) return;
+    if (submitting.current || attemptRef.current) return;
     setCart((c) =>
       qty <= 0 ? c.filter((l) => l.key !== key) : c.map((l) => (l.key === key ? { ...l, qty } : l))
     );
@@ -130,12 +144,37 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const cartCount = cart.reduce((s, l) => s + l.qty, 0);
   const hasAlcohol = cart.some((l) => l.ageRestricted);
 
+  async function runSubmission(submission: Submission, action: "submit" | "check" | "stop") {
+    if (submitting.current) return;
+    submitting.current = true; setPlacing(true); setError("");
+    const result = await recoverSubmission(submission, action);
+    if (result.kind === "unknown") {
+      attemptRef.current = submission; setRecovery(submission); setError(result.error);
+    } else {
+      try { if (sessionStorage.getItem(RECOVERY_KEY) === submission.id) sessionStorage.removeItem(RECOVERY_KEY); } catch { /* A retained reference reopens the same result; it cannot create a duplicate. */ }
+      attemptRef.current = null; setRecovery(null);
+      if (result.kind === "accepted") { setConfirmation(result.receipt); setCart([]); setCartOpen(false); }
+      else {
+        if (result.quote) {
+          const quote = result.quote;
+          setCart(current => current.map((line, i) => ({ ...line, name: quote.lines[i].name, unitCents: quote.lines[i].unitCents, labels: quote.lines[i].options, ageRestricted: quote.lines[i].ageRestricted })));
+          setLive(current => current ? { ...current, feeCents: quote.totals.feeCents, taxBasisPoints: quote.taxBasisPoints, taxRate: quote.taxBasisPoints / 10000 } : current);
+        }
+        setError(result.error); refreshLive();
+      }
+    }
+    submitting.current = false; setPlacing(false);
+  }
+  const recoveryCard = recovery ? <SubmissionRecovery submission={recovery} busy={placing} error={error} onAction={action => runSubmission(recovery, action)} /> : null;
+  if (recovery && !cartOpen) return recoveryCard;
+
   if (confirmation) {
     return <Confirmed confirmation={confirmation} />;
   }
 
   return (
     <div className="pb-28">
+      {!cartOpen && error && <p role="alert" className="mb-5 text-sm">{error}</p>}
       {/* Functional status only. This banner briefly carried a paragraph about
           the fee and the no-delivery-apps model, and Kevin killed it: "it reads
           more client facing." Guests get what a Toast or Menufy page would give
@@ -281,35 +320,20 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
           setQty={setQty}
           placing={placing}
           error={error}
-          onClose={() => { if (!submitting.current) setCartOpen(false); }}
+          onClose={() => { if (!submitting.current && !attemptRef.current) setCartOpen(false); }}
+          recoveryControls={recovery ? recoveryCard : null}
           onPlace={async (form) => {
-            if (submitting.current) return;
-            submitting.current = true; setPlacing(true); setError("");
-            const submitted = cart.map(l => ({ itemId: l.itemId, qty: l.qty, options: l.options, quotedUnitCents: l.unitCents, quotedAgeRestricted: l.ageRestricted }));
+            if (submitting.current || attemptRef.current) return;
+            const id = crypto.randomUUID();
+            const submission = { id, body: JSON.stringify({ attemptId: id, guestName: form.name, guestPhone: form.phone, guestEmail: form.email, note: form.note, tipCents: form.tipCents, ageAcknowledged: form.ageAcknowledged, payAtPickup: form.payAtPickup, lines: cart.map(l => ({ itemId: l.itemId, qty: l.qty, options: l.options, quotedUnitCents: l.unitCents, quotedAgeRestricted: l.ageRestricted })), expectedTotals: form.expectedTotals }) };
             try {
-              const r = await fetch("/api/ordering/order", {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ guestName: form.name, guestPhone: form.phone, guestEmail: form.email, note: form.note, tipCents: form.tipCents, ageAcknowledged: form.ageAcknowledged, payAtPickup: form.payAtPickup, lines: submitted, expectedTotals: form.expectedTotals }),
-              });
-              const data = await r.json();
-              if (!r.ok) {
-                if (r.status === 409 && data.priceChanged === true && isQuoteForSubmission(data.quote, submitted)) {
-                  const quote = data.quote;
-                  setCart(current => current.map((line, i) => ({ ...line, name: quote.lines[i].name, unitCents: quote.lines[i].unitCents, labels: quote.lines[i].options, ageRestricted: quote.lines[i].ageRestricted })));
-                  setLive(current => current ? { ...current, feeCents: quote.totals.feeCents, taxBasisPoints: quote.taxBasisPoints, taxRate: quote.taxBasisPoints / 10000 } : current);
-                  setError("Prices or item requirements changed. Nothing was ordered. Review the updated total, then place your order again.");
-                } else {
-                  setError(typeof data.error === "string" ? data.error : "The order could not be confirmed. Contact the kitchen before placing it again.");
-                  refreshLive();
-                }
-              } else {
-                if (typeof data.id !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(data.id) || !Number.isSafeInteger(data.number) || data.number < 1 || !Number.isSafeInteger(data.quotedMinutes) || data.quotedMinutes < 0 || !isQuoteForSubmission(data.quote, submitted) || !quoteWasReviewed(submitted, form.expectedTotals, data.quote)) throw Error("Incomplete order acknowledgement");
-                setConfirmation({ id: data.id, number: data.number, quotedMinutes: data.quotedMinutes, totalCents: data.quote.totals.totalCents, emailedTo: form.email, payAtPickup: form.payAtPickup, status: "new" });
-                setCart([]); setCartOpen(false);
-              }
-            } catch {
-              setError("The order could not be confirmed. Your cart is still here. Contact the kitchen before placing it again.");
-            } finally { submitting.current = false; setPlacing(false); }
+              const priorId = sessionStorage.getItem(RECOVERY_KEY);
+              if (validSubmissionId(priorId)) { const prior = { id: priorId, body: null }; attemptRef.current = prior; setRecovery(prior); return; }
+              // Only an opaque reference is persisted; contact details stay in memory.
+              sessionStorage.setItem(RECOVERY_KEY, id);
+            } catch { setError("The browser could not keep a recovery reference. Nothing was ordered. Enable session storage before trying again."); return; }
+            attemptRef.current = submission;
+            await runSubmission(submission, "submit");
           }}
         />
       )}
@@ -414,6 +438,7 @@ function Checkout({
   error,
   onClose,
   onPlace,
+  recoveryControls,
 }: {
   live: LiveState;
   cart: CartLine[];
@@ -423,6 +448,7 @@ function Checkout({
   placing: boolean;
   error: string;
   onClose: () => void;
+  recoveryControls?: ReactNode;
   onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean; expectedTotals: OrderTotals }) => void;
 }) {
   const [name, setName] = useState("");
@@ -442,7 +468,7 @@ function Checkout({
   const taxCents = totals?.taxCents ?? 0;
   const total = totals?.totalCents ?? 0;
   const canPlace =
-    Boolean(totals) && cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
+    !recoveryControls && Boolean(totals) && cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" role="dialog" aria-modal="true" aria-label="Your order">
@@ -451,7 +477,8 @@ function Checkout({
         tabIndex={-1}
         className="max-h-[92vh] w-full max-w-lg overflow-y-auto border border-ink-line bg-ink p-5 sm:rounded-sm"
       >
-        <fieldset disabled={placing} className="m-0 min-w-0 border-0 p-0">
+        {recoveryControls}
+        <fieldset disabled={placing || Boolean(recoveryControls)} className="m-0 min-w-0 border-0 p-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="display text-xl uppercase text-cream">Your order</h2>
           <button
@@ -688,4 +715,20 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
       </a>
     </div>
   );
+}
+
+function SubmissionRecovery({ submission, busy, error, onAction }: { submission: Submission; busy: boolean; error: string; onAction: (action: "submit" | "check" | "stop") => void }) {
+  return <section aria-label="Check your submission" className="mb-5 rounded-sm border border-lamp bg-ink-soft p-4 text-sm text-cream">
+    <h2 className="display text-xl uppercase">Check your submission</h2>
+    <p className="mt-2">An order may already be recorded. Check this submission before starting another one.</p>
+    {error && <p role="alert" className="mt-2">{error}</p>}
+    <p className="mt-2 break-all text-xs text-cream-dim">Reference: {submission.id}</p>
+    <div className="mt-4 flex flex-wrap gap-2">
+      <button type="button" disabled={busy} onClick={() => onAction("check")} className="rounded-sm border border-lamp px-3 py-2 disabled:opacity-40">Check order result</button>
+      {submission.body && <button type="button" disabled={busy} onClick={() => onAction("submit")} className="rounded-sm border border-lamp px-3 py-2 disabled:opacity-40">Retry this submission</button>}
+      <button type="button" disabled={busy} onClick={() => onAction("stop")} className="rounded-sm border border-ink-line px-3 py-2 disabled:opacity-40">Stop submission and return</button>
+    </div>
+    <p className="mt-3 text-xs text-cream-dim">Stopping prevents an unaccepted submission from becoming an order. If it already went through, its confirmation will appear instead.</p>
+    {busy && <p role="status" className="mt-2">Checking the submission…</p>}
+  </section>;
 }

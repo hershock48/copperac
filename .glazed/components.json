@@ -130,6 +130,32 @@
       "verifiedOn": "2026-09-17",
       "verification": "Canonical/client hash match; arithmetic and route tests, local production browser quote review, and client build passed. Demo only; hosted deployment not inspected.",
       "deployment": "unknown"
+    },
+    {
+      "id": "order-acceptance",
+      "version": "1.0.0",
+      "file": "lib/ordering/order-acceptance.ts",
+      "sha256LF": "d682ddd94719ae90d9c1ad3c91d96407ec2b70a5b19f36f4ee6d3bb2433dd2b6",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "4eacdbcae009b1bbb5fdb69ec50d082fd3f3bb85",
+      "sourcePath": "glaze/assets/order-acceptance/1.0.0/order-acceptance.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Source matches canonical copy; client route/race/storage tests, local database restart, production builds and browser lost-response recovery passed. Intended-host/provider delivery unverified.",
+      "deployment": "unknown"
+    },
+    {
+      "id": "order-recovery",
+      "version": "1.0.0",
+      "file": "lib/ordering/order-recovery.ts",
+      "sha256LF": "f95f8239222ff339da010eb1edce3b7384a3217e63f63f53e78c7f955de4932e",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "4eacdbcae009b1bbb5fdb69ec50d082fd3f3bb85",
+      "sourcePath": "glaze/assets/order-recovery/1.0.0/order-recovery.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Source matches canonical copy; client route/race/storage tests, local database restart, production builds and browser lost-response recovery passed. Intended-host/provider delivery unverified.",
+      "deployment": "unknown"
     }
   ]
 }

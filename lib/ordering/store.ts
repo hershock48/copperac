@@ -21,6 +21,7 @@
 // to query it, not before.
 
 import type { Pool } from "pg";
+import { ATTEMPT_SCHEMA, settleMemory, settlePostgres, type Attempt, type AttemptResult } from "./order-acceptance";
 
 export type OrderStatus = "new" | "accepted" | "done" | "refunded";
 
@@ -35,7 +36,7 @@ export type OrderLine = {
 
 export type Order = {
   id: string;
-  number: number; // short ticket number, resets daily in practice
+  number: number; // Increasing ticket sequence; retries/rollbacks may leave gaps.
   guestName: string;
   guestPhone: string;
   // Optional; when present the guest gets a confirmation email and, if it
@@ -91,7 +92,9 @@ export const DEFAULT_STATE: KitchenState = {
 
 export interface OrderStore {
   backend: "postgres" | "memory";
-  createOrder(order: Order): Promise<void>;
+  getAttempt(id: string): Promise<Attempt | null>;
+  settleAttempt(attempt: Attempt, order?: Order, jobs?: PrintJob[]): Promise<AttemptResult>;
+  claimConfirmation(id: string): Promise<boolean>;
   getOrder(id: string): Promise<Order | null>;
   // Active = new or accepted, oldest first: the kitchen works top down.
   listActiveOrders(): Promise<Order[]>;
@@ -117,6 +120,8 @@ export interface OrderStore {
 /* ------------------------------ memory ------------------------------ */
 
 type MemoryBag = {
+  attempts: Map<string, Attempt>;
+  confirmations: Map<string, { status: string; order: Order }>;
   orders: Map<string, Order>;
   state: KitchenState;
   ticket: number;
@@ -129,6 +134,7 @@ function memoryBag(): MemoryBag {
   const g = globalThis as unknown as { __copperOrdering?: MemoryBag };
   if (!g.__copperOrdering) {
     g.__copperOrdering = {
+      attempts: new Map(), confirmations: new Map(),
       orders: new Map(),
       state: { ...DEFAULT_STATE },
       ticket: 0,
@@ -142,8 +148,15 @@ function memoryBag(): MemoryBag {
 
 const memoryStore: OrderStore = {
   backend: "memory",
-  async createOrder(order) {
-    memoryBag().orders.set(order.id, order);
+  async getAttempt(id) { return structuredClone(memoryBag().attempts?.get(id) ?? null); },
+  async settleAttempt(attempt, order, jobs) {
+    requireDurableWrite(); const bag = memoryBag(); bag.attempts ??= new Map(); bag.confirmations ??= new Map();
+    return settleMemory(bag, attempt, order, jobs);
+  },
+  async claimConfirmation(id) {
+    requireDurableWrite(); const entry = memoryBag().confirmations?.get(id);
+    if (!entry || entry.status !== "queued") return false;
+    entry.status = "attempted"; return true;
   },
   async getOrder(id) {
     return memoryBag().orders.get(id) ?? null;
@@ -154,6 +167,7 @@ const memoryStore: OrderStore = {
       .sort((a, b) => a.createdAt - b.createdAt);
   },
   async setOrderStatus(id, status) {
+    requireDurableWrite();
     const o = memoryBag().orders.get(id);
     if (o) {
       o.status = status;
@@ -161,18 +175,22 @@ const memoryStore: OrderStore = {
     }
   },
   async nextTicketNumber() {
+    requireDurableWrite();
     return ++memoryBag().ticket;
   },
   async getState() {
     return memoryBag().state;
   },
   async setState(state) {
+    requireDurableWrite();
     memoryBag().state = state;
   },
   async enqueuePrintJob(job) {
+    requireDurableWrite();
     memoryBag().printJobs.push(job);
   },
   async nextPrintJob(printerId, notOlderThanMs) {
+    requireDurableWrite();
     const cutoff = Date.now() - notOlderThanMs;
     const bag = memoryBag();
     // Expire stale queued jobs so an offline printer never prints cold food.
@@ -182,10 +200,12 @@ const memoryStore: OrderStore = {
     return bag.printJobs.find((j) => j.printerId === printerId && j.status === "queued") ?? null;
   },
   async setPrintJobStatus(id, status) {
+    requireDurableWrite();
     const j = memoryBag().printJobs.find((x) => x.id === id);
     if (j) j.status = status;
   },
   async printerSeen(printerId) {
+    requireDurableWrite();
     memoryBag().printersSeen[printerId] = Date.now();
   },
   async printerLastSeen() {
@@ -195,6 +215,7 @@ const memoryStore: OrderStore = {
     return memoryBag().menuDoc;
   },
   async setMenuDoc(doc) {
+    requireDurableWrite();
     memoryBag().menuDoc = doc;
   },
 };
@@ -202,24 +223,23 @@ const memoryStore: OrderStore = {
 /* ----------------------------- postgres ----------------------------- */
 
 function connectionString(): string | undefined {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.POSTGRES_URL) return process.env.POSTGRES_URL;
+  const values = [...new Set(Object.entries(process.env).filter(([key, value]) => value && /_(DATABASE|POSTGRES)_URL$/.test(key)).map(([, value]) => value!))];
+  if (values.length > 1) throw new Error("Multiple ordering databases configured. Choose DATABASE_URL explicitly.");
+  return values[0];
 }
 
 async function pgPool(): Promise<Pool> {
   const g = globalThis as unknown as { __copperPgPool?: Pool; __copperPgReady?: Promise<void> };
-  if (!g.__copperPgPool) {
-    // Dynamic import so the module (and the dependency) never loads unless a
-    // database is actually configured.
-    const { Pool } = await import("pg");
-    g.__copperPgPool = new Pool({
-      connectionString: connectionString(),
-      // Neon and friends require TLS; local postgres usually has none.
-      ssl: connectionString()?.includes("localhost") ? undefined : { rejectUnauthorized: false },
-      max: 3,
-    });
+  if (!g.__copperPgReady) {
     g.__copperPgReady = (async () => {
-      await g.__copperPgPool!.query(`
-        CREATE TABLE IF NOT EXISTS ordering_orders (
+      const { Pool } = await import("pg"); const cs = connectionString();
+      if (!cs) throw new Error("Persistent ordering storage is not configured.");
+      // Honor explicit pg connection settings; do not disable certificate checks.
+      g.__copperPgPool = new Pool({ connectionString: cs, max: 3, connectionTimeoutMillis: 7000 });
+      await g.__copperPgPool.query(`SELECT pg_advisory_xact_lock(4213711);
+CREATE TABLE IF NOT EXISTS ordering_orders (
           id text PRIMARY KEY,
           status text NOT NULL,
           created_at bigint NOT NULL,
@@ -246,21 +266,21 @@ async function pgPool(): Promise<Pool> {
           data jsonb NOT NULL
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
-      `);
-    })();
+${ATTEMPT_SCHEMA}`);
+    })().catch(async (error: unknown) => {
+      const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
+      await failed?.end().catch(() => {}); throw error;
+    });
   }
-  await g.__copperPgReady;
-  return g.__copperPgPool;
+  await g.__copperPgReady; return g.__copperPgPool!;
 }
 
 const postgresStore: OrderStore = {
   backend: "postgres",
-  async createOrder(order) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_orders (id, status, created_at, data) VALUES ($1, $2, $3, $4)`,
-      [order.id, order.status, order.createdAt, JSON.stringify(order)]
-    );
+  async getAttempt(id) { const pool = await pgPool(); const result = await pool.query("SELECT data FROM ordering_attempts WHERE id=$1", [id]); return result.rows[0]?.data ?? null; },
+  async settleAttempt(attempt, order, jobs) { const pool = await pgPool(); return settlePostgres((sql, params) => pool.query(sql, params), attempt, order, jobs); },
+  async claimConfirmation(id) {
+    const pool = await pgPool(); const result = await pool.query("UPDATE ordering_confirmations SET status='attempted' WHERE order_id=$1 AND status='queued' RETURNING order_id", [id]); return result.rows.length === 1;
   },
   async getOrder(id) {
     const pool = await pgPool();
@@ -383,3 +403,5 @@ export function effectiveState(state: KitchenState, now: number = Date.now()): K
   }
   return state;
 }
+
+function requireDurableWrite() { if (process.env.NODE_ENV === "production") throw new Error("Persistent storage is required for ordering writes."); }

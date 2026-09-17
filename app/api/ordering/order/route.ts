@@ -1,130 +1,84 @@
-// Guest amounts are a review checkpoint. The server reloads current prices,
-// validates whole quantities/cents, and requires another review if they changed.
-// This adapter records demo/pay-at-pickup orders; it does not charge a card.
-
+// A submission reference settles once: accepted order, rejected input, or a
+// stopped submission. Retries recover the recorded result before repricing.
 import { NextRequest, NextResponse } from "next/server";
 import { ORDERING } from "@/lib/ordering/config";
 import { guestMenu } from "@/lib/ordering/menu";
 import { priceOptions } from "@/lib/ordering/pricing";
 import { quoteOrder, quoteWasReviewed } from "@/lib/ordering/order-quote";
+import { isAttemptId, readAttemptBody, requestFingerprint, type Attempt } from "@/lib/ordering/order-acceptance";
 import { orderingWindow } from "@/lib/ordering/time";
 import { effectiveState, getStore, type Order } from "@/lib/ordering/store";
 
 export const dynamic = "force-dynamic";
-
-function bad(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status });
+const headers = { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" };
+const bad = (error: string, status = 400) => NextResponse.json({ error }, { status, headers });
+function recorded(attempt: Attempt, fingerprint: string) {
+  if (attempt.fingerprint !== null && attempt.fingerprint !== fingerprint) return NextResponse.json({ attemptId: attempt.id, outcome: "conflict", error: "This submission reference belongs to different details. Check its recorded result before starting another order." }, { status: 409, headers });
+  return NextResponse.json(attempt.response, { status: attempt.status, headers });
 }
 
 export async function POST(req: NextRequest) {
-  const raw: unknown = await req.json().catch(() => null);
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return bad("Malformed request.");
-  const body = raw as Record<string, unknown>;
-  for (const [key, max] of [["guestName", 60], ["guestPhone", 25], ["guestEmail", 120], ["note", 300]] as const) {
-    const value = body[key];
-    if ((value !== undefined && (typeof value !== "string" || value.length > max)) || (["guestName", "guestPhone"].includes(key) && typeof value !== "string")) return bad("Use valid contact details and keep notes under 300 characters.");
+  const body = await readAttemptBody(req);
+  if (!body || !isAttemptId(body.attemptId)) return bad("This checkout page needs a refresh before ordering.");
+  const attemptId = body.attemptId;
+  try {
+    const fingerprint = requestFingerprint(body), store = getStore();
+    if (process.env.NODE_ENV === "production" && store.backend === "memory") throw Error("Persistent ordering storage is required.");
+    const existing = await store.getAttempt(attemptId);
+    if (existing) return recorded(existing, fingerprint);
+    const reject = async (error: string, status = 400, extra: Record<string, unknown> = {}) => {
+      const result = await store.settleAttempt({ id: attemptId, fingerprint, createdAt: Date.now(), outcome: "rejected", status, response: { ...extra, error, attemptId, outcome: "rejected" } });
+      return recorded(result.attempt, fingerprint);
+    };
+    for (const [key, max] of [["guestName", 60], ["guestPhone", 25], ["guestEmail", 120], ["note", 300]] as const) {
+      const value = body[key];
+      if ((value !== undefined && (typeof value !== "string" || value.length > max)) || (["guestName", "guestPhone"].includes(key) && typeof value !== "string")) return reject("Use valid contact details and keep notes under 300 characters.");
+    }
+    for (const key of ["ageAcknowledged", "payAtPickup"]) if (body[key] !== undefined && typeof body[key] !== "boolean") return reject("Malformed checkout choice.");
+    const clean = (key: string) => String(body[key] ?? "").replace(/[\x00-\x1f\x7f]/g, " ").trim();
+    const guestName = clean("guestName"), guestPhone = clean("guestPhone"), guestEmail = clean("guestEmail"), note = clean("note");
+    if (!guestName) return reject("A name for the order is required.");
+    if (guestPhone.replace(/\D/g, "").length < 10) return reject("A phone number is required so the kitchen can reach you.");
+    if (guestEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) return reject("That email does not look right. It is optional, so blank works too.");
+    const window = orderingWindow(); if (!window.open) return reject(window.reason, 409);
+    const state = effectiveState(await store.getState());
+    if (state.pausedUntil !== null) return reject("The kitchen just paused online ordering. Give it a few minutes or call the bar.", 409);
+    let menu;
+    try { menu = await guestMenu(store, { fresh: true }); }
+    catch { return reject("The current menu could not be checked. Please try later or contact the bar.", 503); }
+    const priced = quoteOrder(body.lines, menu.index, state.unavailable, { feeCents: ORDERING.feeCents, tipCents: body.tipCents, taxBasisPoints: ORDERING.taxBasisPoints }, priceOptions);
+    if (!priced.ok) return reject(priced.error, priced.status);
+    const quote = priced.quote;
+    if (!quoteWasReviewed(body.lines, body.expectedTotals, quote)) return reject("Prices or item requirements changed. Review the updated total before placing your order.", 409, { priceChanged: true, quote });
+    if (quote.hasAlcohol && body.ageAcknowledged !== true) return reject("Orders with drinks need the 21+ box checked. A valid ID gets checked at pickup.");
+    const createdAt = Date.now();
+    const order: Order = { id: attemptId, number: await store.nextTicketNumber(), guestName, guestPhone, guestEmail, note, lines: quote.lines, ...quote.totals, quotedMinutes: ORDERING.basePickupMinutes + state.busyMinutes, hasAlcohol: quote.hasAlcohol, paid: false, payAtPickup: body.payAtPickup === true, status: "new", createdAt, acceptedAt: null };
+    const { configuredPrinters, renderFor } = await import("@/lib/ordering/printing");
+    const jobs = configuredPrinters().map(printer => ({ id: crypto.randomUUID(), printerId: printer.id, orderId: order.id, body: renderFor(printer.role, order), status: "queued" as const, createdAt }));
+    const response = { attemptId, outcome: "accepted", id: order.id, number: order.number, quotedMinutes: order.quotedMinutes, totals: quote.totals, quote, payAtPickup: order.payAtPickup };
+    const result = await store.settleAttempt({ id: attemptId, fingerprint, createdAt, outcome: "accepted", status: 200, response }, order, jobs);
+    // Only the winner attempts the courtesy email. Its durable intent is saved
+    // with the order; attempted is deliberately not a delivery claim. A separate
+    // notification recovery workflow must reconcile queued/attempted intents.
+    if (result.created && guestEmail) {
+      try {
+        if (await store.claimConfirmation(order.id)) {
+          const { sendOrderConfirmation } = await import("@/lib/ordering/email");
+          await sendOrderConfirmation(order);
+        }
+      } catch { /* The committed order remains recoverable even if mail fails. */ }
+    }
+    return recorded(result.attempt, fingerprint);
+  } catch {
+    return NextResponse.json({ attemptId, outcome: "unknown", error: "We could not confirm the submission. Check its status or retry the same submission." }, { status: 503, headers });
   }
-  for (const key of ["ageAcknowledged", "payAtPickup"]) if (body[key] !== undefined && typeof body[key] !== "boolean") return bad("Malformed checkout choice.");
-  const clean = (key: string) => String(body[key] ?? "").replace(/[\x00-\x1f\x7f]/g, " ").trim();
-  const guestName = clean("guestName"), guestPhone = clean("guestPhone"), guestEmail = clean("guestEmail"), note = clean("note");
-  if (!guestName) return bad("A name for the order is required.");
-  if (guestPhone.replace(/\D/g, "").length < 10) return bad("A phone number is required so the kitchen can reach you.");
-  if (guestEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) return bad("That email does not look right. It is optional, so blank works too.");
-
-  const window = orderingWindow();
-  if (!window.open) return bad(window.reason, 409);
-
-  const store = getStore();
-  if (process.env.NODE_ENV === "production" && store.backend === "memory") return bad("Ordering requires persistent storage. Please contact the bar.", 503);
-  const state = effectiveState(await store.getState());
-  if (state.pausedUntil !== null) {
-    return bad("The kitchen just paused online ordering. Give it a few minutes or call the bar.", 409);
-  }
-
-  let menu;
-  try { menu = await guestMenu(store, { fresh: true }); }
-  catch { return bad("The current menu could not be checked. Please try later or contact the bar.", 503); }
-  const priced = quoteOrder(body.lines, menu.index, state.unavailable, { feeCents: ORDERING.feeCents, tipCents: body.tipCents, taxBasisPoints: ORDERING.taxBasisPoints }, priceOptions);
-  if (!priced.ok) return bad(priced.error, priced.status);
-  const quote = priced.quote;
-  if (!quoteWasReviewed(body.lines, body.expectedTotals, quote)) return NextResponse.json({ error: "Prices or item requirements changed. Review the updated total before placing your order. Older pages need a refresh.", priceChanged: true, quote }, { status: 409 });
-  const { lines, hasAlcohol } = quote;
-  if (hasAlcohol && body.ageAcknowledged !== true) return bad("Orders with drinks need the 21+ box checked. A valid ID gets checked at pickup.");
-  const { subtotalCents, feeCents, tipCents, taxCents, totalCents } = quote.totals;
-
-  const order: Order = {
-    id: crypto.randomUUID(),
-    number: await store.nextTicketNumber(),
-    guestName,
-    guestPhone,
-    guestEmail,
-    note,
-    lines,
-    subtotalCents,
-    feeCents,
-    tipCents,
-    taxCents,
-    totalCents,
-    quotedMinutes: ORDERING.basePickupMinutes + state.busyMinutes,
-    hasAlcohol,
-    // PAYMENT SEAM: flips to true when Stripe confirms the charge. Until
-    // then the front-of-house slip prints DUE AT PICKUP with tip and
-    // signature lines. payAtPickup orders skip Stripe entirely, live and
-    // demo alike: the counter collects, so paid stays false for good and
-    // there is no application fee to split -- the whole 99 cents is rung
-    // into the till with the rest.
-    paid: false,
-    payAtPickup: body.payAtPickup === true,
-    status: "new",
-    createdAt: Date.now(),
-    acceptedAt: null,
-  };
-
-  await store.createOrder(order);
-
-  // Fan out one job per configured printer, each with its station's own
-  // template. No printers configured means no jobs: the chime path carries.
-  const { configuredPrinters, renderFor } = await import("@/lib/ordering/printing");
-  for (const printer of configuredPrinters()) {
-    await store.enqueuePrintJob({
-      id: crypto.randomUUID(),
-      printerId: printer.id,
-      orderId: order.id,
-      body: renderFor(printer.role, order),
-      status: "queued",
-      createdAt: Date.now(),
-    });
-  }
-
-  // Courtesy copy of what the confirmation screen shows. Best-effort by
-  // design: an email problem must never fail an order. But the send is
-  // AWAITED, because fire-and-forget dies on serverless: Vercel freezes the
-  // lambda the moment the response returns, so an un-awaited send silently
-  // never runs and its catch never logs. Proven live in devine's agreement
-  // flow, which delivered exactly one of its two emails for this reason.
-  // The catch keeps a bounced email from failing the order.
-  const { sendOrderConfirmation } = await import("@/lib/ordering/email");
-  await sendOrderConfirmation(order).catch(() => {});
-
-  return NextResponse.json({
-    id: order.id,
-    number: order.number,
-    quotedMinutes: order.quotedMinutes,
-    totals: { subtotalCents, feeCents, tipCents, taxCents, totalCents },
-    quote,
-  });
 }
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
-  if (!id) return bad("Missing id.");
-  const order = await getStore().getOrder(id);
-  if (!order) return bad("No such order.", 404);
-  // Only what the confirmation screen needs; the phone number stays server-side.
-  return NextResponse.json({
-    number: order.number,
-    status: order.status,
-    quotedMinutes: order.quotedMinutes,
-    createdAt: order.createdAt,
-  });
+  if (!isAttemptId(id)) return bad("Missing or invalid order reference.");
+  try {
+    const order = await getStore().getOrder(id); if (!order) return bad("No such order.", 404);
+    return NextResponse.json({ number: order.number, status: order.status, quotedMinutes: order.quotedMinutes, createdAt: order.createdAt }, { headers });
+  } catch { return bad("The order status could not be checked.", 503); }
 }

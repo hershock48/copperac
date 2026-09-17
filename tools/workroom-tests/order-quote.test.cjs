@@ -9,9 +9,10 @@ const root = path.resolve(__dirname, '../..');
 function load(file, mocks = {}, env = {}) {
  const compiled=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const module={exports:{}};
- new vm.Script(compiled,{filename:file}).runInNewContext({module,exports:module.exports,crypto:require('node:crypto').webcrypto,process:{env},Response,Request,URL,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];throw Error('Unexpected dependency: '+name);}});
+ new vm.Script(compiled,{filename:file}).runInNewContext({module,exports:module.exports,crypto:require('node:crypto').webcrypto,process:{env},Buffer,structuredClone,Response,Request,URL,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='node:crypto')return require('node:crypto');throw Error('Unexpected dependency: '+name);}});
  return module.exports;
 }
+const acceptance=load('lib/ordering/order-acceptance.ts');
 const q=load('lib/ordering/order-quote.ts'), pricing=load('lib/ordering/pricing.ts');
 const clean=x=>JSON.parse(JSON.stringify(x));
 const item=(patch={})=>({id:'food-burger',name:'Burger',priceCents:1000,ageRestricted:false,options:[],...patch});
@@ -56,16 +57,17 @@ function harness() {
  let menuItems=[{name:'Burger',desc:'Fixture',price:'10.00'}];
  let doc=[{name:'Food',ageRestricted:false,items:[{id:'food-burger',name:'Burger',desc:'Fixture',priceCents:1000,image:null,groups:[]}]}];
  const effects={tickets:0,orders:[],prints:0,emails:0};
- const store={backend:'postgres',getState:async()=>({unavailable:[],busyMinutes:0,pausedUntil:null}),getMenuDoc:async()=>structuredClone(doc),nextTicketNumber:async()=>++effects.tickets,createOrder:async o=>effects.orders.push(o),enqueuePrintJob:async()=>effects.prints++};
+ const bag={attempts:new Map(),orders:new Map(),printJobs:[],confirmations:new Map()};
+ const store={getAttempt:async id=>bag.attempts.get(id)??null,settleAttempt:async(a,o,j)=>{const r=acceptance.settleMemory(bag,a,o,j);if(r.created&&o){effects.orders.push(o);effects.prints+=(j??[]).length;}return r;},claimConfirmation:async()=>true,backend:'postgres',getState:async()=>({unavailable:[],busyMinutes:0,pausedUntil:null}),getMenuDoc:async()=>structuredClone(doc),nextTicketNumber:async()=>++effects.tickets,createOrder:async o=>effects.orders.push(o),enqueuePrintJob:async()=>effects.prints++};
  const seed=copper?{SEED_MENU:doc}:load('lib/ordering/seed.ts',{'@/lib/menu':{FOOD_MENU:[]}});
  const content={getMenus:async()=>({food:[{name:'Food',items:structuredClone(menuItems)}]})};
  const menu=load('lib/ordering/menu.ts',{'./seed':seed,'./toast-menu.json':{default:doc},'@/lib/content':content});
  const env={NODE_ENV:'production',STRIPE_SECRET_KEY:'fixture-does-not-activate-payment'};
  const time={orderingWindow:()=>({open:true})};
  const config={ORDERING:{feeCents:99,taxBasisPoints:600,basePickupMinutes:15}};
- const mocks={'next/server':{NextResponse:{json:Response.json}},'@/lib/ordering/config':config,'@/lib/ordering/menu':menu,'@/lib/ordering/pricing':pricing,'@/lib/ordering/order-quote':q,'@/lib/ordering/time':time,'@/lib/ordering/store':{getStore:()=>store,effectiveState:s=>s},'@/lib/ordering/printing':{configuredPrinters:()=>[{id:'fixture',role:'kitchen'}],renderFor:()=> 'fixture-ticket'},'@/lib/ordering/email':{sendOrderConfirmation:async()=>effects.emails++}};
+ const mocks={'next/server':{NextResponse:{json:Response.json}},'@/lib/ordering/config':config,'@/lib/ordering/menu':menu,'@/lib/ordering/pricing':pricing,'@/lib/ordering/order-quote':q,'@/lib/ordering/order-acceptance':acceptance,'@/lib/ordering/time':time,'@/lib/ordering/store':{getStore:()=>store,effectiveState:s=>s},'@/lib/ordering/printing':{configuredPrinters:()=>[{id:'fixture',role:'kitchen'}],renderFor:()=> 'fixture-ticket'},'@/lib/ordering/email':{sendOrderConfirmation:async()=>effects.emails++}};
  const route=load('app/api/ordering/order/route.ts',mocks,env);
- const body=(patch={})=>({guestName:'Fixture',guestPhone:'2025550123',guestEmail:'',tipCents:0,lines:[line()],expectedTotals:quote().quote.totals,...patch});
+ const body=(patch={})=>({attemptId:require('node:crypto').randomUUID(),guestName:'Fixture',guestPhone:'2025550123',guestEmail:'',tipCents:0,lines:[line()],expectedTotals:quote().quote.totals,...patch});
  const post=async b=>route.POST(new Request('https://fixture.invalid/api/ordering/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}));
  return {store,effects,menu,post,body,mocks,env,time,changePrice(cents){doc[0].items[0].priceCents=cents;menuItems[0].price=(cents/100).toFixed(2);},hide(){doc[0].items[0].hidden=true;menuItems=[];}};
 }
@@ -76,7 +78,7 @@ test('warm page cache cannot authorize stale checkout prices; review is free of 
  assert.deepEqual(h.effects,{tickets:0,orders:[],prints:0,emails:0});
  const accepted=await h.post(h.body({lines:[line({quotedUnitCents:1200})],expectedTotals:changed.quote.totals}));
  assert.equal(accepted.status,200);const receipt=await accepted.json();assert.equal(receipt.totals.totalCents,1377);assert.equal(receipt.quote.lines[0].unitCents,1200);
- assert.equal(h.effects.orders.length,1);assert.equal(h.effects.prints,1);assert.equal(h.effects.emails,1);assert.equal(h.effects.orders[0].paid,false);
+ assert.equal(h.effects.orders.length,1);assert.equal(h.effects.prints,1);assert.equal(h.effects.emails,0);assert.equal(h.effects.orders[0].paid,false);
 });
 test('hidden/sold-out/paused/offline-storage cases stop before accepting anything',async()=>{
  for(const mode of ['hidden','sold-out','paused','memory','menu-failed','closed']){

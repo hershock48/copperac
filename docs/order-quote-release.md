@@ -22,6 +22,6 @@ September 17 local production Next previews with a PGlite adapter verified both 
 
 ## Remaining operating requirements
 
-Order acceptance currently uses random IDs without a durable retry key; order creation and printer fanout are separate writes. An ambiguous response can still lead to duplicate orders if a guest retries. Durable idempotency and transactional notification/print jobs are the next acceptance work.
+Submission retry keys and atomic order/print/email-intent writes are now implemented; see [durable submission recovery](order-acceptance-release.md). Provider notification reconciliation and physical printer completion still require verification.
 
-The kitchen PIN/session, persistent throttle, state-update concurrency, status transition rules, cancellation/refund semantics, PostgreSQL TLS/initialization and real owner fulfillment handover still require work. The price snapshot is fresh when read but is not locked against an owner edit between that read and order insertion. No card is charged or refunded by this release, and neither complete ordering application is declared production-ready.
+The kitchen PIN/session, persistent throttle, state-update concurrency, status transition rules, cancellation/refund semantics, real owner fulfillment handover and intended-host PostgreSQL verification still require work. The price snapshot is fresh when read but is not locked against an owner edit between that read and order insertion. No card is charged or refunded by this release, and neither complete ordering application is declared production-ready.
