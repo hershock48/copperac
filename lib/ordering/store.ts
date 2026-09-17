@@ -1,3 +1,5 @@
+import { NOTIFICATION_SCHEMA, notificationList, dueNotifications, dueDeliveryChecks, dispatchNotification, checkNotification, closeNotification, getNotificationReview, type Mail, type SendResult, type DeliveryResult, type CloseCommand } from "./notification-outbox";
+import { resolvePrintJob, getPrintAction, type PrintCommand, PRINT_SCHEMA, pollPrintJob, fetchPrintJob, confirmPrintJob, printStatus, type PrinterPoll, type PrintReply, type Query } from "./printer-jobs";
 // Order and kitchen-state storage.
 //
 // Two backends behind one interface:
@@ -20,9 +22,12 @@
 // and a schema this young will change shape. Normalize when something needs
 // to query it, not before.
 
+import { MENU_HISTORY_SCHEMA, compareMenu, compareMenuMemory, type MenuRecord, type MenuHistory } from "./menu-document-store";
 import type { Pool } from "pg";
+import { OPERATION_SCHEMA, getReceipt, commitOperation, commitMemory, type Receipt, type Candidate } from "./kitchen-operations";
+import { ATTEMPT_SCHEMA, settleMemory, settlePostgres, type Attempt, type AttemptResult } from "./order-acceptance";
 
-export type OrderStatus = "new" | "accepted" | "done" | "refunded";
+export type OrderStatus = "new" | "accepted" | "done" | "cancelled" | "refunded";
 
 export type OrderLine = {
   itemId: string;
@@ -35,11 +40,10 @@ export type OrderLine = {
 
 export type Order = {
   id: string;
-  number: number; // short ticket number, resets daily in practice
+  number: number; // Increasing ticket sequence; retries/rollbacks may leave gaps.
   guestName: string;
   guestPhone: string;
-  // Optional; when present the guest gets a confirmation email and, if it
-  // comes to it, the refund notice with the 5-10 business day expectation.
+  // Optional courtesy confirmation; delivery is tracked separately from fulfillment.
   guestEmail: string;
   note: string;
   lines: OrderLine[];
@@ -66,6 +70,11 @@ export type Order = {
   status: OrderStatus;
   createdAt: number; // epoch ms
   acceptedAt: number | null;
+  completedAt?: number;
+  cancelledAt?: number;
+  cancellationReason?: string;
+  lastOperationId?: string;
+  revision?: string; // API snapshot only; omitted from stored orders.
 };
 
 export type PrintJob = {
@@ -78,6 +87,8 @@ export type PrintJob = {
 };
 
 export type KitchenState = {
+  lastOperationId?: string;
+  revision?: string; // API snapshot only; omitted from stored state.
   unavailable: string[]; // orderable item ids currently 86'd
   busyMinutes: 0 | 15 | 30;
   pausedUntil: number | null; // epoch ms; always set with a timer, never forever
@@ -91,46 +102,61 @@ export const DEFAULT_STATE: KitchenState = {
 
 export interface OrderStore {
   backend: "postgres" | "memory";
-  createOrder(order: Order): Promise<void>;
+  getAttempt(id: string): Promise<Attempt | null>;
+  settleAttempt(attempt: Attempt, order?: Order, jobs?: PrintJob[]): Promise<AttemptResult>;
+  notificationList():ReturnType<typeof notificationList>;
+  dueNotifications():ReturnType<typeof dueNotifications>;
+  dueDeliveryChecks():ReturnType<typeof dueDeliveryChecks>;
+  dispatchNotification(id:string,render:(order:Record<string,unknown>)=>Mail,credential:string,namespace:string,send:(payload:string,key:string)=>Promise<SendResult>):ReturnType<typeof dispatchNotification>;
+  checkNotification(id:string,retrieve:(id:string,payload:string)=>Promise<DeliveryResult>):ReturnType<typeof checkNotification>;
+  closeNotification(command:CloseCommand):ReturnType<typeof closeNotification>;
+  getNotificationReview(id:string):ReturnType<typeof getNotificationReview>;
   getOrder(id: string): Promise<Order | null>;
   // Active = new or accepted, oldest first: the kitchen works top down.
   listActiveOrders(): Promise<Order[]>;
-  setOrderStatus(id: string, status: OrderStatus): Promise<void>;
+  getOperation(id: string): Promise<Receipt | null>;
+  commitKitchen(receipt: Receipt, candidate: Candidate | null): Promise<Receipt>;
   nextTicketNumber(): Promise<number>;
   getState(): Promise<KitchenState>;
-  setState(state: KitchenState): Promise<void>;
-  // Printing. Jobs are queued at order time and drained by each printer's
-  // polls; stale queued jobs are skipped at poll time via the TTL so a
-  // printer that was off for an hour does not print cold orders.
-  enqueuePrintJob(job: PrintJob): Promise<void>;
-  nextPrintJob(printerId: string, notOlderThanMs: number): Promise<PrintJob | null>;
-  setPrintJobStatus(id: string, status: "printed" | "failed"): Promise<void>;
-  printerSeen(printerId: string): Promise<void>;
-  printerLastSeen(): Promise<Record<string, number>>;
+  getStateRecord(): Promise<KitchenState | null>;
+  resolvePrintJob(command:PrintCommand,role:"kitchen"|"front"):ReturnType<typeof resolvePrintJob>;
+  getPrintAction(id:string):ReturnType<typeof getPrintAction>;
+  printerPoll(id:string,poll:PrinterPoll):ReturnType<typeof pollPrintJob>;
+  printerFetch(id:string,jobId:string):Promise<PrintReply>;
+  printerConfirm(id:string,jobId:string,role:"kitchen"|"front",code:string):Promise<PrintReply>;
+  printStatus():ReturnType<typeof printStatus>;
   // The editable menu document. null means never edited: callers seed from
   // the bundled harvest. Stored whole -- it is one restaurant's menu, edits
   // are rare, and whole-document writes cannot half-apply.
   getMenuDoc(): Promise<unknown | null>;
-  setMenuDoc(doc: unknown): Promise<void>;
+  getMenuRecord(): Promise<MenuRecord | null>;
+  compareMenuDoc(expected: MenuRecord | null, doc: unknown, beforeDoc: unknown): Promise<MenuRecord | null>;
+  menuHistory(): Promise<{ id: string; changedAt: string }[]>;
 }
 
 /* ------------------------------ memory ------------------------------ */
 
 type MemoryBag = {
+  attempts: Map<string, Attempt>;
+  confirmations: Map<string, { status: string; order: Order }>;
   orders: Map<string, Order>;
-  state: KitchenState;
+  state: KitchenState | null;
+  operations?: Map<string, Receipt>;
   ticket: number;
   printJobs: PrintJob[];
   printersSeen: Record<string, number>;
   menuDoc: unknown | null;
+  menuRevision?: string;
+  menuHistory?: MenuHistory[];
 };
 
 function memoryBag(): MemoryBag {
   const g = globalThis as unknown as { __copperOrdering?: MemoryBag };
   if (!g.__copperOrdering) {
     g.__copperOrdering = {
+      attempts: new Map(), confirmations: new Map(),
       orders: new Map(),
-      state: { ...DEFAULT_STATE },
+      state: null, operations: new Map(),
       ticket: 0,
       printJobs: [],
       printersSeen: {},
@@ -142,84 +168,86 @@ function memoryBag(): MemoryBag {
 
 const memoryStore: OrderStore = {
   backend: "memory",
-  async createOrder(order) {
-    memoryBag().orders.set(order.id, order);
+  async getAttempt(id) { return structuredClone(memoryBag().attempts?.get(id) ?? null); },
+  async settleAttempt(attempt, order, jobs) {
+    requireDurableWrite(); const bag = memoryBag(); bag.attempts ??= new Map(); bag.confirmations ??= new Map();
+    return settleMemory(bag, attempt, order, jobs);
   },
+  async notificationList(){return {items:[],count:0};},
+  async dueNotifications(){return [];},async dueDeliveryChecks(){return [];},
+  async dispatchNotification(){throw Error("Persistent notification storage is required.");},
+  async checkNotification(){throw Error("Persistent notification storage is required.");},
+  async closeNotification(){throw Error("Persistent notification storage is required.");},
+  async getNotificationReview(){return null;},
   async getOrder(id) {
-    return memoryBag().orders.get(id) ?? null;
+    return structuredClone(memoryBag().orders.get(id) ?? null);
   },
   async listActiveOrders() {
     return [...memoryBag().orders.values()]
-      .filter((o) => o.status !== "done" && o.status !== "refunded")
-      .sort((a, b) => a.createdAt - b.createdAt);
+      .filter((o) => o.status === "new" || o.status === "accepted")
+      .sort((a, b) => a.createdAt - b.createdAt).map(o => structuredClone(o));
   },
-  async setOrderStatus(id, status) {
-    const o = memoryBag().orders.get(id);
-    if (o) {
-      o.status = status;
-      if (status === "accepted" && o.acceptedAt === null) o.acceptedAt = Date.now();
+  async getOperation(id) { return structuredClone(memoryBag().operations?.get(id) ?? null); },
+  async commitKitchen(receipt, candidate) {
+    requireDurableWrite(); const bag=memoryBag(); bag.operations ??= new Map();
+    const current=candidate?.table === "ordering_state" ? bag.state : candidate ? bag.orders.get(String(candidate.key)) ?? null : null;
+    const result=commitMemory(bag.operations,current,receipt,candidate);
+    if(result.changed && candidate) {
+      if(candidate.table === "ordering_state") bag.state=result.value as KitchenState;
+      else {
+        const order=result.value as Order; bag.orders.set(String(candidate.key),order);
+        if(order.status === "cancelled") for(const job of bag.printJobs) if(job.orderId===order.id && job.status==="queued")job.status="failed";
+      }
     }
+    return result.receipt;
   },
   async nextTicketNumber() {
+    requireDurableWrite();
     return ++memoryBag().ticket;
   },
   async getState() {
-    return memoryBag().state;
+    return structuredClone(memoryBag().state ?? DEFAULT_STATE);
   },
-  async setState(state) {
-    memoryBag().state = state;
-  },
-  async enqueuePrintJob(job) {
-    memoryBag().printJobs.push(job);
-  },
-  async nextPrintJob(printerId, notOlderThanMs) {
-    const cutoff = Date.now() - notOlderThanMs;
-    const bag = memoryBag();
-    // Expire stale queued jobs so an offline printer never prints cold food.
-    for (const j of bag.printJobs) {
-      if (j.status === "queued" && j.createdAt < cutoff) j.status = "failed";
-    }
-    return bag.printJobs.find((j) => j.printerId === printerId && j.status === "queued") ?? null;
-  },
-  async setPrintJobStatus(id, status) {
-    const j = memoryBag().printJobs.find((x) => x.id === id);
-    if (j) j.status = status;
-  },
-  async printerSeen(printerId) {
-    memoryBag().printersSeen[printerId] = Date.now();
-  },
-  async printerLastSeen() {
-    return { ...memoryBag().printersSeen };
-  },
+  async getStateRecord() { return structuredClone(memoryBag().state); },
+  async resolvePrintJob() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async getPrintAction() { return null; },
+  async printerPoll() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printerFetch() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printerConfirm() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printStatus() { return {devices:[],issues:[],issueCount:0}; },
   async getMenuDoc() {
-    return memoryBag().menuDoc;
+    return structuredClone(memoryBag().menuDoc);
   },
-  async setMenuDoc(doc) {
-    memoryBag().menuDoc = doc;
+  async getMenuRecord() { const bag=memoryBag();return bag.menuDoc===null?null:{doc:structuredClone(bag.menuDoc),revision:bag.menuRevision??"legacy"}; },
+  async compareMenuDoc(expected,doc,beforeDoc) {
+    requireDurableWrite(); const bag=memoryBag();bag.menuHistory??=[];
+    const current=bag.menuDoc===null?null:{doc:bag.menuDoc,revision:bag.menuRevision??"legacy"};
+    const record=compareMenuMemory(current,bag.menuHistory,expected,doc,beforeDoc);
+    if(record){bag.menuDoc=structuredClone(record.doc);bag.menuRevision=record.revision;}return record;
   },
+  async menuHistory() { return (memoryBag().menuHistory??[]).slice(-10).reverse().map(({id,changedAt})=>({id,changedAt})); },
 };
 
 /* ----------------------------- postgres ----------------------------- */
 
 function connectionString(): string | undefined {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.POSTGRES_URL) return process.env.POSTGRES_URL;
+  const values = [...new Set(Object.entries(process.env).filter(([key, value]) => value && /_(DATABASE|POSTGRES)_URL$/.test(key)).map(([, value]) => value!))];
+  if (values.length > 1) throw new Error("Multiple ordering databases configured. Choose DATABASE_URL explicitly.");
+  return values[0];
 }
 
 async function pgPool(): Promise<Pool> {
   const g = globalThis as unknown as { __copperPgPool?: Pool; __copperPgReady?: Promise<void> };
-  if (!g.__copperPgPool) {
-    // Dynamic import so the module (and the dependency) never loads unless a
-    // database is actually configured.
-    const { Pool } = await import("pg");
-    g.__copperPgPool = new Pool({
-      connectionString: connectionString(),
-      // Neon and friends require TLS; local postgres usually has none.
-      ssl: connectionString()?.includes("localhost") ? undefined : { rejectUnauthorized: false },
-      max: 3,
-    });
+  if (!g.__copperPgReady) {
     g.__copperPgReady = (async () => {
-      await g.__copperPgPool!.query(`
-        CREATE TABLE IF NOT EXISTS ordering_orders (
+      const { Pool } = await import("pg"); const cs = connectionString();
+      if (!cs) throw new Error("Persistent ordering storage is not configured.");
+      // Honor explicit pg connection settings; do not disable certificate checks.
+      g.__copperPgPool = new Pool({ connectionString: cs, max: 3, connectionTimeoutMillis: 7000 });
+      await g.__copperPgPool.query(`SELECT pg_advisory_xact_lock(4213711);
+CREATE TABLE IF NOT EXISTS ordering_orders (
           id text PRIMARY KEY,
           status text NOT NULL,
           created_at bigint NOT NULL,
@@ -246,22 +274,42 @@ async function pgPool(): Promise<Pool> {
           data jsonb NOT NULL
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
-      `);
-    })();
+${ATTEMPT_SCHEMA}
+${OPERATION_SCHEMA}
+${PRINT_SCHEMA}
+${NOTIFICATION_SCHEMA}
+${MENU_HISTORY_SCHEMA}`);
+    })().catch(async (error: unknown) => {
+      const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
+      await failed?.end().catch(() => {}); throw error;
+    });
   }
-  await g.__copperPgReady;
-  return g.__copperPgPool;
+  await g.__copperPgReady; return g.__copperPgPool!;
+}
+
+async function orderingTransaction<T>(work:(query:Query)=>Promise<T>):Promise<T>{
+  const client=await (await pgPool()).connect();
+  try{
+    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+    await client.query("SET LOCAL lock_timeout='5s'");
+    await client.query("SET LOCAL statement_timeout='10s'");
+    const result=await work((sql,params)=>client.query(sql,params));
+    await client.query("COMMIT");return result;
+  }catch(error){await client.query("ROLLBACK").catch(()=>{});throw error;}
+  finally{client.release();}
 }
 
 const postgresStore: OrderStore = {
   backend: "postgres",
-  async createOrder(order) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_orders (id, status, created_at, data) VALUES ($1, $2, $3, $4)`,
-      [order.id, order.status, order.createdAt, JSON.stringify(order)]
-    );
-  },
+  async getAttempt(id) { const pool = await pgPool(); const result = await pool.query("SELECT data FROM ordering_attempts WHERE id=$1", [id]); return result.rows[0]?.data ?? null; },
+  async settleAttempt(attempt, order, jobs) { const pool = await pgPool(); return settlePostgres((sql, params) => pool.query(sql, params), attempt, order, jobs); },
+  async notificationList(){const pool=await pgPool();return notificationList((sql,p)=>pool.query(sql,p));},
+  async dueNotifications(){const pool=await pgPool();return dueNotifications((sql,p)=>pool.query(sql,p));},
+  async dueDeliveryChecks(){const pool=await pgPool();return dueDeliveryChecks((sql,p)=>pool.query(sql,p));},
+  dispatchNotification:(id,render,credential,namespace,send)=>dispatchNotification(orderingTransaction,id,render,credential,namespace,send),
+  checkNotification:(id,retrieve)=>checkNotification(orderingTransaction,id,retrieve),
+  closeNotification:command=>closeNotification(orderingTransaction,command),
+  async getNotificationReview(id){const pool=await pgPool();return getNotificationReview((sql,p)=>pool.query(sql,p),id);},
   async getOrder(id) {
     const pool = await pgPool();
     const r = await pool.query(`SELECT data FROM ordering_orders WHERE id = $1`, [id]);
@@ -270,23 +318,12 @@ const postgresStore: OrderStore = {
   async listActiveOrders() {
     const pool = await pgPool();
     const r = await pool.query(
-      `SELECT data FROM ordering_orders WHERE status NOT IN ('done', 'refunded') ORDER BY created_at ASC LIMIT 100`
+      `SELECT data FROM ordering_orders WHERE status IN ('new', 'accepted') ORDER BY created_at ASC LIMIT 100`
     );
     return r.rows.map((row) => row.data as Order);
   },
-  async setOrderStatus(id, status) {
-    const pool = await pgPool();
-    await pool.query(
-      `UPDATE ordering_orders
-       SET status = $2,
-           data = data || jsonb_build_object('status', $2::text)
-                       || CASE WHEN $2 = 'accepted' AND (data->>'acceptedAt') IS NULL
-                               THEN jsonb_build_object('acceptedAt', $3::bigint)
-                               ELSE '{}'::jsonb END
-       WHERE id = $1`,
-      [id, status, Date.now()]
-    );
-  },
+  async getOperation(id) { const pool=await pgPool(); return getReceipt((sql,params)=>pool.query(sql,params),id); },
+  async commitKitchen(receipt,candidate) { const pool=await pgPool(); return commitOperation((sql,params)=>pool.query(sql,params),receipt,candidate); },
   async nextTicketNumber() {
     const pool = await pgPool();
     const r = await pool.query(`SELECT nextval('ordering_ticket') AS n`);
@@ -297,77 +334,29 @@ const postgresStore: OrderStore = {
     const r = await pool.query(`SELECT data FROM ordering_state WHERE id = 1`);
     return r.rows[0] ? (r.rows[0].data as KitchenState) : { ...DEFAULT_STATE };
   },
-  async setState(state) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_state (id, data) VALUES (1, $1)
-       ON CONFLICT (id) DO UPDATE SET data = $1`,
-      [JSON.stringify(state)]
-    );
+  async getStateRecord() {
+    const pool=await pgPool(); const result=await pool.query("SELECT data FROM ordering_state WHERE id=1");
+    return result.rows[0]?.data ?? null;
   },
-  async enqueuePrintJob(job) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_print_jobs (id, printer_id, order_id, body, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [job.id, job.printerId, job.orderId, job.body, job.status, job.createdAt]
-    );
-  },
-  async nextPrintJob(printerId, notOlderThanMs) {
-    const pool = await pgPool();
-    const cutoff = Date.now() - notOlderThanMs;
-    await pool.query(
-      `UPDATE ordering_print_jobs SET status = 'failed'
-       WHERE status = 'queued' AND created_at < $1`,
-      [cutoff]
-    );
-    const r = await pool.query(
-      `SELECT id, printer_id, order_id, body, status, created_at
-       FROM ordering_print_jobs
-       WHERE printer_id = $1 AND status = 'queued'
-       ORDER BY created_at ASC LIMIT 1`,
-      [printerId]
-    );
-    if (!r.rows[0]) return null;
-    const row = r.rows[0];
-    return {
-      id: row.id,
-      printerId: row.printer_id,
-      orderId: row.order_id,
-      body: row.body,
-      status: row.status,
-      createdAt: Number(row.created_at),
-    };
-  },
-  async setPrintJobStatus(id, status) {
-    const pool = await pgPool();
-    await pool.query(`UPDATE ordering_print_jobs SET status = $2 WHERE id = $1`, [id, status]);
-  },
-  async printerSeen(printerId) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_printers (id, last_seen) VALUES ($1, $2)
-       ON CONFLICT (id) DO UPDATE SET last_seen = $2`,
-      [printerId, Date.now()]
-    );
-  },
-  async printerLastSeen() {
-    const pool = await pgPool();
-    const r = await pool.query(`SELECT id, last_seen FROM ordering_printers`);
-    return Object.fromEntries(r.rows.map((row) => [row.id, Number(row.last_seen)]));
-  },
+  resolvePrintJob:(command,role)=>resolvePrintJob(orderingTransaction,command,role),
+  async getPrintAction(id) { const pool=await pgPool(); return getPrintAction((sql,params)=>pool.query(sql,params),id); },
+  printerPoll:(id,poll)=>pollPrintJob(orderingTransaction,id,poll),
+  printerFetch:(id,jobId)=>fetchPrintJob(orderingTransaction,id,jobId),
+  printerConfirm:(id,jobId,role,code)=>confirmPrintJob(orderingTransaction,id,jobId,role,code),
+  async printStatus() {const pool=await pgPool();return printStatus((sql,params)=>pool.query(sql,params));},
   async getMenuDoc() {
     const pool = await pgPool();
     const r = await pool.query(`SELECT data FROM ordering_menu WHERE id = 1`);
     return r.rows[0] ? r.rows[0].data : null;
   },
-  async setMenuDoc(doc) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_menu (id, data) VALUES (1, $1)
-       ON CONFLICT (id) DO UPDATE SET data = $1`,
-      [JSON.stringify(doc)]
-    );
+  async getMenuRecord() {
+    const result=await (await pgPool()).query("SELECT data,revision FROM ordering_menu WHERE id=1");
+    return result.rows[0]?{doc:result.rows[0].data,revision:String(result.rows[0].revision)}:null;
+  },
+  async compareMenuDoc(expected,doc,beforeDoc) { const pool=await pgPool();return compareMenu((sql,params)=>pool.query(sql,params),expected,doc,beforeDoc); },
+  async menuHistory() {
+    const result=await (await pgPool()).query("SELECT id,changed_at FROM ordering_menu_history ORDER BY changed_at DESC,id DESC LIMIT 10");
+    return result.rows.map(r=>({id:r.id,changedAt:new Date(r.changed_at).toISOString()}));
   },
 };
 
@@ -383,3 +372,5 @@ export function effectiveState(state: KitchenState, now: number = Date.now()): K
   }
   return state;
 }
+
+function requireDurableWrite() { if (process.env.NODE_ENV === "production") throw new Error("Persistent storage is required for ordering writes."); }

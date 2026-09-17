@@ -256,9 +256,9 @@ Decisions worth knowing before touching it:
 - **Ordering hours derive from the posted hours** (last order 9:30 PM, kitchen
   closes at 10), computed per request in America/Detroit, never at build time.
   `ORDERING_DEMO_ALWAYS_OPEN=1` overrides for pitching outside kitchen hours.
-- `/kitchen` is noindex and out of the sitemap; the PIN is a gate for
-  passers-by, not a vault, and the comment in `lib/ordering/auth.ts` says
-  exactly where that line is.
+- `/kitchen` is noindex and out of the sitemap. Staff use signed expiring sessions
+  and a persistent attempt limit; the parked menu-price editor requires owner
+  access. See [kitchen access verification](docs/kitchen-access-release.md).
 
 ## Before launch
 
@@ -272,7 +272,7 @@ Decisions worth knowing before touching it:
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
 - The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel, it is parked for now (see the ordering section above), so none of them block launch
 - [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
-- [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
+- [ ] **Ordering: configure staff sign-in** with a 6–12 digit `KITCHEN_PIN`, separate `WORKROOM_SESSION_SECRET` and persistent database. Published demo PINs are development-only.
 - [ ] **Ordering: set `ORDERING_DEMO_ALWAYS_OPEN=1` on the demo deploy, and REMOVE it at go-live** so real guests get real hours
 - [ ] **Ordering: wire Stripe Connect before real money** (see the PAYMENT SEAM comment in `app/api/ordering/order/route.ts`; until then checkout is demo mode and says so)
 - [ ] **Ordering: Michigan tax consult before launch**, whether the platform must collect sales tax (marketplace facilitator question) is unsettled; the demo computes 6% for display
@@ -476,4 +476,75 @@ page for a board nobody keeps is worse than no page.
 
 ---
 
+## Workroom deployment requirements (September 2026 review)
+
+Production owner sign-in requires `WORKROOM_PASSCODE`, a separate random
+`WORKROOM_SESSION_SECRET` of at least 32 characters, and persistent Postgres.
+Sessions expire after 18 hours; rotating either credential invalidates them.
+Existing cookies from the earlier implementation require a fresh sign-in.
+Owner sign-in permits five attempts per ten-minute window per trusted client address. Kitchen sign-in has a separate bucket for each address. Atomic database counters persist across instances; empty requests from one remote address cannot lock out another address. Expired rows are pruned and successful owner sign-in clears only that owner/address bucket. Vercel uses its overwritten x-vercel-forwarded-for header. Other hosts must configure an overwriting trusted proxy and WORKROOM_TRUSTED_IP_HEADER. Production closes on missing identity or storage; never configure trusted headers on a directly reachable server. Clients behind the same address share its limit.
+
+Set an explicit `DATABASE_URL` when multiple database integrations exist.
+Database TLS uses the provider's connection configuration; certificate
+verification is no longer disabled in code. Initial schema setup creates the
+workroom tables and `copper_login_attempts`, so the deployment database role
+must have the appropriate permissions. Production saves without durable storage
+return an error. Memory writes are for local development only.
+
+`/api/status` reports session configuration and the selected storage backend;
+these configuration indicators do not prove database health. Inquiry success
+requires a Resend acceptance ID and the request times out after 12 seconds.
+Provider acceptance does not prove delivery to the owner's inbox.
+
+Before deploying this review, verify actual database saves survive a restart,
+owner sign-in and credential rotation, and a controlled inquiry reaches the
+owner's inbox with the correct reply address. Complete mobile owner testing
+and handover. These external checks have not been completed by local tests.
+Toast remains the customer ordering path; the parked ordering and kitchen
+implementation remains restricted to the pitch host.
+
+Local checks:
+
+```text
+node --test --test-isolation=none lib/__tests__/launch-readiness.cjs lib/__tests__/ordering-pricing.mjs
+node node_modules/typescript/bin/tsc --noEmit
+```
+
+Set `STUDIO_BUILD_CHECK=1` when running `next build --webpack` to use the
+separate `.next-check` output without disturbing the development preview.
+
 Built by [Glazed Web](https://glazedweb.com). Logo and photography used with permission of Copper Athletic Club.
+
+## Event, contact and photo save contract
+
+Event edits and contact details require the latest saved revision. Accepted changes and their before/after history commit together; a stale window cannot overwrite a newer save. Keep the editor, API, content loader, store and shared files in the same deployment. Old open editors without revisions are rejected and need a fresh tab.
+
+The event editor holds its draft on failed or uncertain saves and disables the fields during saves/uploads. New drafts retain one identifier across retries. Archive removes an event from the public site while retaining its record and photo; Restore as draft does not publish it. Uploads decode real JPEG/PNG/WebP bytes with Sharp 0.35.4 and retain immutable normalized images, including photos used by other posts or history. Unused photo cleanup and full history restoration are not implemented. Unsaved browser drafts do not survive a reload. Dates/times use Michigan rules; overnight end times are not supported.
+
+Run `npm ci --prefix tools/workroom-tests` and `npm test --prefix tools/workroom-tests` after installing application development dependencies. Event/contact/photo route tests, local SQL rollback tests, production builds and isolated production-route/browser fixtures passed. The fixture database uses a local PGlite adapter; verify actual hosted PostgreSQL/TLS, restart/concurrent writes, public-page updates, photos and owner handover before rollout.
+
+## Checkout quote review
+
+Current menu prices are verified at submission; changed amounts require another guest review. See [integration, tests and remaining operating requirements](docs/order-quote-release.md). This is a demo/pay-at-pickup adapter, with no online card charge.
+
+## Recovering checkout submissions
+
+A stable submission reference and atomic order/print/email-intent write prevent duplicate orders on retry. See [recovery controls, rollout and remaining notification work](docs/order-acceptance-release.md).
+
+## Kitchen actions and recovery
+
+Kitchen controls and fulfillment actions now use saved revisions and recoverable action references. Owner cancellation preserves payment records and requires a reason. See [verification, rollout and remaining operating requirements](docs/kitchen-operations-release.md).
+
+## Parked-demo menu editing
+
+Owner menu drafts keep exact price input and survive kitchen-tab switches. Saves require the current revision and commit with before/after history. Compare the latest saved copy after a conflict or uncertain response. See [verification and rollout requirements](docs/parked-menu-release.md). This editor does not update Toast.
+
+Printer job binding, owner review/recovery, coordinated Basic-auth configuration and remaining hardware gates: [printer release](docs/printer-release.md).
+
+Guest confirmation dispatch, provider status and owner recovery: [notification release](docs/notification-release.md). Sending and hosted scheduling require deliberate configuration.
+
+## Trusted address setup for sign-in
+
+On Vercel, enable **Automatically expose System Environment Variables** in the project environment settings and redeploy. The deployed server must receive `VERCEL=1` and the platform-provided `x-vercel-forwarded-for` header. Leave `WORKROOM_TRUSTED_IP_HEADER` unset there. A missing or invalid trusted address returns HTTP 503 with `reason: trusted_address_unavailable`; database failures instead report sign-in storage unavailable. This distinction does not bypass throttling or accept an arbitrary forwarded header.
+
+On another host, configure an overwriting trusted proxy, block direct access to the application, and set `WORKROOM_TRUSTED_IP_HEADER` to that header. Verify a correct login and an independent address after deployment. The hosted toggle and actual edge header have not been verified by the local tests.

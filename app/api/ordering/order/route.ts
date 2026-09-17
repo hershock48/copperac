@@ -1,200 +1,76 @@
-// Place an order (POST) and check one order's status (GET ?id=).
-//
-// The server is the till: every price is recomputed here from lib/menu.ts via
-// the derived orderable menu. The client's numbers are treated as a display
-// convenience and nothing else, because a request body is guest input even
-// when our own page wrote it.
-//
-// PAYMENT SEAM. In demo mode (no STRIPE_SECRET_KEY) the order is accepted
-// without a charge and the UI says so plainly. The live wiring replaces the
-// marked block below with a Stripe Checkout session created on the bar's
-// connected account:
-//
-//   POST /v1/checkout/sessions  with header  Stripe-Account: {acct_...}
-//     line_items: the order lines, the 99 cent order fee, the tip
-//     payment_intent_data[application_fee_amount]: ORDERING.feeStudioCents
-//     automatic_tax[enabled]: true   (Stripe Tax on the connected account)
-//     success_url: /order/confirmed?id={id}
-//
-// The 49/50 split needs no rebate machinery: the fee settles into the bar's
-// own account and only the application fee leaves. Env names live in
-// .env.example; nothing here reads a key until one exists.
-
+// A submission reference settles once: accepted order, rejected input, or a
+// stopped submission. Retries recover the recorded result before repricing.
 import { NextRequest, NextResponse } from "next/server";
 import { ORDERING } from "@/lib/ordering/config";
 import { guestMenu } from "@/lib/ordering/menu";
-import { parsePicks, priceOptions, type OptionPick } from "@/lib/ordering/pricing";
+import { priceOptions } from "@/lib/ordering/pricing";
+import { quoteOrder, quoteWasReviewed } from "@/lib/ordering/order-quote";
+import { isAttemptId, readAttemptBody, requestFingerprint, type Attempt } from "@/lib/ordering/order-acceptance";
 import { orderingWindow } from "@/lib/ordering/time";
-import { effectiveState, getStore, type Order, type OrderLine } from "@/lib/ordering/store";
+import { effectiveState, getStore, type Order } from "@/lib/ordering/store";
 
 export const dynamic = "force-dynamic";
-
-type IncomingLine = { itemId: string; qty: number; options: OptionPick[] };
-type IncomingOrder = {
-  guestName: string;
-  guestPhone: string;
-  guestEmail?: string;
-  note?: string;
-  tipCents: number;
-  lines: IncomingLine[];
-  ageAcknowledged?: boolean;
-  payAtPickup?: boolean;
-};
-
-function bad(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status });
+const headers = { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" };
+const bad = (error: string, status = 400) => NextResponse.json({ error }, { status, headers });
+function recorded(attempt: Attempt, fingerprint: string) {
+  if (attempt.fingerprint !== null && attempt.fingerprint !== fingerprint) return NextResponse.json({ attemptId: attempt.id, outcome: "conflict", error: "This submission reference belongs to different details. Check its recorded result before starting another order." }, { status: 409, headers });
+  return NextResponse.json(attempt.response, { status: attempt.status, headers });
 }
 
 export async function POST(req: NextRequest) {
-  let body: IncomingOrder;
+  const body = await readAttemptBody(req);
+  if (!body || !isAttemptId(body.attemptId)) return bad("This checkout page needs a refresh before ordering.");
+  const attemptId = body.attemptId;
   try {
-    body = await req.json();
+    const fingerprint = requestFingerprint(body), store = getStore();
+    if (process.env.NODE_ENV === "production" && store.backend === "memory") throw Error("Persistent ordering storage is required.");
+    const existing = await store.getAttempt(attemptId);
+    if (existing) return recorded(existing, fingerprint);
+    const reject = async (error: string, status = 400, extra: Record<string, unknown> = {}) => {
+      const result = await store.settleAttempt({ id: attemptId, fingerprint, createdAt: Date.now(), outcome: "rejected", status, response: { ...extra, error, attemptId, outcome: "rejected" } });
+      return recorded(result.attempt, fingerprint);
+    };
+    for (const [key, max] of [["guestName", 60], ["guestPhone", 25], ["guestEmail", 120], ["note", 300]] as const) {
+      const value = body[key];
+      if ((value !== undefined && (typeof value !== "string" || value.length > max)) || (["guestName", "guestPhone"].includes(key) && typeof value !== "string")) return reject("Use valid contact details and keep notes under 300 characters.");
+    }
+    for (const key of ["ageAcknowledged", "payAtPickup"]) if (body[key] !== undefined && typeof body[key] !== "boolean") return reject("Malformed checkout choice.");
+    const clean = (key: string) => String(body[key] ?? "").replace(/[\x00-\x1f\x7f]/g, " ").trim();
+    const guestName = clean("guestName"), guestPhone = clean("guestPhone"), guestEmail = clean("guestEmail"), note = clean("note");
+    if (!guestName) return reject("A name for the order is required.");
+    if (guestPhone.replace(/\D/g, "").length < 10) return reject("A phone number is required so the kitchen can reach you.");
+    if (guestEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) return reject("That email does not look right. It is optional, so blank works too.");
+    const window = orderingWindow(); if (!window.open) return reject(window.reason, 409);
+    const state = effectiveState(await store.getState());
+    if (state.pausedUntil !== null) return reject("The kitchen just paused online ordering. Give it a few minutes or call the bar.", 409);
+    let menu;
+    try { menu = await guestMenu(store, { fresh: true }); }
+    catch { return reject("The current menu could not be checked. Please try later or contact the bar.", 503); }
+    const priced = quoteOrder(body.lines, menu.index, state.unavailable, { feeCents: ORDERING.feeCents, tipCents: body.tipCents, taxBasisPoints: ORDERING.taxBasisPoints }, priceOptions);
+    if (!priced.ok) return reject(priced.error, priced.status);
+    const quote = priced.quote;
+    if (!quoteWasReviewed(body.lines, body.expectedTotals, quote)) return reject("Prices or item requirements changed. Review the updated total before placing your order.", 409, { priceChanged: true, quote });
+    if (quote.hasAlcohol && body.ageAcknowledged !== true) return reject("Orders with drinks need the 21+ box checked. A valid ID gets checked at pickup.");
+    const createdAt = Date.now();
+    const order: Order = { id: attemptId, number: await store.nextTicketNumber(), guestName, guestPhone, guestEmail, note, lines: quote.lines, ...quote.totals, quotedMinutes: ORDERING.basePickupMinutes + state.busyMinutes, hasAlcohol: quote.hasAlcohol, paid: false, payAtPickup: body.payAtPickup === true, status: "new", createdAt, acceptedAt: null };
+    const { configuredPrinters, renderFor } = await import("@/lib/ordering/printing");
+    const jobs = configuredPrinters().map(printer => ({ id: crypto.randomUUID(), printerId: printer.id, orderId: order.id, body: renderFor(printer.role, order), status: "queued" as const, createdAt }));
+    const response = { attemptId, outcome: "accepted", id: order.id, number: order.number, quotedMinutes: order.quotedMinutes, totals: quote.totals, quote, payAtPickup: order.payAtPickup };
+    const result = await store.settleAttempt({ id: attemptId, fingerprint, createdAt, outcome: "accepted", status: 200, response }, order, jobs);
+    // The atomic intent survives checkout response loss. The worker and owner
+    // controls can recover eligible sends; only a provider ID proves acceptance.
+    if(result.created && guestEmail){try{const {sendOrderConfirmation}=await import("@/lib/ordering/email");await sendOrderConfirmation(order);}catch{/* Order acceptance remains durable. */}}
+    return recorded(result.attempt, fingerprint);
   } catch {
-    return bad("Malformed request.");
+    return NextResponse.json({ attemptId, outcome: "unknown", error: "We could not confirm the submission. Check its status or retry the same submission." }, { status: 503, headers });
   }
-
-  const guestName = String(body.guestName ?? "").trim().slice(0, 60);
-  const guestPhone = String(body.guestPhone ?? "").trim().slice(0, 25);
-  const note = String(body.note ?? "").trim().slice(0, 300);
-  const guestEmail = String(body.guestEmail ?? "").trim().slice(0, 120);
-  if (guestEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) {
-    return bad("That email does not look right. It is optional, so blank works too.");
-  }
-  if (!guestName) return bad("A name for the order is required.");
-  if (guestPhone.replace(/\D/g, "").length < 10) return bad("A phone number is required so the kitchen can reach you.");
-  if (!Array.isArray(body.lines) || body.lines.length === 0) return bad("The cart is empty.");
-  if (body.lines.length > 30) return bad("That is a catering order. Call the bar and they will take care of you.");
-
-  const window = orderingWindow();
-  if (!window.open) return bad(window.reason, 409);
-
-  const store = getStore();
-  const state = effectiveState(await store.getState());
-  if (state.pausedUntil !== null) {
-    return bad("The kitchen just paused online ordering. Give it a few minutes or call the bar.", 409);
-  }
-
-  const { index: ITEM_INDEX } = await guestMenu(store);
-  const lines: OrderLine[] = [];
-  for (const raw of body.lines) {
-    const item = ITEM_INDEX.get(String(raw.itemId));
-    if (!item) return bad("An item in the cart is no longer on the menu.");
-    if (state.unavailable.includes(item.id)) {
-      return bad(`${item.name} just sold out tonight. Take it out of the cart and the rest can go through.`, 409);
-    }
-    const qty = Math.floor(Number(raw.qty));
-    if (!Number.isFinite(qty) || qty < 1 || qty > 12) return bad("Quantity out of range.");
-
-    // Picks arrive group-qualified and are priced by lib/ordering/pricing.ts,
-    // the same function the cart uses, so the two cannot disagree. See that
-    // file for why a bare choice name is not enough.
-    const picks = parsePicks(raw.options);
-    if (picks === "stale") {
-      return bad("This page is out of date. Refresh it and add the items again.");
-    }
-    if (picks === null) return bad("Malformed options.");
-    const priced = priceOptions(item, picks);
-    if (!priced.ok) return bad(priced.error);
-
-    const unitCents = item.priceCents + priced.optionCents;
-    lines.push({
-      itemId: item.id,
-      name: item.name,
-      qty,
-      unitCents,
-      options: priced.labels,
-      lineCents: unitCents * qty,
-    });
-  }
-
-  const hasAlcohol = lines.some((l) => ITEM_INDEX.get(l.itemId)?.ageRestricted);
-  if (hasAlcohol && body.ageAcknowledged !== true) {
-    return bad("Orders with drinks need the 21+ box checked. A valid ID gets checked at pickup.");
-  }
-
-  const subtotalCents = lines.reduce((s, l) => s + l.lineCents, 0);
-  const feeCents = ORDERING.feeCents;
-  const tipCents = Math.floor(Number(body.tipCents));
-  if (!Number.isFinite(tipCents) || tipCents < 0 || tipCents > subtotalCents * 2) {
-    return bad("Tip out of range.");
-  }
-  // MI 6% on the food and the fee; the tip is not taxable. The live build
-  // hands this to Stripe Tax instead of computing it here.
-  const taxCents = Math.round((subtotalCents + feeCents) * ORDERING.taxRate);
-  const totalCents = subtotalCents + feeCents + tipCents + taxCents;
-
-  const order: Order = {
-    id: crypto.randomUUID(),
-    number: await store.nextTicketNumber(),
-    guestName,
-    guestPhone,
-    guestEmail,
-    note,
-    lines,
-    subtotalCents,
-    feeCents,
-    tipCents,
-    taxCents,
-    totalCents,
-    quotedMinutes: ORDERING.basePickupMinutes + state.busyMinutes,
-    hasAlcohol,
-    // PAYMENT SEAM: flips to true when Stripe confirms the charge. Until
-    // then the front-of-house slip prints DUE AT PICKUP with tip and
-    // signature lines. payAtPickup orders skip Stripe entirely, live and
-    // demo alike: the counter collects, so paid stays false for good and
-    // there is no application fee to split -- the whole 99 cents is rung
-    // into the till with the rest.
-    paid: false,
-    payAtPickup: body.payAtPickup === true,
-    status: "new",
-    createdAt: Date.now(),
-    acceptedAt: null,
-  };
-
-  await store.createOrder(order);
-
-  // Fan out one job per configured printer, each with its station's own
-  // template. No printers configured means no jobs: the chime path carries.
-  const { configuredPrinters, renderFor } = await import("@/lib/ordering/printing");
-  for (const printer of configuredPrinters()) {
-    await store.enqueuePrintJob({
-      id: crypto.randomUUID(),
-      printerId: printer.id,
-      orderId: order.id,
-      body: renderFor(printer.role, order),
-      status: "queued",
-      createdAt: Date.now(),
-    });
-  }
-
-  // Courtesy copy of what the confirmation screen shows. Best-effort by
-  // design: an email problem must never fail an order. But the send is
-  // AWAITED, because fire-and-forget dies on serverless: Vercel freezes the
-  // lambda the moment the response returns, so an un-awaited send silently
-  // never runs and its catch never logs. Proven live in devine's agreement
-  // flow, which delivered exactly one of its two emails for this reason.
-  // The catch keeps a bounced email from failing the order.
-  const { sendOrderConfirmation } = await import("@/lib/ordering/email");
-  await sendOrderConfirmation(order).catch(() => {});
-
-  return NextResponse.json({
-    id: order.id,
-    number: order.number,
-    quotedMinutes: order.quotedMinutes,
-    totals: { subtotalCents, feeCents, tipCents, taxCents, totalCents },
-  });
 }
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
-  if (!id) return bad("Missing id.");
-  const order = await getStore().getOrder(id);
-  if (!order) return bad("No such order.", 404);
-  // Only what the confirmation screen needs; the phone number stays server-side.
-  return NextResponse.json({
-    number: order.number,
-    status: order.status,
-    quotedMinutes: order.quotedMinutes,
-    createdAt: order.createdAt,
-  });
+  if (!isAttemptId(id)) return bad("Missing or invalid order reference.");
+  try {
+    const order = await getStore().getOrder(id); if (!order) return bad("No such order.", 404);
+    return NextResponse.json({ number: order.number, status: order.status, quotedMinutes: order.quotedMinutes, createdAt: order.createdAt }, { headers });
+  } catch { return bad("The order status could not be checked.", 503); }
 }

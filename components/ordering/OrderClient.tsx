@@ -13,9 +13,13 @@
 // and it is also the pitch, so it is written in the bar's voice, not buried.
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import { priceOptions, type OptionPick } from "@/lib/ordering/pricing";
+import { orderLineKey, orderTotals, type OrderTotals } from "@/lib/ordering/order-quote";
+
+import { recoverSubmission, validSubmissionId, type Submission } from "@/lib/ordering/order-recovery";
+const RECOVERY_KEY = "copperac-pending-order-v1";
 
 type LiveState = {
   open: boolean;
@@ -26,6 +30,7 @@ type LiveState = {
   feeLabel: string;
   feeExplainer: string;
   taxRate: number;
+  taxBasisPoints: number;
   demo: boolean;
 };
 
@@ -47,7 +52,7 @@ type Confirmation = {
   totalCents: number;
   emailedTo: string;
   payAtPickup: boolean;
-  status: "new" | "accepted" | "done" | "refunded";
+  status: "new" | "accepted" | "done" | "cancelled" | "refunded";
 };
 
 function money(cents: number): string {
@@ -61,6 +66,18 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [placing, setPlacing] = useState(false);
+  const submitting = useRef(false);
+  const attemptRef = useRef<Submission | null>(null);
+  const [recovery, setRecovery] = useState<Submission | null>(null);
+  useEffect(() => {
+    const first = setTimeout(() => {
+      try {
+        const id = sessionStorage.getItem(RECOVERY_KEY);
+        if (validSubmissionId(id)) { const prior = { id, body: null }; attemptRef.current = prior; setRecovery(prior); }
+      } catch { /* A new submission checks storage again before sending. */ }
+    }, 0);
+    return () => clearTimeout(first);
+  }, []);
   const [error, setError] = useState("");
 
   const refreshLive = useCallback(async () => {
@@ -86,13 +103,14 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   // Confirmation polling: the "Accepted" flip is the product moment, worth a
   // 5 second poll for the few minutes anyone watches this screen.
   useEffect(() => {
-    if (!confirmation || confirmation.status === "done" || confirmation.status === "refunded") return;
+    if (!confirmation || confirmation.status === "done" || confirmation.status === "cancelled" || confirmation.status === "refunded") return;
     const t = setInterval(async () => {
       try {
         const r = await fetch(`/api/ordering/order?id=${confirmation.id}`, { cache: "no-store" });
         if (r.ok) {
           const data = await r.json();
-          setConfirmation((c) => (c ? { ...c, status: data.status } : c));
+          if (["new","accepted","done","cancelled","refunded"].includes(data.status) && data.number === confirmation.number)
+            setConfirmation((c) => (c?.id === confirmation.id ? { ...c, status: data.status } : c));
         }
       } catch {
         /* transient; next tick retries */
@@ -104,7 +122,8 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const unavailable = useMemo(() => new Set(live?.unavailable ?? []), [live]);
 
   function addToCart(line: Omit<CartLine, "key" | "qty">) {
-    const key = `${line.itemId}|${line.options.map((p) => `${p.group}=${p.choice}`).sort().join(",")}`;
+    if (submitting.current || attemptRef.current) return;
+    const key = orderLineKey(line.itemId, line.options);
     setCart((c) => {
       const existing = c.find((l) => l.key === key);
       if (existing) {
@@ -116,6 +135,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   }
 
   function setQty(key: string, qty: number) {
+    if (submitting.current || attemptRef.current) return;
     setCart((c) =>
       qty <= 0 ? c.filter((l) => l.key !== key) : c.map((l) => (l.key === key ? { ...l, qty } : l))
     );
@@ -125,12 +145,37 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const cartCount = cart.reduce((s, l) => s + l.qty, 0);
   const hasAlcohol = cart.some((l) => l.ageRestricted);
 
+  async function runSubmission(submission: Submission, action: "submit" | "check" | "stop") {
+    if (submitting.current) return;
+    submitting.current = true; setPlacing(true); setError("");
+    const result = await recoverSubmission(submission, action);
+    if (result.kind === "unknown") {
+      attemptRef.current = submission; setRecovery(submission); setError(result.error);
+    } else {
+      try { if (sessionStorage.getItem(RECOVERY_KEY) === submission.id) sessionStorage.removeItem(RECOVERY_KEY); } catch { /* A retained reference reopens the same result; it cannot create a duplicate. */ }
+      attemptRef.current = null; setRecovery(null);
+      if (result.kind === "accepted") { setConfirmation(result.receipt); setCart([]); setCartOpen(false); }
+      else {
+        if (result.quote) {
+          const quote = result.quote;
+          setCart(current => current.map((line, i) => ({ ...line, name: quote.lines[i].name, unitCents: quote.lines[i].unitCents, labels: quote.lines[i].options, ageRestricted: quote.lines[i].ageRestricted })));
+          setLive(current => current ? { ...current, feeCents: quote.totals.feeCents, taxBasisPoints: quote.taxBasisPoints, taxRate: quote.taxBasisPoints / 10000 } : current);
+        }
+        setError(result.error); refreshLive();
+      }
+    }
+    submitting.current = false; setPlacing(false);
+  }
+  const recoveryCard = recovery ? <SubmissionRecovery submission={recovery} busy={placing} error={error} onAction={action => runSubmission(recovery, action)} /> : null;
+  if (recovery && !cartOpen) return recoveryCard;
+
   if (confirmation) {
     return <Confirmed confirmation={confirmation} />;
   }
 
   return (
     <div className="pb-28">
+      {!cartOpen && error && <p role="alert" className="mb-5 text-sm">{error}</p>}
       {/* Functional status only. This banner briefly carried a paragraph about
           the fee and the no-delivery-apps model, and Kevin killed it: "it reads
           more client facing." Guests get what a Toast or Menufy page would give
@@ -276,47 +321,20 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
           setQty={setQty}
           placing={placing}
           error={error}
-          onClose={() => setCartOpen(false)}
+          onClose={() => { if (!submitting.current && !attemptRef.current) setCartOpen(false); }}
+          recoveryControls={recovery ? recoveryCard : null}
           onPlace={async (form) => {
-            setPlacing(true);
-            setError("");
+            if (submitting.current || attemptRef.current) return;
+            const id = crypto.randomUUID();
+            const submission = { id, body: JSON.stringify({ attemptId: id, guestName: form.name, guestPhone: form.phone, guestEmail: form.email, note: form.note, tipCents: form.tipCents, ageAcknowledged: form.ageAcknowledged, payAtPickup: form.payAtPickup, lines: cart.map(l => ({ itemId: l.itemId, qty: l.qty, options: l.options, quotedUnitCents: l.unitCents, quotedAgeRestricted: l.ageRestricted })), expectedTotals: form.expectedTotals }) };
             try {
-              const r = await fetch("/api/ordering/order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  guestName: form.name,
-                  guestPhone: form.phone,
-                  guestEmail: form.email,
-                  note: form.note,
-                  tipCents: form.tipCents,
-                  ageAcknowledged: form.ageAcknowledged,
-                  payAtPickup: form.payAtPickup,
-                  lines: cart.map((l) => ({ itemId: l.itemId, qty: l.qty, options: l.options })),
-                }),
-              });
-              const data = await r.json();
-              if (!r.ok) {
-                setError(data.error ?? "Something went wrong. The phone still works.");
-                refreshLive(); // an 86 or a pause mid-checkout shows up right away
-              } else {
-                setConfirmation({
-                  id: data.id,
-                  number: data.number,
-                  quotedMinutes: data.quotedMinutes,
-                  totalCents: data.totals.totalCents,
-                  emailedTo: form.email,
-                  payAtPickup: form.payAtPickup,
-                  status: "new",
-                });
-                setCart([]);
-                setCartOpen(false);
-              }
-            } catch {
-              setError("Could not reach the kitchen. Check your connection and try again, or call the bar.");
-            } finally {
-              setPlacing(false);
-            }
+              const priorId = sessionStorage.getItem(RECOVERY_KEY);
+              if (validSubmissionId(priorId)) { const prior = { id: priorId, body: null }; attemptRef.current = prior; setRecovery(prior); return; }
+              // Only an opaque reference is persisted; contact details stay in memory.
+              sessionStorage.setItem(RECOVERY_KEY, id);
+            } catch { setError("The browser could not keep a recovery reference. Nothing was ordered. Enable session storage before trying again."); return; }
+            attemptRef.current = submission;
+            await runSubmission(submission, "submit");
           }}
         />
       )}
@@ -421,6 +439,7 @@ function Checkout({
   error,
   onClose,
   onPlace,
+  recoveryControls,
 }: {
   live: LiveState;
   cart: CartLine[];
@@ -430,7 +449,8 @@ function Checkout({
   placing: boolean;
   error: string;
   onClose: () => void;
-  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean }) => void;
+  recoveryControls?: ReactNode;
+  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean; expectedTotals: OrderTotals }) => void;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -445,10 +465,11 @@ function Checkout({
   }, []);
 
   const tipCents = tipPct === null ? 0 : Math.round((subtotal * tipPct) / 100);
-  const taxCents = Math.round((subtotal + live.feeCents) * live.taxRate);
-  const total = subtotal + live.feeCents + tipCents + taxCents;
+  const totals = orderTotals(subtotal, live.feeCents, tipCents, live.taxBasisPoints);
+  const taxCents = totals?.taxCents ?? 0;
+  const total = totals?.totalCents ?? 0;
   const canPlace =
-    cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
+    !recoveryControls && Boolean(totals) && cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" role="dialog" aria-modal="true" aria-label="Your order">
@@ -457,6 +478,8 @@ function Checkout({
         tabIndex={-1}
         className="max-h-[92vh] w-full max-w-lg overflow-y-auto border border-ink-line bg-ink p-5 sm:rounded-sm"
       >
+        {recoveryControls}
+        <fieldset disabled={placing || Boolean(recoveryControls)} className="m-0 min-w-0 border-0 p-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="display text-xl uppercase text-cream">Your order</h2>
           <button
@@ -556,6 +579,7 @@ function Checkout({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={60}
               autoComplete="name"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
             />
@@ -565,6 +589,7 @@ function Checkout({
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              maxLength={25}
               type="tel"
               autoComplete="tel"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
@@ -575,6 +600,7 @@ function Checkout({
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              maxLength={120}
               type="email"
               autoComplete="email"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
@@ -604,6 +630,7 @@ function Checkout({
           )}
         </div>
 
+        {!totals && <p role="alert" className="mt-4 text-sm">The totals are unavailable. Refresh the menu before ordering.</p>}
         {error && (
           <p role="alert" className="mt-4 rounded-sm border border-[#d9736b]/40 bg-[#d9736b]/10 px-3 py-2.5 text-sm text-[#d9736b]">
             {error}
@@ -617,15 +644,15 @@ function Checkout({
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: false })}
+          onClick={() => totals && onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: false, expectedTotals: totals })}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {placing ? "Sending to the kitchen" : `Pay ${money(total)} · place order`}
+          {placing ? "Sending to the kitchen" : live.demo ? `Place demo order · ${money(total)}` : `Place order · ${money(total)}`}
         </button>
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: true })}
+          onClick={() => totals && onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: true, expectedTotals: totals })}
           className="mt-3 w-full rounded-sm px-2 py-2 text-center text-sm text-cream-dim underline decoration-ink-line underline-offset-4 transition-colors hover:text-cream disabled:cursor-not-allowed disabled:opacity-40"
         >
           or pay cash or card at pickup
@@ -633,6 +660,7 @@ function Checkout({
         {live.demo && (
           <p className="mt-3 text-center text-xs text-cream-dim/60">{`Demo checkout. No card is charged.`}</p>
         )}
+        </fieldset>
       </div>
     </div>
   );
@@ -641,30 +669,32 @@ function Checkout({
 /* -------------------------- confirmation -------------------------- */
 
 function Confirmed({ confirmation }: { confirmation: Confirmation }) {
-  if (confirmation.status === "refunded") {
+  if (confirmation.status === "cancelled" || confirmation.status === "refunded") {
     return (
       <div className="mx-auto max-w-lg py-10 text-center">
         <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">Order #{confirmation.number}</p>
-        <p className="display mt-4 text-4xl uppercase text-cream">Refunded</p>
+        <p className="display mt-4 text-4xl uppercase text-cream">Order cancelled</p>
         <p className="mt-6 text-base leading-relaxed text-cream-dim">
-          Your {money(confirmation.totalCents)} is on its way back. Card refunds usually show up in 5 to 10
-          business days, depending on your bank.{confirmation.emailedTo ? " A confirmation is in your email." : ""}
+          The kitchen will not prepare this order. This screen does not confirm a refund.
+          If you paid at the counter or have a payment question, contact the bar.
         </p>
+        <a href="/order" className="display mt-8 inline-block rounded-sm border border-copper px-6 py-3 text-sm uppercase text-cream">Start another order</a>
       </div>
     );
   }
-  const accepted = confirmation.status !== "new";
+  const completed = confirmation.status === "done";
+  const accepted = confirmation.status === "accepted" || completed;
   return (
     <div className="mx-auto max-w-lg py-10 text-center">
       <p className="display text-xs uppercase tracking-[0.3em] text-copper-light">Order in</p>
       <p className="display mt-4 text-7xl text-cream tabular-nums">#{confirmation.number}</p>
       <p className="mt-6 text-base leading-relaxed text-cream-dim">
-        {accepted
+        {completed ? "This order has been marked picked up. Thank you." : accepted
           ? `The kitchen has it. See you in about ${confirmation.quotedMinutes} minutes.`
           : `Sent to the kitchen. Ready in about ${confirmation.quotedMinutes} minutes.`}
       </p>
       {confirmation.emailedTo && (
-        <p className="mt-2 text-sm text-cream-dim/70">Confirmation sent to {confirmation.emailedTo}.</p>
+        <p className="mt-2 text-sm text-cream-dim/70">Check {confirmation.emailedTo} for a confirmation; contact the bar if it does not arrive.</p>
       )}
       <div className="mx-auto mt-8 flex max-w-xs items-center justify-center gap-3 rounded-sm border border-ink-line bg-ink-soft px-4 py-3">
         <span
@@ -672,11 +702,11 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
           aria-hidden
         />
         <p className="text-sm text-cream-dim">
-          {accepted ? "Accepted by the kitchen" : "Waiting for the kitchen to accept"}
+          {completed ? "Picked up" : accepted ? "Accepted by the kitchen" : "Waiting for the kitchen to accept"}
         </p>
       </div>
       <p className="mt-8 text-sm text-cream-dim/70">
-        {confirmation.payAtPickup
+        {completed ? `Total ${money(confirmation.totalCents)}` : confirmation.payAtPickup
           ? `Total ${money(confirmation.totalCents)} · cash or card at the counter`
           : `Total ${money(confirmation.totalCents)} · pay at pickup in this demo`}
       </p>
@@ -688,4 +718,20 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
       </a>
     </div>
   );
+}
+
+function SubmissionRecovery({ submission, busy, error, onAction }: { submission: Submission; busy: boolean; error: string; onAction: (action: "submit" | "check" | "stop") => void }) {
+  return <section aria-label="Check your submission" className="mb-5 rounded-sm border border-lamp bg-ink-soft p-4 text-sm text-cream">
+    <h2 className="display text-xl uppercase">Check your submission</h2>
+    <p className="mt-2">An order may already be recorded. Check this submission before starting another one.</p>
+    {error && <p role="alert" className="mt-2">{error}</p>}
+    <p className="mt-2 break-all text-xs text-cream-dim">Reference: {submission.id}</p>
+    <div className="mt-4 flex flex-wrap gap-2">
+      <button type="button" disabled={busy} onClick={() => onAction("check")} className="rounded-sm border border-lamp px-3 py-2 disabled:opacity-40">Check order result</button>
+      {submission.body && <button type="button" disabled={busy} onClick={() => onAction("submit")} className="rounded-sm border border-lamp px-3 py-2 disabled:opacity-40">Retry this submission</button>}
+      <button type="button" disabled={busy} onClick={() => onAction("stop")} className="rounded-sm border border-ink-line px-3 py-2 disabled:opacity-40">Stop submission and return</button>
+    </div>
+    <p className="mt-3 text-xs text-cream-dim">Stopping prevents an unaccepted submission from becoming an order. If it already went through, its confirmation will appear instead.</p>
+    {busy && <p role="status" className="mt-2">Checking the submission…</p>}
+  </section>;
 }

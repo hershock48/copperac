@@ -1,110 +1,44 @@
-// Guest email: order confirmation and refund notice.
-//
-// Sends through Resend's REST API with the same delivery posture as the
-// enquiry form (see glaze.md): when RESEND_API_KEY is unset, the email is
-// NOT faked -- the full payload goes to the server log so nothing is lost,
-// and the caller carries on. Email here is a courtesy copy of state the
-// guest can already see on their confirmation screen, so best-effort is the
-// honest level: an email failure must never fail an order.
-//
-// From-address strategy is the studio standard: a verified glazedweb.com
-// sender, reply_to the bar's inbox, so no client DNS work is ever on the
-// critical path. INQUIRY_FROM is the complete From header, display name
-// included ("Copper Athletic Club <copper@glazedweb.com>"), read exactly the
-// way app/api/inquiry/route.ts reads it and sent as-is. An earlier version
-// wrapped it in a second display name, which Resend refuses as malformed.
-//
-// Best-effort is not the same as silent. Resend answering with anything but
-// 2xx (a bad key is 401, an unverified From domain is 403) is logged with
-// its status and body, because the enquiry route once lost mail exactly
-// this way and the runtime log was the only place the reason showed up.
-
-import { ORDERING } from "./config";
+import "server-only";
+import { createHash } from "node:crypto";
+import { getStore, type Order } from "./store";
 import { SITE } from "@/lib/site";
-import type { Order } from "./store";
+import { ORDERING } from "./config";
+import type { Mail } from "./notification-outbox";
+import { sendResend,retrieveResend } from "./notification-provider";
 
-function money(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+export function notificationConfiguration(){
+ const key=process.env.RESEND_API_KEY?.trim()??"",from=process.env.INQUIRY_FROM?.trim()??"";
+ const enabled=process.env.ORDERING_EMAIL_ENABLED==="true"&&!!key&&!!from;
+ return {enabled,key,from,credential:createHash("sha256").update(key).digest("hex"),reason:process.env.ORDERING_EMAIL_ENABLED!=="true"?"Order emails are disabled until delivery setup is verified.":!key||!from?"The email provider or sender is not configured.":""};
 }
-
-function orderLines(order: Order): string {
-  return order.lines
-    .map((l) => `  ${l.qty} x ${l.name}${l.options.length ? ` (${l.options.join(", ")})` : ""} - ${money(l.lineCents)}`)
-    .join("\n");
+const money=(cents:number)=>"$"+(cents/100).toFixed(2);
+export function renderOrderConfirmation(raw:Record<string,unknown>,from:string):Mail{
+ const order=raw as unknown as Order;
+ const received=new Intl.DateTimeFormat("en-US",{timeZone:ORDERING.timezone,dateStyle:"medium",timeStyle:"short"}).format(new Date(order.createdAt));
+ return {from,to:[order.guestEmail],reply_to:SITE.email,subject:"Order #"+order.number+" at "+SITE.name,text:
+  "Thanks, "+order.guestName+". Your order was received at "+received+".\n\n"+
+  "Order #"+order.number+". The pickup estimate at submission was "+order.quotedMinutes+" minutes; check your order screen or call the bar for its current status.\n\n"+
+  order.lines.map(l=>"  "+l.qty+" x "+l.name+(l.options.length?" ("+l.options.join(", ")+")":"")+" - "+money(l.lineCents)).join("\n")+
+  "\n\nSubtotal: "+money(order.subtotalCents)+"\nTaxes & fees: "+money(order.feeCents+order.taxCents)+(order.tipCents>0?"\nTip: "+money(order.tipCents):"")+"\nTotal: "+money(order.totalCents)+"\n\n"+
+  (order.paid?"The order record shows paid online.":"Due at pickup: "+money(order.totalCents)+". Cash or card at the bar.")+"\n"+
+  (order.hasAlcohol?"For drinks, whoever picks up must show a valid ID (21+).\n":"")+
+  "Pickup: "+SITE.street+", "+SITE.city+". Questions or changes? Call "+SITE.phone+".\n\nOrder reference: "+order.id};
 }
-
-async function send(to: string, subject: string, text: string): Promise<void> {
-  // Trimmed on read: a trailing space or CR on a pasted key is invisible in
-  // every dashboard and would otherwise fail as a bad credential.
-  const key = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.INQUIRY_FROM?.trim();
-  if (!key || !from) {
-    console.log(`[ordering email, delivery unconfigured] to=${to} subject="${subject}"\n${text}`);
-    return;
-  }
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        reply_to: SITE.email,
-        subject,
-        text,
-      }),
-    });
-    if (!res.ok) {
-      const detail = await res.text().catch(() => "<unreadable>");
-      console.error(`[ordering email] Resend refused ${res.status}: ${detail} to=${to} subject="${subject}"`);
-    }
-  } catch (err) {
-    console.error(`[ordering email] call to Resend failed to=${to} subject="${subject}"`, err);
-  }
+export async function sendOrderConfirmation(order:Pick<Order,"id">):Promise<void>{
+ const config=notificationConfiguration();if(!config.enabled)return;
+ const store=getStore();if(store.backend!=="postgres")throw Error("Persistent notification storage is required.");
+ await store.dispatchNotification(order.id,o=>renderOrderConfirmation(o,config.from),config.credential,"copperac",(payload,key)=>sendResend(payload,key,config.key));
 }
-
-export async function sendOrderConfirmation(order: Order): Promise<void> {
-  if (!order.guestEmail) return;
-  const paidLine = order.paid
-    ? "Paid online. Nothing owed at pickup."
-    : `Due at pickup: ${money(order.totalCents)}. Cash or card at the bar.`;
-  await send(
-    order.guestEmail,
-    `Order #${order.number} at Copper Athletic Club`,
-    `Thanks, ${order.guestName}. The kitchen has your order.
-
-Order #${order.number} - ready in about ${order.quotedMinutes} minutes.
-
-${orderLines(order)}
-
-  Subtotal      ${money(order.subtotalCents)}
-  Taxes & fees  ${money(order.feeCents + order.taxCents)}${order.tipCents > 0 ? `\n  Tip           ${money(order.tipCents)}` : ""}
-  Total         ${money(order.totalCents)}
-
-${paidLine}
-${order.hasAlcohol ? "Your order includes drinks: whoever picks it up shows a valid ID (21+).\n" : ""}
-Pickup at the bar: ${SITE.street}, ${SITE.city}. Questions? Call ${SITE.phone}.`
-  );
+export async function checkOrderNotification(id:string):Promise<void>{
+ const config=notificationConfiguration();if(!config.key)throw Error("The email provider is not configured.");
+ const store=getStore();if(store.backend!=="postgres")throw Error("Persistent notification storage is required.");
+ await store.checkNotification(id,(providerId,payload)=>retrieveResend(providerId,payload,config.key));
 }
-
-export async function sendRefundNotice(order: Order): Promise<void> {
-  if (!order.guestEmail) return;
-  await send(
-    order.guestEmail,
-    `Refund for order #${order.number} at Copper Athletic Club`,
-    `Hi ${order.guestName},
-
-Your refund of ${money(order.totalCents)} for order #${order.number} has been issued.
-
-${order.paid
-  ? "Card refunds usually appear on your statement in 5 to 10 business days, depending on your bank."
-  : "This order was not charged online, so there is nothing further to do."}
-
-Sorry it did not work out this time. Questions? Call ${SITE.phone}.`
-  );
+export async function runNotificationQueue(){
+ const config=notificationConfiguration();if(!config.key)return {enabled:false,processed:0,checked:0,errors:0,message:config.reason};
+ const store=getStore();if(store.backend!=="postgres")throw Error("Persistent notification storage is required.");
+ let processed=0,checked=0,errors=0;
+ for(const id of config.enabled?await store.dueNotifications():[]){try{await sendOrderConfirmation({id});processed++;}catch{errors++;}}
+ for(const id of await store.dueDeliveryChecks()){try{await checkOrderNotification(id);checked++;}catch{errors++;}}
+ return {enabled:config.enabled,processed,checked,errors,message:!config.enabled?config.reason+" Available provider results were checked.":errors?"Some notification checks failed. Refresh their saved status before retrying.":"Due confirmations processed. Refresh their saved status for provider results."};
 }
-
-// Referenced so a future non-Copper build remembers this file is Copper-fitted:
-// the venue name and numbers above come from lib/site.ts, and the multi-tenant
-// extraction parameterizes exactly these.
-void ORDERING;

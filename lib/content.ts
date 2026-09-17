@@ -1,4 +1,5 @@
 import "server-only";
+import { contentRevision } from "@/lib/workroom/content-cas";
 
 import { BRUNCH_MENU, COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu";
 import { EVENTS, type CACEvent } from "@/lib/site";
@@ -94,7 +95,7 @@ export function toSiteEvent(e: WorkroomEvent): CACEvent {
     checked-in seed, seed rows yielding to a workroom row of the same slug. */
 async function allSiteEvents(): Promise<CACEvent[]> {
   const stored = await getStore().events.list();
-  const fromWorkroom = stored.filter((e) => e.published).map(toSiteEvent);
+  const fromWorkroom = stored.filter((e) => e.published && !e.archivedAt).map(toSiteEvent);
   const taken = new Set(fromWorkroom.map((e) => e.slug));
   return [...fromWorkroom, ...EVENTS.filter((e) => !taken.has(e.slug))];
 }
@@ -117,8 +118,8 @@ export async function getEventsContact(): Promise<EventsContact> {
 
 /* ------------------------------- menus ------------------------------- */
 
-export async function getMenuOverrides(): Promise<MenuOverrides> {
-  const stored = await getStore().getValue<MenuOverrides>(MENU_OVERRIDES_KEY);
+export async function getMenuOverrides(): Promise<MenuOverrides> { return filterMenuOverrides(await getStore().getValue(MENU_OVERRIDES_KEY)); }
+function filterMenuOverrides(stored: unknown): MenuOverrides {
   if (!stored || typeof stored !== "object") return {};
   // Re-filter on read: only keys that name an item this build knows, only
   // the whitelisted fields, so a row from another build cannot misprice.
@@ -180,12 +181,16 @@ export type MenuEditorItem = {
 };
 
 export type MenuEditorState = {
+  revision: string;
+  history: { id: string; changedAt: string }[];
   menus: { id: MenuId; label: string; sections: { name: string; items: MenuEditorItem[] }[] }[];
   backend: "postgres" | "memory";
 };
 
-export async function menuEditorState(): Promise<MenuEditorState> {
-  const overrides = await getMenuOverrides();
+export async function menuEditorState(): Promise<MenuEditorState> { return (await menuEditorSnapshot()).state; }
+export async function menuEditorSnapshot(): Promise<{ raw: unknown; state: MenuEditorState }> {
+  const raw = await getStore().getValue(MENU_OVERRIDES_KEY);
+  const overrides = filterMenuOverrides(raw);
   const build = (id: MenuId, label: string, sections: MenuSection[]) => ({
     id,
     label,
@@ -207,8 +212,6 @@ export async function menuEditorState(): Promise<MenuEditorState> {
       }),
     })),
   });
-  return {
-    menus: [build("food", "Main menu", FOOD_MENU), build("brunch", "Sunday brunch", BRUNCH_MENU)],
-    backend: getStore().backend,
-  };
+  const menus = [build("food", "Main menu", FOOD_MENU), build("brunch", "Sunday brunch", BRUNCH_MENU)];
+  return { raw, state: { menus, backend: getStore().backend, revision: contentRevision({ raw, menus }), history: (await getStore().contentHistory(MENU_OVERRIDES_KEY)).map(({ id, changedAt }) => ({ id, changedAt })) } };
 }
