@@ -57,17 +57,9 @@ export async function POST(req: NextRequest) {
     const jobs = configuredPrinters().map(printer => ({ id: crypto.randomUUID(), printerId: printer.id, orderId: order.id, body: renderFor(printer.role, order), status: "queued" as const, createdAt }));
     const response = { attemptId, outcome: "accepted", id: order.id, number: order.number, quotedMinutes: order.quotedMinutes, totals: quote.totals, quote, payAtPickup: order.payAtPickup };
     const result = await store.settleAttempt({ id: attemptId, fingerprint, createdAt, outcome: "accepted", status: 200, response }, order, jobs);
-    // Only the winner attempts the courtesy email. Its durable intent is saved
-    // with the order; attempted is deliberately not a delivery claim. A separate
-    // notification recovery workflow must reconcile queued/attempted intents.
-    if (result.created && guestEmail) {
-      try {
-        if (await store.claimConfirmation(order.id)) {
-          const { sendOrderConfirmation } = await import("@/lib/ordering/email");
-          await sendOrderConfirmation(order);
-        }
-      } catch { /* The committed order remains recoverable even if mail fails. */ }
-    }
+    // The atomic intent survives checkout response loss. The worker and owner
+    // controls can recover eligible sends; only a provider ID proves acceptance.
+    if(result.created && guestEmail){try{const {sendOrderConfirmation}=await import("@/lib/ordering/email");await sendOrderConfirmation(order);}catch{/* Order acceptance remains durable. */}}
     return recorded(result.attempt, fingerprint);
   } catch {
     return NextResponse.json({ attemptId, outcome: "unknown", error: "We could not confirm the submission. Check its status or retry the same submission." }, { status: 503, headers });

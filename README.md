@@ -540,3 +540,5 @@ Kitchen controls and fulfillment actions now use saved revisions and recoverable
 Owner menu drafts keep exact price input and survive kitchen-tab switches. Saves require the current revision and commit with before/after history. Compare the latest saved copy after a conflict or uncertain response. See [verification and rollout requirements](docs/parked-menu-release.md). This editor does not update Toast.
 
 Printer job binding, owner review/recovery, coordinated Basic-auth configuration and remaining hardware gates: [printer release](docs/printer-release.md).
+
+Guest confirmation dispatch, provider status and owner recovery: [notification release](docs/notification-release.md). Sending and hosted scheduling require deliberate configuration.

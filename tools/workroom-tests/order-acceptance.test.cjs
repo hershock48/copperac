@@ -3,7 +3,7 @@ const {PGlite}=require('@electric-sql/pglite');
 const root=path.resolve(__dirname,'../..');
 function load(file,mocks={},env={}){
  const mod={exports:{}};const source=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- new vm.Script(source,{filename:file}).runInNewContext({module:mod,exports:mod.exports,process:{env},Buffer,structuredClone,Request,Response,URL,AbortSignal,crypto:crypto.webcrypto,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='./printer-jobs')return load('lib/ordering/printer-jobs.ts');if(name==='./menu-document-fields')return load('lib/ordering/menu-document-fields.ts');if(name==='./menu-document-store')return load('lib/ordering/menu-document-store.ts');if(name==='../workroom/content-cas')return load('lib/workroom/content-cas.ts');if(name==='node:crypto')return crypto;throw Error('Unexpected dependency '+name);}});return mod.exports;
+ new vm.Script(source,{filename:file}).runInNewContext({module:mod,exports:mod.exports,process:{env},Buffer,structuredClone,Request,Response,URL,AbortSignal,crypto:crypto.webcrypto,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='./notification-outbox')return load('lib/ordering/notification-outbox.ts');if(name==='./printer-jobs')return load('lib/ordering/printer-jobs.ts');if(name==='./menu-document-fields')return load('lib/ordering/menu-document-fields.ts');if(name==='./menu-document-store')return load('lib/ordering/menu-document-store.ts');if(name==='../workroom/content-cas')return load('lib/workroom/content-cas.ts');if(name==='node:crypto')return crypto;throw Error('Unexpected dependency '+name);}});return mod.exports;
 }
 const kitchen=load('lib/ordering/kitchen-operations.ts');
 const core=load('lib/ordering/order-acceptance.ts'),quotes=load('lib/ordering/order-quote.ts'),pricing=load('lib/ordering/pricing.ts');
@@ -52,7 +52,7 @@ test('failure after commit is recoverable by reference; mail failure cannot prod
  assert.equal((await h.post(body)).status,503);assert.equal(h.bag.orders.size,1);assert.equal(h.bag.confirmations.get(body.attemptId).status,'queued');
  const recovered=await (await h.attempt.GET(readRequest(body.attemptId))).json();assert.equal(recovered.outcome,'accepted');assert.equal(recovered.id,body.attemptId);
  assert.deepEqual(await (await h.post(body)).json(),recovered);assert.equal(h.bag.printJobs.length,1);assert.equal(h.calls.email,0);
- const fresh=harness();fresh.mocks['@/lib/ordering/email'].sendOrderConfirmation=async()=>{throw Error('No mail');};const another=payload();assert.equal((await fresh.post(another)).status,200);assert.equal(fresh.bag.confirmations.get(another.attemptId).status,'attempted');assert.equal((await fresh.post(another)).status,200);
+ const fresh=harness();fresh.mocks['@/lib/ordering/email'].sendOrderConfirmation=async()=>{throw Error('No mail');};const another=payload();assert.equal((await fresh.post(another)).status,200);assert.equal(fresh.bag.confirmations.get(another.attemptId).status,'queued');assert.equal((await fresh.post(another)).status,200);
 });
 test('bounded JSON, invalid references, excessive nesting and production memory cannot create attempts',async()=>{
  assert.equal(await core.readAttemptBody(new Request('https://fixture.invalid',{method:'POST',headers:{'Content-Type':'text/plain'},body:'{}'})),null);

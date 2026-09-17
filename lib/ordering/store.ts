@@ -1,3 +1,4 @@
+import { NOTIFICATION_SCHEMA, notificationList, dueNotifications, dueDeliveryChecks, dispatchNotification, checkNotification, closeNotification, getNotificationReview, type Mail, type SendResult, type DeliveryResult, type CloseCommand } from "./notification-outbox";
 import { resolvePrintJob, getPrintAction, type PrintCommand, PRINT_SCHEMA, pollPrintJob, fetchPrintJob, confirmPrintJob, printStatus, type PrinterPoll, type PrintReply, type Query } from "./printer-jobs";
 // Order and kitchen-state storage.
 //
@@ -103,7 +104,13 @@ export interface OrderStore {
   backend: "postgres" | "memory";
   getAttempt(id: string): Promise<Attempt | null>;
   settleAttempt(attempt: Attempt, order?: Order, jobs?: PrintJob[]): Promise<AttemptResult>;
-  claimConfirmation(id: string): Promise<boolean>;
+  notificationList():ReturnType<typeof notificationList>;
+  dueNotifications():ReturnType<typeof dueNotifications>;
+  dueDeliveryChecks():ReturnType<typeof dueDeliveryChecks>;
+  dispatchNotification(id:string,render:(order:Record<string,unknown>)=>Mail,credential:string,namespace:string,send:(payload:string,key:string)=>Promise<SendResult>):ReturnType<typeof dispatchNotification>;
+  checkNotification(id:string,retrieve:(id:string,payload:string)=>Promise<DeliveryResult>):ReturnType<typeof checkNotification>;
+  closeNotification(command:CloseCommand):ReturnType<typeof closeNotification>;
+  getNotificationReview(id:string):ReturnType<typeof getNotificationReview>;
   getOrder(id: string): Promise<Order | null>;
   // Active = new or accepted, oldest first: the kitchen works top down.
   listActiveOrders(): Promise<Order[]>;
@@ -166,11 +173,12 @@ const memoryStore: OrderStore = {
     requireDurableWrite(); const bag = memoryBag(); bag.attempts ??= new Map(); bag.confirmations ??= new Map();
     return settleMemory(bag, attempt, order, jobs);
   },
-  async claimConfirmation(id) {
-    requireDurableWrite(); const entry = memoryBag().confirmations?.get(id);
-    if (!entry || entry.status !== "queued") return false;
-    entry.status = "attempted"; return true;
-  },
+  async notificationList(){return {items:[],count:0};},
+  async dueNotifications(){return [];},async dueDeliveryChecks(){return [];},
+  async dispatchNotification(){throw Error("Persistent notification storage is required.");},
+  async checkNotification(){throw Error("Persistent notification storage is required.");},
+  async closeNotification(){throw Error("Persistent notification storage is required.");},
+  async getNotificationReview(){return null;},
   async getOrder(id) {
     return structuredClone(memoryBag().orders.get(id) ?? null);
   },
@@ -269,6 +277,7 @@ CREATE TABLE IF NOT EXISTS ordering_orders (
 ${ATTEMPT_SCHEMA}
 ${OPERATION_SCHEMA}
 ${PRINT_SCHEMA}
+${NOTIFICATION_SCHEMA}
 ${MENU_HISTORY_SCHEMA}`);
     })().catch(async (error: unknown) => {
       const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
@@ -278,7 +287,7 @@ ${MENU_HISTORY_SCHEMA}`);
   await g.__copperPgReady; return g.__copperPgPool!;
 }
 
-async function printTransaction<T>(work:(query:Query)=>Promise<T>):Promise<T>{
+async function orderingTransaction<T>(work:(query:Query)=>Promise<T>):Promise<T>{
   const client=await (await pgPool()).connect();
   try{
     await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
@@ -294,9 +303,13 @@ const postgresStore: OrderStore = {
   backend: "postgres",
   async getAttempt(id) { const pool = await pgPool(); const result = await pool.query("SELECT data FROM ordering_attempts WHERE id=$1", [id]); return result.rows[0]?.data ?? null; },
   async settleAttempt(attempt, order, jobs) { const pool = await pgPool(); return settlePostgres((sql, params) => pool.query(sql, params), attempt, order, jobs); },
-  async claimConfirmation(id) {
-    const pool = await pgPool(); const result = await pool.query("UPDATE ordering_confirmations SET status='attempted' WHERE order_id=$1 AND status='queued' RETURNING order_id", [id]); return result.rows.length === 1;
-  },
+  async notificationList(){const pool=await pgPool();return notificationList((sql,p)=>pool.query(sql,p));},
+  async dueNotifications(){const pool=await pgPool();return dueNotifications((sql,p)=>pool.query(sql,p));},
+  async dueDeliveryChecks(){const pool=await pgPool();return dueDeliveryChecks((sql,p)=>pool.query(sql,p));},
+  dispatchNotification:(id,render,credential,namespace,send)=>dispatchNotification(orderingTransaction,id,render,credential,namespace,send),
+  checkNotification:(id,retrieve)=>checkNotification(orderingTransaction,id,retrieve),
+  closeNotification:command=>closeNotification(orderingTransaction,command),
+  async getNotificationReview(id){const pool=await pgPool();return getNotificationReview((sql,p)=>pool.query(sql,p),id);},
   async getOrder(id) {
     const pool = await pgPool();
     const r = await pool.query(`SELECT data FROM ordering_orders WHERE id = $1`, [id]);
@@ -325,11 +338,11 @@ const postgresStore: OrderStore = {
     const pool=await pgPool(); const result=await pool.query("SELECT data FROM ordering_state WHERE id=1");
     return result.rows[0]?.data ?? null;
   },
-  resolvePrintJob:(command,role)=>resolvePrintJob(printTransaction,command,role),
+  resolvePrintJob:(command,role)=>resolvePrintJob(orderingTransaction,command,role),
   async getPrintAction(id) { const pool=await pgPool(); return getPrintAction((sql,params)=>pool.query(sql,params),id); },
-  printerPoll:(id,poll)=>pollPrintJob(printTransaction,id,poll),
-  printerFetch:(id,jobId)=>fetchPrintJob(printTransaction,id,jobId),
-  printerConfirm:(id,jobId,role,code)=>confirmPrintJob(printTransaction,id,jobId,role,code),
+  printerPoll:(id,poll)=>pollPrintJob(orderingTransaction,id,poll),
+  printerFetch:(id,jobId)=>fetchPrintJob(orderingTransaction,id,jobId),
+  printerConfirm:(id,jobId,role,code)=>confirmPrintJob(orderingTransaction,id,jobId,role,code),
   async printStatus() {const pool=await pgPool();return printStatus((sql,params)=>pool.query(sql,params));},
   async getMenuDoc() {
     const pool = await pgPool();

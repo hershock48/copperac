@@ -11,6 +11,7 @@
 // why the PIN screen doubles as the audio unlock. The oscillator chime needs
 // no asset file and cannot 404.
 
+import NotificationInbox from "./NotificationInbox";
 import PrinterReview from "./PrinterReview";
 import type { PrintIssue } from "@/lib/ordering/printer-jobs";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -319,6 +320,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         </div>
       </section>}
       {!operation && <button type="button" onClick={() => void poll()} className="mb-4 text-sm text-cream underline">Refresh board</button>}
+      {role==="owner"&&<NotificationInbox/>}
       <PrinterReview issues={printIssues} count={printIssueCount} owner={role==="owner"} printers={printers} onSaved={poll}/>
 
       <fieldset disabled={Boolean(operation)} className="min-w-0">

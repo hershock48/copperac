@@ -208,6 +208,45 @@
       "verifiedOn": "2026-09-17",
       "verification": "Canonical/client hash match; protocol/owner route tests, atomic rollback and restart tests, production build and isolated browser review checks passed. Hosted concurrency, firmware and actual paper output unverified.",
       "deployment": "unknown"
+    },
+    {
+      "id": "notification-outbox",
+      "version": "1.0.0",
+      "file": "lib/ordering/notification-outbox.ts",
+      "sha256LF": "23c9db614cf1aad3d8eaaa4d3dd2ca23f6112e4e68d0e969101b8fae44561dcb",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "00ed96eaa9e8b65ac43dbfcf4893931db86666a4",
+      "sourcePath": "glaze/assets/notification-outbox/1.0.0/notification-outbox.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match, provider and owner-route tests, audit rollback/restart recovery, production builds and isolated browser checks passed. Hosted concurrency, live sender/inbox and scheduler remain unverified.",
+      "deployment": "unknown"
+    },
+    {
+      "id": "notification-provider",
+      "version": "1.0.0",
+      "file": "lib/ordering/notification-provider.ts",
+      "sha256LF": "5e45a75d86f6b2abba431477d9a1e9b10c3ed991778c6003cb386554d047be96",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "00ed96eaa9e8b65ac43dbfcf4893931db86666a4",
+      "sourcePath": "glaze/assets/notification-provider/1.0.0/notification-provider.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match, provider and owner-route tests, audit rollback/restart recovery, production builds and isolated browser checks passed. Hosted concurrency, live sender/inbox and scheduler remain unverified.",
+      "deployment": "unknown"
+    },
+    {
+      "id": "notification-request",
+      "version": "1.0.0",
+      "file": "lib/ordering/notification-request.ts",
+      "sha256LF": "ccec0a2914e39e5d887a2355f975c701d6ab4b2f5f51a426c67658b8898bb474",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "00ed96eaa9e8b65ac43dbfcf4893931db86666a4",
+      "sourcePath": "glaze/assets/notification-request/1.0.0/notification-request.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match, provider and owner-route tests, audit rollback/restart recovery, production builds and isolated browser checks passed. Hosted concurrency, live sender/inbox and scheduler remain unverified.",
+      "deployment": "unknown"
     }
   ]
 }
