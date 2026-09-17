@@ -1,4 +1,4 @@
-# Durable submission recovery — 1.0.0
+# Durable submission recovery (1.0.0)
 
 The order-acceptance server component and order-recovery client component are adopted in Mike's Place and Copper's parked ordering demo. They prevent retries of the same submission from creating another order. Copper's public ordering remains Toast; no card payment adapter is introduced.
 

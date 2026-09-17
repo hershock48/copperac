@@ -1,4 +1,4 @@
-# Checkout quote review — order-quote 1.0.0
+# Checkout quote review (order-quote 1.0.0)
 
 This client-owned primitive validates whole quantities and cents, computes totals with exact integer tax rounding, and compares the server's fresh quote with the amounts the guest reviewed. The client supplies its menu and the reviewed option-pricing resolver. It does not connect to a payment provider.
 

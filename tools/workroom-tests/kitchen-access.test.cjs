@@ -65,6 +65,31 @@ test('owner and kitchen sign-in distinguish proxy setup from storage failure bef
  }
 });
 
+// The test above drives the real loginClient through env and headers. This one
+// mocks loginClient to throw outright, the way the other route tests mock it to
+// return 'a', so a wording change in the owner-facing message is caught and the
+// limiter is proven untouched no matter why the address could not be read.
+test('owner and kitchen sign-in report a missing trusted address in plain words and never count the attempt',async()=>{
+ const message='Sign-in is off until the hosting settings let the site see your connection address.';
+ for(const role of ['owner','kitchen']) {
+  let counts=0;
+  const reserve=async()=>{counts++;return true;};
+  const limiter={loginClient(){throw Error('Trusted client address unavailable.');},allowLogin:reserve,clearLoginAttempts:async()=>{}};
+  const route=load(role==='owner'?'app/api/workroom/login/route.ts':'app/api/kitchen/login/route.ts',{
+   'next/server':next,
+   '@/lib/workroom/auth':{workroomPasscode:()=> 'fixture-pin',workroomSessionReady:()=>true,passcodeMatches:()=>true,setWorkroomCookie:async()=>{}},
+   '@/lib/ordering/auth':{kitchenPin:()=> 'fixture-pin',kitchenSessionReady:()=>true,kitchenPinMatches:()=>true,setKitchenCookie:async()=>{}},
+   '@/lib/workroom/login-limit':limiter,
+   '@/lib/ordering/login-limit':{allowKitchenLogin:reserve},
+  },{...production(),VERCEL:'1'});
+  const response=await route.POST(request(role==='owner'?{passcode:'fixture-pin'}:{pin:'fixture-pin'},{'x-vercel-forwarded-for':'192.0.2.1'}));
+  assert.equal(response.status,503,role);
+  const body=await response.json();
+  assert.equal(body.error,message,role);assert.equal(body.reason,'trusted_address_unavailable',role);
+  assert.equal(counts,0,role+' limiter must not run without an address');
+ }
+});
+
 test('kitchen sessions reject raw PINs, forgery, other apps and owner-role tokens', async () => {
  const a = authentication();
  a.values.set(cookie,a.env.KITCHEN_PIN); assert.equal(await a.auth.isKitchenAuthed(),false);

@@ -51,8 +51,11 @@ export async function POST(req: Request) {
   const pin = kitchenPin();
   if (!pin || !kitchenSessionReady()) return reply({ error: "Staff sign-in is not configured. Ask the owner to finish kitchen setup." }, 503);
   let client: string;
+  // Same split as the owner route: a missing trusted address is a hosting setup
+  // problem (Vercel system env toggle off, or no usable WORKROOM_TRUSTED_IP_HEADER
+  // elsewhere) and must not be reported as a storage outage.
   try { client = loginClient(req); }
-  catch { return reply({ error: "Sign-in cannot identify your address. Ask the site administrator to check trusted-proxy configuration.", reason: "trusted_address_unavailable" }, 503); }
+  catch { return reply({ error: "Sign-in is off until the hosting settings let the site see your connection address.", reason: "trusted_address_unavailable" }, 503); }
   try {
     if (!(await allowKitchenLogin(client))) return NextResponse.json({ error: "Too many sign-in attempts. Wait ten minutes, or use owner sign-in." }, { status: 429, headers: { ...headers, "Retry-After": "600" } });
   } catch { return reply({ error: "Sign-in storage is unavailable. Try again later." }, 503); }

@@ -160,7 +160,7 @@ function ItemRow({
             <span className="display ml-2 text-[10px] uppercase tracking-widest text-cream-dim/60">hidden</span>
           )}
         </button>
-        <span className="text-sm text-cream-dim tabular-nums">${item.priceCents || "—"}</span>
+        <span className="text-sm text-cream-dim tabular-nums">{item.priceCents ? `$${item.priceCents}` : "no price"}</span>
         <button type="button" onClick={onToggle} className={smallBtn}>
           {open ? "Close" : "Edit"}
         </button>

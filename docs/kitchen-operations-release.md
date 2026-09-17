@@ -1,4 +1,4 @@
-# Kitchen actions and recovery — 1.0.0
+# Kitchen actions and recovery (1.0.0)
 
 Verified locally September 17, 2026 in Mike's Place and Copper's parked ordering demo. Copper's customers still order through Toast. These checks do not certify an installed deployment or physical printer.
 
