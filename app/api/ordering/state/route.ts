@@ -21,6 +21,8 @@ export async function GET() {
     reason = `The kitchen is slammed. Online ordering is paused for about ${mins} more minute${mins === 1 ? "" : "s"}. The phone still works: call the bar.`;
   }
 
+  if (process.env.NODE_ENV === "production" && store.backend === "memory") { open = false; reason = "Ordering is unavailable while storage is disconnected. Please contact the bar."; }
+
   return NextResponse.json({
     open,
     reason,
@@ -29,7 +31,9 @@ export async function GET() {
     feeCents: ORDERING.feeCents,
     feeLabel: ORDERING.feeLabel,
     feeExplainer: ORDERING.feeExplainer,
-    taxRate: ORDERING.taxRate,
-    demo: !process.env.STRIPE_SECRET_KEY,
+    taxRate: ORDERING.taxBasisPoints / 10000,
+    taxBasisPoints: ORDERING.taxBasisPoints,
+    // No online payment adapter is implemented; a key alone cannot activate it.
+    demo: true,
   });
 }

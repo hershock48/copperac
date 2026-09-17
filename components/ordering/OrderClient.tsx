@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import { priceOptions, type OptionPick } from "@/lib/ordering/pricing";
+import { orderLineKey, orderTotals, quoteWasReviewed, isQuoteForSubmission, type OrderTotals } from "@/lib/ordering/order-quote";
 
 type LiveState = {
   open: boolean;
@@ -26,6 +27,7 @@ type LiveState = {
   feeLabel: string;
   feeExplainer: string;
   taxRate: number;
+  taxBasisPoints: number;
   demo: boolean;
 };
 
@@ -61,6 +63,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [placing, setPlacing] = useState(false);
+  const submitting = useRef(false);
   const [error, setError] = useState("");
 
   const refreshLive = useCallback(async () => {
@@ -104,7 +107,8 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   const unavailable = useMemo(() => new Set(live?.unavailable ?? []), [live]);
 
   function addToCart(line: Omit<CartLine, "key" | "qty">) {
-    const key = `${line.itemId}|${line.options.map((p) => `${p.group}=${p.choice}`).sort().join(",")}`;
+    if (submitting.current) return;
+    const key = orderLineKey(line.itemId, line.options);
     setCart((c) => {
       const existing = c.find((l) => l.key === key);
       if (existing) {
@@ -116,6 +120,7 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
   }
 
   function setQty(key: string, qty: number) {
+    if (submitting.current) return;
     setCart((c) =>
       qty <= 0 ? c.filter((l) => l.key !== key) : c.map((l) => (l.key === key ? { ...l, qty } : l))
     );
@@ -276,47 +281,35 @@ export default function OrderClient({ sections }: { sections: OrderableSection[]
           setQty={setQty}
           placing={placing}
           error={error}
-          onClose={() => setCartOpen(false)}
+          onClose={() => { if (!submitting.current) setCartOpen(false); }}
           onPlace={async (form) => {
-            setPlacing(true);
-            setError("");
+            if (submitting.current) return;
+            submitting.current = true; setPlacing(true); setError("");
+            const submitted = cart.map(l => ({ itemId: l.itemId, qty: l.qty, options: l.options, quotedUnitCents: l.unitCents, quotedAgeRestricted: l.ageRestricted }));
             try {
               const r = await fetch("/api/ordering/order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  guestName: form.name,
-                  guestPhone: form.phone,
-                  guestEmail: form.email,
-                  note: form.note,
-                  tipCents: form.tipCents,
-                  ageAcknowledged: form.ageAcknowledged,
-                  payAtPickup: form.payAtPickup,
-                  lines: cart.map((l) => ({ itemId: l.itemId, qty: l.qty, options: l.options })),
-                }),
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ guestName: form.name, guestPhone: form.phone, guestEmail: form.email, note: form.note, tipCents: form.tipCents, ageAcknowledged: form.ageAcknowledged, payAtPickup: form.payAtPickup, lines: submitted, expectedTotals: form.expectedTotals }),
               });
               const data = await r.json();
               if (!r.ok) {
-                setError(data.error ?? "Something went wrong. The phone still works.");
-                refreshLive(); // an 86 or a pause mid-checkout shows up right away
+                if (r.status === 409 && data.priceChanged === true && isQuoteForSubmission(data.quote, submitted)) {
+                  const quote = data.quote;
+                  setCart(current => current.map((line, i) => ({ ...line, name: quote.lines[i].name, unitCents: quote.lines[i].unitCents, labels: quote.lines[i].options, ageRestricted: quote.lines[i].ageRestricted })));
+                  setLive(current => current ? { ...current, feeCents: quote.totals.feeCents, taxBasisPoints: quote.taxBasisPoints, taxRate: quote.taxBasisPoints / 10000 } : current);
+                  setError("Prices or item requirements changed. Nothing was ordered. Review the updated total, then place your order again.");
+                } else {
+                  setError(typeof data.error === "string" ? data.error : "The order could not be confirmed. Contact the kitchen before placing it again.");
+                  refreshLive();
+                }
               } else {
-                setConfirmation({
-                  id: data.id,
-                  number: data.number,
-                  quotedMinutes: data.quotedMinutes,
-                  totalCents: data.totals.totalCents,
-                  emailedTo: form.email,
-                  payAtPickup: form.payAtPickup,
-                  status: "new",
-                });
-                setCart([]);
-                setCartOpen(false);
+                if (typeof data.id !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(data.id) || !Number.isSafeInteger(data.number) || data.number < 1 || !Number.isSafeInteger(data.quotedMinutes) || data.quotedMinutes < 0 || !isQuoteForSubmission(data.quote, submitted) || !quoteWasReviewed(submitted, form.expectedTotals, data.quote)) throw Error("Incomplete order acknowledgement");
+                setConfirmation({ id: data.id, number: data.number, quotedMinutes: data.quotedMinutes, totalCents: data.quote.totals.totalCents, emailedTo: form.email, payAtPickup: form.payAtPickup, status: "new" });
+                setCart([]); setCartOpen(false);
               }
             } catch {
-              setError("Could not reach the kitchen. Check your connection and try again, or call the bar.");
-            } finally {
-              setPlacing(false);
-            }
+              setError("The order could not be confirmed. Your cart is still here. Contact the kitchen before placing it again.");
+            } finally { submitting.current = false; setPlacing(false); }
           }}
         />
       )}
@@ -430,7 +423,7 @@ function Checkout({
   placing: boolean;
   error: string;
   onClose: () => void;
-  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean }) => void;
+  onPlace: (form: { name: string; phone: string; email: string; note: string; tipCents: number; ageAcknowledged: boolean; payAtPickup: boolean; expectedTotals: OrderTotals }) => void;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -445,10 +438,11 @@ function Checkout({
   }, []);
 
   const tipCents = tipPct === null ? 0 : Math.round((subtotal * tipPct) / 100);
-  const taxCents = Math.round((subtotal + live.feeCents) * live.taxRate);
-  const total = subtotal + live.feeCents + tipCents + taxCents;
+  const totals = orderTotals(subtotal, live.feeCents, tipCents, live.taxBasisPoints);
+  const taxCents = totals?.taxCents ?? 0;
+  const total = totals?.totalCents ?? 0;
   const canPlace =
-    cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
+    Boolean(totals) && cart.length > 0 && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 10 && (!hasAlcohol || ageOk) && !placing && live.open;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" role="dialog" aria-modal="true" aria-label="Your order">
@@ -457,6 +451,7 @@ function Checkout({
         tabIndex={-1}
         className="max-h-[92vh] w-full max-w-lg overflow-y-auto border border-ink-line bg-ink p-5 sm:rounded-sm"
       >
+        <fieldset disabled={placing} className="m-0 min-w-0 border-0 p-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="display text-xl uppercase text-cream">Your order</h2>
           <button
@@ -556,6 +551,7 @@ function Checkout({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={60}
               autoComplete="name"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
             />
@@ -565,6 +561,7 @@ function Checkout({
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              maxLength={25}
               type="tel"
               autoComplete="tel"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
@@ -575,6 +572,7 @@ function Checkout({
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              maxLength={120}
               type="email"
               autoComplete="email"
               className="mt-1 w-full rounded-sm border border-ink-line bg-ink-soft px-3 py-2.5 text-cream outline-none focus:border-copper-light"
@@ -604,6 +602,7 @@ function Checkout({
           )}
         </div>
 
+        {!totals && <p role="alert" className="mt-4 text-sm">The totals are unavailable. Refresh the menu before ordering.</p>}
         {error && (
           <p role="alert" className="mt-4 rounded-sm border border-[#d9736b]/40 bg-[#d9736b]/10 px-3 py-2.5 text-sm text-[#d9736b]">
             {error}
@@ -617,15 +616,15 @@ function Checkout({
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: false })}
+          onClick={() => totals && onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: false, expectedTotals: totals })}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {placing ? "Sending to the kitchen" : `Pay ${money(total)} · place order`}
+          {placing ? "Sending to the kitchen" : live.demo ? `Place demo order · ${money(total)}` : `Place order · ${money(total)}`}
         </button>
         <button
           type="button"
           disabled={!canPlace}
-          onClick={() => onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: true })}
+          onClick={() => totals && onPlace({ name: name.trim(), phone, email: email.trim(), note, tipCents, ageAcknowledged: ageOk, payAtPickup: true, expectedTotals: totals })}
           className="mt-3 w-full rounded-sm px-2 py-2 text-center text-sm text-cream-dim underline decoration-ink-line underline-offset-4 transition-colors hover:text-cream disabled:cursor-not-allowed disabled:opacity-40"
         >
           or pay cash or card at pickup
@@ -633,6 +632,7 @@ function Checkout({
         {live.demo && (
           <p className="mt-3 text-center text-xs text-cream-dim/60">{`Demo checkout. No card is charged.`}</p>
         )}
+        </fieldset>
       </div>
     </div>
   );
@@ -664,7 +664,7 @@ function Confirmed({ confirmation }: { confirmation: Confirmation }) {
           : `Sent to the kitchen. Ready in about ${confirmation.quotedMinutes} minutes.`}
       </p>
       {confirmation.emailedTo && (
-        <p className="mt-2 text-sm text-cream-dim/70">Confirmation sent to {confirmation.emailedTo}.</p>
+        <p className="mt-2 text-sm text-cream-dim/70">Check {confirmation.emailedTo} for a confirmation; contact the bar if it does not arrive.</p>
       )}
       <div className="mx-auto mt-8 flex max-w-xs items-center justify-center gap-3 rounded-sm border border-ink-line bg-ink-soft px-4 py-3">
         <span

@@ -522,3 +522,7 @@ Event edits and contact details require the latest saved revision. Accepted chan
 The event editor holds its draft on failed or uncertain saves and disables the fields during saves/uploads. New drafts retain one identifier across retries. Archive removes an event from the public site while retaining its record and photo; Restore as draft does not publish it. Uploads decode real JPEG/PNG/WebP bytes with Sharp 0.35.4 and retain immutable normalized images, including photos used by other posts or history. Unused photo cleanup and full history restoration are not implemented. Unsaved browser drafts do not survive a reload. Dates/times use Michigan rules; overnight end times are not supported.
 
 Run `npm ci --prefix tools/workroom-tests` and `npm test --prefix tools/workroom-tests` after installing application development dependencies. Event/contact/photo route tests, local SQL rollback tests, production builds and isolated production-route/browser fixtures passed. The fixture database uses a local PGlite adapter; verify actual hosted PostgreSQL/TLS, restart/concurrent writes, public-page updates, photos and owner handover before rollout.
+
+## Checkout quote review
+
+Current menu prices are verified at submission; changed amounts require another guest review. See [integration, tests and remaining operating requirements](docs/order-quote-release.md). This is a demo/pay-at-pickup adapter, with no online card charge.

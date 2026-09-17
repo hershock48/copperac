@@ -18,7 +18,7 @@ export const ORDERING = {
   // live build hands this to Stripe Tax on the connected account instead.
   // Treasury guidance points to the order fee being taxable as part of the
   // sales price, so tax applies to subtotal + fee. Confirm at the tax consult.
-  taxRate: 0.06,
+  taxBasisPoints: 600,
 
   // Pickup quote = base + busiest item's prep + the kitchen's busy dial.
   basePickupMinutes: 15,

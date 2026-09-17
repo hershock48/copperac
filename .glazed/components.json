@@ -117,6 +117,19 @@
       "verifiedOn": "2026-09-16",
       "verification": "Source matches reference; event/contact/photo integration tests, production build and isolated production-route/browser checks passed; hosted deployment not inspected",
       "deployment": "unknown"
+    },
+    {
+      "id": "order-quote",
+      "version": "1.0.0",
+      "file": "lib/ordering/order-quote.ts",
+      "sha256LF": "3826e09cb8eeb0361788b7c22d6865b93c3c661f0b84d7c7704515de2cc155e2",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "e341e5f653c43bf0a5e7877e915cdd83a8eb75ef",
+      "sourcePath": "glaze/assets/order-quote/1.0.0/order-quote.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match; arithmetic and route tests, local production browser quote review, and client build passed. Demo only; hosted deployment not inspected.",
+      "deployment": "unknown"
     }
   ]
 }

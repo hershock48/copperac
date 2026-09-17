@@ -1,23 +1,6 @@
-// The orderable menu: database-backed and staff-editable.
-//
-// History, because it explains the shape: v1 derived the menu from the site's
-// lib/menu.ts; v2 replaced that with a harvest of Copper's live Toast menu
-// (114 items, real modifier groups, their own photos -- see toast-menu.json
-// and the harvest story in git). v3, this file, moves the menu into the
-// DATABASE so the restaurant edits it themselves on the kitchen board, the
-// way they edit menus in Toast's back office. The harvested JSON is now the
-// SEED: first read on an empty database loads it, and every edit after that
-// belongs to the restaurant. Menu drift stops being our problem to sync away
-// and becomes their button to press.
-//
-// Two kinds of "off the menu", deliberately distinct:
-//   86'd    (kitchen state)  sold out tonight, shows greyed on the order page
-//   hidden  (menu editor)    off the menu entirely, invisible to guests
-//
-// Reads are cached in-process for a few seconds: order validation and page
-// renders hit this constantly, edits happen a few times a week, and a lambda
-// serving a 10-second-old price is fine because the server re-prices every
-// order at submit time anyway.
+// Guest page reads may use a ten-second process cache. Order submission uses
+// fresh: true and compares the resulting quote with the amounts the guest saw.
+// Copper's parked demo source is its stored ordering document; public customers use Toast.
 
 import SEED_MENU from "./toast-menu.json";
 import type { OrderStore } from "./store";
@@ -68,11 +51,13 @@ export function invalidateMenuCache(): void {
   cacheBag().cache = null;
 }
 
-export async function loadMenuDoc(store: OrderStore): Promise<MenuDocSection[]> {
+export async function loadMenuDoc(store: OrderStore, options: { fresh?: boolean } = {}): Promise<MenuDocSection[]> {
   const bag = cacheBag();
-  if (bag.cache && Date.now() - bag.cache.at < CACHE_MS) return bag.cache.doc;
+  if (!options.fresh && bag.cache && Date.now() - bag.cache.at < CACHE_MS) return bag.cache.doc;
   const fromDb = await store.getMenuDoc();
   const doc = (fromDb ?? (SEED_MENU as MenuDocSection[])) as MenuDocSection[];
+  const error = doc.length === 0 ? null : validateMenuDoc(doc);
+  if (error) throw new Error("The ordering menu is invalid: " + error);
   bag.cache = { doc, at: Date.now() };
   return doc;
 }
@@ -110,8 +95,8 @@ export function buildIndex(sections: OrderableSection[]): Map<string, OrderableI
 // Guest-facing menu + index, one call: what the order page renders and what
 // the order API validates against. Hidden items are simply not in it, so a
 // stale cart line referencing one fails the ordinary unknown-item check.
-export async function guestMenu(store: OrderStore): Promise<{ sections: OrderableSection[]; index: Map<string, OrderableItem> }> {
-  const doc = await loadMenuDoc(store);
+export async function guestMenu(store: OrderStore, options: { fresh?: boolean } = {}): Promise<{ sections: OrderableSection[]; index: Map<string, OrderableItem> }> {
+  const doc = await loadMenuDoc(store, options);
   const sections = toOrderable(doc, { includeHidden: false });
   return { sections, index: buildIndex(sections) };
 }
