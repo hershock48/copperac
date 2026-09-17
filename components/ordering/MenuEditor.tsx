@@ -12,9 +12,9 @@ export default function MenuEditor({onSaved}:{onSaved:(doc:MenuDocSection[])=>vo
  const [openItem,setOpenItem]=useState<string|null>(null),[armDelete,setArmDelete]=useState<string|null>(null);
  const pending=useRef(false),mounted=useRef(true);
  useEffect(()=>{
-  mounted.current=true;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
-  fetch("/api/kitchen/menu",{cache:"no-store",signal:controller.signal}).then(async r=>{if(!r.ok)throw Error();const data:unknown=await r.json();if(!isMenuSnapshot(data))throw Error();if(mounted.current){setDoc(toMenuDraft(data.doc));setSnapshot(data);onSaved(data.doc);}}).catch(()=>{if(mounted.current)setError("Could not load the saved menu. Check owner sign-in and try again in another tab.");}).finally(()=>clearTimeout(timer));
-  return()=>{mounted.current=false;clearTimeout(timer);controller.abort();};
+  mounted.current=true;let active=true;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  fetch("/api/kitchen/menu",{cache:"no-store",signal:controller.signal}).then(async r=>{if(!r.ok)throw Error();const data:unknown=await r.json();if(!isMenuSnapshot(data))throw Error();if(active){setDoc(toMenuDraft(data.doc));setSnapshot(data);onSaved(data.doc);}}).catch(()=>{if(active)setError("Could not load the saved menu. Check owner sign-in and try again in another tab.");}).finally(()=>clearTimeout(timer));
+  return()=>{active=false;mounted.current=false;clearTimeout(timer);controller.abort();};
  },[onSaved]);
  useEffect(()=>{if(!dirty)return;const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();};window.addEventListener("beforeunload",protect);return()=>window.removeEventListener("beforeunload",protect);},[dirty]);
  function mutate(fn:(d:MenuDraftSection[])=>void){if(pending.current)return;setDoc(d=>{if(!d)return d;const copy=structuredClone(d);fn(copy);return copy;});setDirty(true);setSavedFlash(false);setReplaceArmed(false);}
