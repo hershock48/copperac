@@ -182,6 +182,32 @@
       "verifiedOn": "2026-09-17",
       "verification": "Canonical/client hash match; client route/SQL/race tests, database close/reopen, production build and isolated browser lost-response/cancellation checks passed. Intended-host persistence, providers and physical printing unverified.",
       "deployment": "unknown"
+    },
+    {
+      "id": "printer-jobs",
+      "version": "1.0.0",
+      "file": "lib/ordering/printer-jobs.ts",
+      "sha256LF": "72467f0dd5bbcdd85408493879c37b7bcac83588a3ff78c720e68cbbfd6a7aaf",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "789b7323acc03e54642e35e29c11a0e484469e87",
+      "sourcePath": "glaze/assets/printer-jobs/1.0.0/printer-jobs.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match; protocol/owner route tests, atomic rollback and restart tests, production build and isolated browser review checks passed. Hosted concurrency, firmware and actual paper output unverified.",
+      "deployment": "unknown"
+    },
+    {
+      "id": "printer-review",
+      "version": "1.0.0",
+      "file": "lib/ordering/printer-review.ts",
+      "sha256LF": "1f9e8385353dab8f14acaee6179d4032560c71f7e92628c99f47cb0949901b24",
+      "sourceRepository": "https://github.com/hershock48/glazedweb",
+      "sourceCommit": "789b7323acc03e54642e35e29c11a0e484469e87",
+      "sourcePath": "glaze/assets/printer-review/1.0.0/printer-review.ts",
+      "localChanges": false,
+      "verifiedOn": "2026-09-17",
+      "verification": "Canonical/client hash match; protocol/owner route tests, atomic rollback and restart tests, production build and isolated browser review checks passed. Hosted concurrency, firmware and actual paper output unverified.",
+      "deployment": "unknown"
     }
   ]
 }

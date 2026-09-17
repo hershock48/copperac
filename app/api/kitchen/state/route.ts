@@ -11,9 +11,9 @@ export async function GET() {
   try {
     const store = getStore(), state = boardView(await store.getStateRecord());
     const { configuredPrinters } = await import("@/lib/ordering/printing");
-    const seen = await store.printerLastSeen();
-    const printers = configuredPrinters().map(p => ({ id: p.id, label: p.label, role: p.role, online: Date.now() - (seen[p.id] ?? 0) < 60_000 }));
-    return kitchenReply({ state, backend: store.backend, printers });
+    const printing = await store.printStatus();
+    const printers = configuredPrinters().map(p => { const device=printing.devices.find(d=>d.id===p.id);return {id:p.id,label:p.label,role:p.role,online:Date.now()-(device?.lastSeen??0)<60_000,reportedStatus:device?.reportedStatus??null}; });
+    return kitchenReply({ state, backend: store.backend, printers, printIssues:printing.issues, printIssueCount:printing.issueCount });
   } catch { return kitchenReply({ error: "Kitchen state is unavailable. Try refreshing." }, 503); }
 }
 export async function PATCH(req: Request) { return runKitchenAction(req, "state"); }

@@ -1,3 +1,4 @@
+import { resolvePrintJob, getPrintAction, type PrintCommand, PRINT_SCHEMA, pollPrintJob, fetchPrintJob, confirmPrintJob, printStatus, type PrinterPoll, type PrintReply, type Query } from "./printer-jobs";
 // Order and kitchen-state storage.
 //
 // Two backends behind one interface:
@@ -111,14 +112,12 @@ export interface OrderStore {
   nextTicketNumber(): Promise<number>;
   getState(): Promise<KitchenState>;
   getStateRecord(): Promise<KitchenState | null>;
-  // Printing. Jobs are queued at order time and drained by each printer's
-  // polls; stale queued jobs are skipped at poll time via the TTL so a
-  // printer that was off for an hour does not print cold orders.
-  enqueuePrintJob(job: PrintJob): Promise<void>;
-  nextPrintJob(printerId: string, notOlderThanMs: number): Promise<PrintJob | null>;
-  setPrintJobStatus(id: string, status: "printed" | "failed"): Promise<void>;
-  printerSeen(printerId: string): Promise<void>;
-  printerLastSeen(): Promise<Record<string, number>>;
+  resolvePrintJob(command:PrintCommand,role:"kitchen"|"front"):ReturnType<typeof resolvePrintJob>;
+  getPrintAction(id:string):ReturnType<typeof getPrintAction>;
+  printerPoll(id:string,poll:PrinterPoll):ReturnType<typeof pollPrintJob>;
+  printerFetch(id:string,jobId:string):Promise<PrintReply>;
+  printerConfirm(id:string,jobId:string,role:"kitchen"|"front",code:string):Promise<PrintReply>;
+  printStatus():ReturnType<typeof printStatus>;
   // The editable menu document. null means never edited: callers seed from
   // the bundled harvest. Stored whole -- it is one restaurant's menu, edits
   // are rare, and whole-document writes cannot half-apply.
@@ -202,32 +201,12 @@ const memoryStore: OrderStore = {
     return structuredClone(memoryBag().state ?? DEFAULT_STATE);
   },
   async getStateRecord() { return structuredClone(memoryBag().state); },
-  async enqueuePrintJob(job) {
-    requireDurableWrite();
-    memoryBag().printJobs.push(job);
-  },
-  async nextPrintJob(printerId, notOlderThanMs) {
-    requireDurableWrite();
-    const cutoff = Date.now() - notOlderThanMs;
-    const bag = memoryBag();
-    // Expire stale queued jobs so an offline printer never prints cold food.
-    for (const j of bag.printJobs) {
-      if (j.status === "queued" && j.createdAt < cutoff) j.status = "failed";
-    }
-    return bag.printJobs.find((j) => j.printerId === printerId && j.status === "queued") ?? null;
-  },
-  async setPrintJobStatus(id, status) {
-    requireDurableWrite();
-    const j = memoryBag().printJobs.find((x) => x.id === id);
-    if (j) j.status = status;
-  },
-  async printerSeen(printerId) {
-    requireDurableWrite();
-    memoryBag().printersSeen[printerId] = Date.now();
-  },
-  async printerLastSeen() {
-    return { ...memoryBag().printersSeen };
-  },
+  async resolvePrintJob() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async getPrintAction() { return null; },
+  async printerPoll() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printerFetch() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printerConfirm() { throw Error("Persistent storage is required for physical printer delivery."); },
+  async printStatus() { return {devices:[],issues:[],issueCount:0}; },
   async getMenuDoc() {
     return structuredClone(memoryBag().menuDoc);
   },
@@ -289,6 +268,7 @@ CREATE TABLE IF NOT EXISTS ordering_orders (
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
 ${ATTEMPT_SCHEMA}
 ${OPERATION_SCHEMA}
+${PRINT_SCHEMA}
 ${MENU_HISTORY_SCHEMA}`);
     })().catch(async (error: unknown) => {
       const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
@@ -296,6 +276,18 @@ ${MENU_HISTORY_SCHEMA}`);
     });
   }
   await g.__copperPgReady; return g.__copperPgPool!;
+}
+
+async function printTransaction<T>(work:(query:Query)=>Promise<T>):Promise<T>{
+  const client=await (await pgPool()).connect();
+  try{
+    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+    await client.query("SET LOCAL lock_timeout='5s'");
+    await client.query("SET LOCAL statement_timeout='10s'");
+    const result=await work((sql,params)=>client.query(sql,params));
+    await client.query("COMMIT");return result;
+  }catch(error){await client.query("ROLLBACK").catch(()=>{});throw error;}
+  finally{client.release();}
 }
 
 const postgresStore: OrderStore = {
@@ -333,57 +325,12 @@ const postgresStore: OrderStore = {
     const pool=await pgPool(); const result=await pool.query("SELECT data FROM ordering_state WHERE id=1");
     return result.rows[0]?.data ?? null;
   },
-  async enqueuePrintJob(job) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_print_jobs (id, printer_id, order_id, body, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [job.id, job.printerId, job.orderId, job.body, job.status, job.createdAt]
-    );
-  },
-  async nextPrintJob(printerId, notOlderThanMs) {
-    const pool = await pgPool();
-    const cutoff = Date.now() - notOlderThanMs;
-    await pool.query(
-      `UPDATE ordering_print_jobs SET status = 'failed'
-       WHERE status = 'queued' AND created_at < $1`,
-      [cutoff]
-    );
-    const r = await pool.query(
-      `SELECT id, printer_id, order_id, body, status, created_at
-       FROM ordering_print_jobs
-       WHERE printer_id = $1 AND status = 'queued'
-       ORDER BY created_at ASC LIMIT 1`,
-      [printerId]
-    );
-    if (!r.rows[0]) return null;
-    const row = r.rows[0];
-    return {
-      id: row.id,
-      printerId: row.printer_id,
-      orderId: row.order_id,
-      body: row.body,
-      status: row.status,
-      createdAt: Number(row.created_at),
-    };
-  },
-  async setPrintJobStatus(id, status) {
-    const pool = await pgPool();
-    await pool.query(`UPDATE ordering_print_jobs SET status = $2 WHERE id = $1`, [id, status]);
-  },
-  async printerSeen(printerId) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_printers (id, last_seen) VALUES ($1, $2)
-       ON CONFLICT (id) DO UPDATE SET last_seen = $2`,
-      [printerId, Date.now()]
-    );
-  },
-  async printerLastSeen() {
-    const pool = await pgPool();
-    const r = await pool.query(`SELECT id, last_seen FROM ordering_printers`);
-    return Object.fromEntries(r.rows.map((row) => [row.id, Number(row.last_seen)]));
-  },
+  resolvePrintJob:(command,role)=>resolvePrintJob(printTransaction,command,role),
+  async getPrintAction(id) { const pool=await pgPool(); return getPrintAction((sql,params)=>pool.query(sql,params),id); },
+  printerPoll:(id,poll)=>pollPrintJob(printTransaction,id,poll),
+  printerFetch:(id,jobId)=>fetchPrintJob(printTransaction,id,jobId),
+  printerConfirm:(id,jobId,role,code)=>confirmPrintJob(printTransaction,id,jobId,role,code),
+  async printStatus() {const pool=await pgPool();return printStatus((sql,params)=>pool.query(sql,params));},
   async getMenuDoc() {
     const pool = await pgPool();
     const r = await pool.query(`SELECT data FROM ordering_menu WHERE id = 1`);

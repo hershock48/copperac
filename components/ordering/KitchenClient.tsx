@@ -11,6 +11,8 @@
 // why the PIN screen doubles as the audio unlock. The oscillator chime needs
 // no asset file and cannot 404.
 
+import PrinterReview from "./PrinterReview";
+import type { PrintIssue } from "@/lib/ordering/printer-jobs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toOrderable, type MenuDocSection } from "@/lib/ordering/menu-document-fields";
 import MenuEditor from "@/components/ordering/MenuEditor";
@@ -46,7 +48,9 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // function of state and ticks with the 5s poll.
   const [now, setNow] = useState(0);
   const [backend, setBackend] = useState<"postgres" | "memory" | null>(null);
-  const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean }[]>([]);
+  const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean; reportedStatus: string | null }[]>([]);
+  const [printIssues,setPrintIssues]=useState<PrintIssue[]>([]);
+  const [printIssueCount,setPrintIssueCount]=useState(0);
   // The board opens on 86s and hours (Kevin's call): that is the tab staff
   // reach for on their own; orders announce themselves with the chime and the
   // badge, so they do not need to be the front page.
@@ -120,7 +124,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         const data = stateData;
         setNow(Date.now());
         setState(data.state);
-        setPrinters(data.printers ?? []);
+        setPrinters(data.printers ?? []);setPrintIssues(data.printIssues ?? []);setPrintIssueCount(data.printIssueCount ?? 0);
       }
     } catch {
       if (epoch === authEpoch.current && sequence === pollSequence.current) setPollError("The board could not refresh. These may be older values; check your connection.");
@@ -315,6 +319,8 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         </div>
       </section>}
       {!operation && <button type="button" onClick={() => void poll()} className="mb-4 text-sm text-cream underline">Refresh board</button>}
+      <PrinterReview issues={printIssues} count={printIssueCount} owner={role==="owner"} printers={printers} onSaved={poll}/>
+
       <fieldset disabled={Boolean(operation)} className="min-w-0">
       {/* Tab rail */}
       <div className="mb-8 flex flex-wrap gap-2">
@@ -496,7 +502,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                     }`}
                   >
                     <span className={`h-2 w-2 rounded-full ${p.online ? "bg-[#7dd18a]" : "bg-[#d9736b]"}`} aria-hidden />
-                    {p.label} {p.online ? "" : "· OFFLINE"}
+                    {p.label} · {p.online ? (p.reportedStatus || "Connected") : "Not recently seen"}
                   </span>
                 ))}
               </div>
