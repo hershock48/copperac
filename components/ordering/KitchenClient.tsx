@@ -12,6 +12,7 @@
 // no asset file and cannot 404.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toOrderable, type MenuDocSection } from "@/lib/ordering/menu-document-fields";
 import MenuEditor from "@/components/ordering/MenuEditor";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import type { KitchenState, Order } from "@/lib/ordering/store";
@@ -28,6 +29,8 @@ function age(ms: number): string {
 }
 
 export default function KitchenClient({ sections }: { sections: OrderableSection[] }) {
+  const [editedSections,setEditedSections] = useState<OrderableSection[] | null>(null);
+  const menuSaved = useCallback((doc:MenuDocSection[]) => setEditedSections(toOrderable(doc,{includeHidden:true})),[]);
   const [authed, setAuthed] = useState(false);
   const [role, setRole] = useState<"staff" | "owner" | null>(null);
   const [authPending, setAuthPending] = useState(false);
@@ -344,9 +347,8 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         )}
       </div>
 
-      {tab === "editor" && role === "owner" ? (
-        <MenuEditor />
-      ) : tab === "orders" ? (
+      {role === "owner" && <div hidden={tab!=="editor"}><MenuEditor onSaved={menuSaved} /></div>}
+      {tab === "editor" ? null : tab === "orders" ? (
         <>
           {orders.length === 0 ? (
             <p className="rounded-sm border border-ink-line bg-ink-soft px-5 py-10 text-center text-sm text-cream-dim/70">
@@ -513,7 +515,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
               </p>
               <div className="flex flex-wrap gap-2">
                 {state!.unavailable.map((id) => {
-                  const item = sections.flatMap((s) => s.items).find((i) => i.id === id);
+                  const item = (editedSections ?? sections).flatMap((s) => s.items).find((i) => i.id === id);
                   if (!item) return null;
                   return (
                     <button
@@ -539,7 +541,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
             className="mb-6 w-full max-w-sm rounded-sm border border-ink-line bg-ink-soft px-4 py-3 text-sm text-cream outline-none placeholder:text-cream-dim/50 focus:border-copper-light"
           />
 
-          {sections
+          {(editedSections ?? sections)
             .map((section) => ({
               ...section,
               items: filter

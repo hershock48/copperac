@@ -3,7 +3,7 @@ const {PGlite}=require('@electric-sql/pglite');
 const root=path.resolve(__dirname,'../..');
 function load(file,mocks={},env={}){
  const mod={exports:{}};const source=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- new vm.Script(source,{filename:file}).runInNewContext({module:mod,exports:mod.exports,process:{env},Buffer,structuredClone,Request,Response,URL,AbortSignal,crypto:crypto.webcrypto,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='node:crypto')return crypto;throw Error('Unexpected dependency '+name);}});return mod.exports;
+ new vm.Script(source,{filename:file}).runInNewContext({module:mod,exports:mod.exports,process:{env},Buffer,structuredClone,Request,Response,URL,AbortSignal,crypto:crypto.webcrypto,console,require(name){if(Object.hasOwn(mocks,name))return mocks[name];if(name==='./menu-document-fields')return load('lib/ordering/menu-document-fields.ts');if(name==='./menu-document-store')return load('lib/ordering/menu-document-store.ts');if(name==='../workroom/content-cas')return load('lib/workroom/content-cas.ts');if(name==='node:crypto')return crypto;throw Error('Unexpected dependency '+name);}});return mod.exports;
 }
 const kitchen=load('lib/ordering/kitchen-operations.ts');
 const core=load('lib/ordering/order-acceptance.ts'),quotes=load('lib/ordering/order-quote.ts'),pricing=load('lib/ordering/pricing.ts');

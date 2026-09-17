@@ -149,11 +149,12 @@ if(app==='copperac')test('parked menu price API refuses staff before reading bod
  let touched=0, role='staff';
  const route=load('app/api/kitchen/menu/route.ts',{
   'next/server':next,'@/lib/ordering/auth':{kitchenRole:async()=>role},
-  '@/lib/ordering/menu':{invalidateMenuCache(){},loadMenuDoc:async()=>[],validateMenuDoc:()=>null},
-  '@/lib/ordering/store':{getStore:()=>{touched++;return {setMenuDoc:async()=>{}};}}
+  '@/lib/ordering/menu':{invalidateMenuCache(){},seedMenuDoc:()=>[],validateMenuDoc:()=>null},
+  '@/lib/ordering/menu-document-store':{menuRevision:()=> 'a'.repeat(64)},
+  '@/lib/ordering/store':{getStore:()=>{touched++;return {backend:"postgres",getMenuRecord:async()=>null,menuHistory:async()=>[],compareMenuDoc:async()=>({doc:[],revision:"saved"})};}}
  });
  const badRequest={json:async()=>{throw Error('Must not parse');}};
  assert.equal((await route.GET()).status,403); assert.equal((await route.PUT(badRequest)).status,403); assert.equal(touched,0);
  role=null; assert.equal((await route.PUT(badRequest)).status,401); assert.equal(touched,0);
- role='owner'; assert.equal((await route.GET()).status,200); assert.equal((await route.PUT({json:async()=>({doc:[]})})).status,200); assert.equal(touched,2);
+ role='owner'; assert.equal((await route.GET()).status,200); assert.equal((await route.PUT(new Request('https://fixture.invalid/api/kitchen/menu',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({doc:[],revision:'a'.repeat(64)})}))).status,200); assert.equal(touched,2);
 });

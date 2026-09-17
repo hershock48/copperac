@@ -534,3 +534,7 @@ A stable submission reference and atomic order/print/email-intent write prevent 
 ## Kitchen actions and recovery
 
 Kitchen controls and fulfillment actions now use saved revisions and recoverable action references. Owner cancellation preserves payment records and requires a reason. See [verification, rollout and remaining operating requirements](docs/kitchen-operations-release.md).
+
+## Parked-demo menu editing
+
+Owner menu drafts keep exact price input and survive kitchen-tab switches. Saves require the current revision and commit with before/after history. Compare the latest saved copy after a conflict or uncertain response. See [verification and rollout requirements](docs/parked-menu-release.md). This editor does not update Toast.

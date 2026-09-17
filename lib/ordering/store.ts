@@ -20,6 +20,7 @@
 // and a schema this young will change shape. Normalize when something needs
 // to query it, not before.
 
+import { MENU_HISTORY_SCHEMA, compareMenu, compareMenuMemory, type MenuRecord, type MenuHistory } from "./menu-document-store";
 import type { Pool } from "pg";
 import { OPERATION_SCHEMA, getReceipt, commitOperation, commitMemory, type Receipt, type Candidate } from "./kitchen-operations";
 import { ATTEMPT_SCHEMA, settleMemory, settlePostgres, type Attempt, type AttemptResult } from "./order-acceptance";
@@ -122,7 +123,9 @@ export interface OrderStore {
   // the bundled harvest. Stored whole -- it is one restaurant's menu, edits
   // are rare, and whole-document writes cannot half-apply.
   getMenuDoc(): Promise<unknown | null>;
-  setMenuDoc(doc: unknown): Promise<void>;
+  getMenuRecord(): Promise<MenuRecord | null>;
+  compareMenuDoc(expected: MenuRecord | null, doc: unknown, beforeDoc: unknown): Promise<MenuRecord | null>;
+  menuHistory(): Promise<{ id: string; changedAt: string }[]>;
 }
 
 /* ------------------------------ memory ------------------------------ */
@@ -137,6 +140,8 @@ type MemoryBag = {
   printJobs: PrintJob[];
   printersSeen: Record<string, number>;
   menuDoc: unknown | null;
+  menuRevision?: string;
+  menuHistory?: MenuHistory[];
 };
 
 function memoryBag(): MemoryBag {
@@ -224,12 +229,16 @@ const memoryStore: OrderStore = {
     return { ...memoryBag().printersSeen };
   },
   async getMenuDoc() {
-    return memoryBag().menuDoc;
+    return structuredClone(memoryBag().menuDoc);
   },
-  async setMenuDoc(doc) {
-    requireDurableWrite();
-    memoryBag().menuDoc = doc;
+  async getMenuRecord() { const bag=memoryBag();return bag.menuDoc===null?null:{doc:structuredClone(bag.menuDoc),revision:bag.menuRevision??"legacy"}; },
+  async compareMenuDoc(expected,doc,beforeDoc) {
+    requireDurableWrite(); const bag=memoryBag();bag.menuHistory??=[];
+    const current=bag.menuDoc===null?null:{doc:bag.menuDoc,revision:bag.menuRevision??"legacy"};
+    const record=compareMenuMemory(current,bag.menuHistory,expected,doc,beforeDoc);
+    if(record){bag.menuDoc=structuredClone(record.doc);bag.menuRevision=record.revision;}return record;
   },
+  async menuHistory() { return (memoryBag().menuHistory??[]).slice(-10).reverse().map(({id,changedAt})=>({id,changedAt})); },
 };
 
 /* ----------------------------- postgres ----------------------------- */
@@ -279,7 +288,8 @@ CREATE TABLE IF NOT EXISTS ordering_orders (
         );
         CREATE SEQUENCE IF NOT EXISTS ordering_ticket;
 ${ATTEMPT_SCHEMA}
-${OPERATION_SCHEMA}`);
+${OPERATION_SCHEMA}
+${MENU_HISTORY_SCHEMA}`);
     })().catch(async (error: unknown) => {
       const failed = g.__copperPgPool; g.__copperPgPool = undefined; g.__copperPgReady = undefined;
       await failed?.end().catch(() => {}); throw error;
@@ -379,13 +389,14 @@ const postgresStore: OrderStore = {
     const r = await pool.query(`SELECT data FROM ordering_menu WHERE id = 1`);
     return r.rows[0] ? r.rows[0].data : null;
   },
-  async setMenuDoc(doc) {
-    const pool = await pgPool();
-    await pool.query(
-      `INSERT INTO ordering_menu (id, data) VALUES (1, $1)
-       ON CONFLICT (id) DO UPDATE SET data = $1`,
-      [JSON.stringify(doc)]
-    );
+  async getMenuRecord() {
+    const result=await (await pgPool()).query("SELECT data,revision FROM ordering_menu WHERE id=1");
+    return result.rows[0]?{doc:result.rows[0].data,revision:String(result.rows[0].revision)}:null;
+  },
+  async compareMenuDoc(expected,doc,beforeDoc) { const pool=await pgPool();return compareMenu((sql,params)=>pool.query(sql,params),expected,doc,beforeDoc); },
+  async menuHistory() {
+    const result=await (await pgPool()).query("SELECT id,changed_at FROM ordering_menu_history ORDER BY changed_at DESC,id DESC LIMIT 10");
+    return result.rows.map(r=>({id:r.id,changedAt:new Date(r.changed_at).toISOString()}));
   },
 };
 

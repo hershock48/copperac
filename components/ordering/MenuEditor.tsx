@@ -1,109 +1,63 @@
 "use client";
-
-// The menu editor: Toast's back-office menu manager, on the kitchen board.
-//
-// Everything on the order page is editable here: sections, items, prices,
-// descriptions, photos, and the modifier groups with their choices and
-// prices. Unlike the 86 board (which saves per tap, because a sold-out tap
-// is one fact), the editor batches: edit freely, one Save button, one
-// atomic write. That is also how Toast's editor works, so the mental model
-// transfers. Unsaved work is flagged loudly and never silently dropped.
-//
-// Hidden vs 86'd, said here because staff will ask: Hide takes an item off
-// the menu indefinitely (seasonal, discontinued). 86 is tonight only.
-
-import { useEffect, useState } from "react";
-import type { MenuDocItem, MenuDocSection } from "@/lib/ordering/menu";
-
-function toDollars(cents: number): string {
-  return (cents / 100).toFixed(2);
-}
-function toCents(dollars: string): number {
-  const n = Math.round(parseFloat(dollars || "0") * 100);
-  return Number.isFinite(n) && n >= 0 ? n : 0;
-}
-function slug(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
-
-const inputCls =
-  "w-full rounded-sm border border-ink-line bg-ink px-3 py-2 text-sm text-cream outline-none focus:border-copper-light";
-const smallBtn =
-  "rounded-sm border border-ink-line px-3 py-1.5 text-xs text-cream-dim transition-colors hover:border-copper-light";
-
-export default function MenuEditor() {
-  const [doc, setDoc] = useState<MenuDocSection[] | null>(null);
-  const [dirty, setDirty] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [savedFlash, setSavedFlash] = useState(false);
-  const [error, setError] = useState("");
-  const [openItem, setOpenItem] = useState<string | null>(null);
-  const [armDelete, setArmDelete] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/kitchen/menu", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => setDoc(data.doc))
-      .catch(() => setError("Could not load the menu. Refresh the page."));
-  }, []);
-
-  function mutate(fn: (d: MenuDocSection[]) => void) {
-    setDoc((d) => {
-      if (!d) return d;
-      const copy = structuredClone(d);
-      fn(copy);
-      return copy;
-    });
-    setDirty(true);
-    setSavedFlash(false);
+import { useEffect, useRef, useState } from "react";
+import { saveOwnerDraft } from "@/lib/workroom/owner-save";
+import { isMenuSnapshot, toMenuDraft, prepareMenuDraft, menuDocumentJSON, type MenuDocSection, type MenuDraftItem, type MenuDraftSection, type MenuSnapshot } from "@/lib/ordering/menu-document-fields";
+function slug(s:string):string{return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+const inputCls="w-full rounded-sm border border-ink-line bg-ink px-3 py-2 text-sm text-cream outline-none focus:border-copper-light";
+const smallBtn="rounded-sm border border-ink-line px-3 py-2 text-xs text-cream-dim transition-colors hover:border-copper-light";
+export default function MenuEditor({onSaved}:{onSaved:(doc:MenuDocSection[])=>void}){
+ const [doc,setDoc]=useState<MenuDraftSection[]|null>(null),[snapshot,setSnapshot]=useState<MenuSnapshot|null>(null);
+ const [dirty,setDirty]=useState(false),[saving,setSaving]=useState(false),[savedFlash,setSavedFlash]=useState(false),[error,setError]=useState("");
+ const [latest,setLatest]=useState<MenuSnapshot|null>(null),[checking,setChecking]=useState(false),[replaceArmed,setReplaceArmed]=useState(false);
+ const [openItem,setOpenItem]=useState<string|null>(null),[armDelete,setArmDelete]=useState<string|null>(null);
+ const pending=useRef(false),mounted=useRef(true);
+ useEffect(()=>{
+  mounted.current=true;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  fetch("/api/kitchen/menu",{cache:"no-store",signal:controller.signal}).then(async r=>{if(!r.ok)throw Error();const data:unknown=await r.json();if(!isMenuSnapshot(data))throw Error();if(mounted.current){setDoc(toMenuDraft(data.doc));setSnapshot(data);onSaved(data.doc);}}).catch(()=>{if(mounted.current)setError("Could not load the saved menu. Check owner sign-in and try again in another tab.");}).finally(()=>clearTimeout(timer));
+  return()=>{mounted.current=false;clearTimeout(timer);controller.abort();};
+ },[onSaved]);
+ useEffect(()=>{if(!dirty)return;const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();};window.addEventListener("beforeunload",protect);return()=>window.removeEventListener("beforeunload",protect);},[dirty]);
+ function mutate(fn:(d:MenuDraftSection[])=>void){if(pending.current)return;setDoc(d=>{if(!d)return d;const copy=structuredClone(d);fn(copy);return copy;});setDirty(true);setSavedFlash(false);setReplaceArmed(false);}
+ async function save(){
+  if(!doc || !snapshot || pending.current)return;
+  const planned=prepareMenuDraft(doc);if(planned.error){setError(planned.error);return;}const submitted=planned.doc!;
+  pending.current=true;setSaving(true);setError("");setSavedFlash(false);
+  const result=await saveOwnerDraft("/api/kitchen/menu",{doc:submitted,revision:snapshot.revision},(value):value is MenuSnapshot=>isMenuSnapshot(value) && value.revision!==snapshot.revision && menuDocumentJSON(value.doc)===menuDocumentJSON(submitted));
+  if(mounted.current){
+   if(result.kind==="saved"){setSnapshot(result.data);setDirty(false);setSavedFlash(true);setLatest(null);onSaved(result.data.doc);}
+   else setError(result.kind === "conflict" ? "The saved menu changed. Use Compare latest saved menu; your draft is still here." : result.kind === "uncertain" ? "This save could not be confirmed. Use Compare latest saved menu before retrying; your draft is still here." : result.message);
+   setSaving(false);
   }
-
-  async function save() {
-    if (!doc) return;
-    setSaving(true);
-    setError("");
-    try {
-      const r = await fetch("/api/kitchen/menu", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ doc }),
-      });
-      const data = await r.json();
-      if (!r.ok) setError(data.error ?? "Save failed.");
-      else {
-        setDirty(false);
-        setSavedFlash(true);
-      }
-    } catch {
-      setError("Could not reach the server. Your edits are still on this screen; try Save again.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  if (!doc) {
-    return <p className="py-10 text-center text-sm text-cream-dim/70">{error || "Loading the menu..."}</p>;
-  }
-
-  return (
-    <div>
-      {/* Save rail: sticky so a long menu never hides the way out. */}
-      <div className="sticky top-0 z-30 -mx-1 mb-6 flex flex-wrap items-center gap-3 border-b border-ink-line bg-ink/95 px-1 py-3 backdrop-blur">
-        <button
-          type="button"
-          onClick={save}
-          disabled={!dirty || saving}
-          className="display rounded-sm bg-copper px-6 py-3 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {saving ? "Saving" : "Save menu"}
-        </button>
-        {dirty && <span className="text-sm text-copper-light">Unsaved changes</span>}
-        {savedFlash && !dirty && <span className="text-sm text-[#7dd18a]">Saved. Live on the order page.</span>}
-        {error && (
-          <span role="alert" className="text-sm text-[#d9736b]">{error}</span>
-        )}
-      </div>
-
+  pending.current=false;
+ }
+ async function compareLatest(){
+  if(pending.current)return;pending.current=true;setChecking(true);setError("");
+  try{const response=await fetch("/api/kitchen/menu",{cache:"no-store",signal:AbortSignal.timeout(12000)});const data:unknown=await response.json();if(!response.ok || !isMenuSnapshot(data))throw Error();if(mounted.current){setLatest(data);setReplaceArmed(false);}}
+  catch{if(mounted.current)setError("Could not check the latest saved menu. Your draft is still here.");}
+  finally{pending.current=false;if(mounted.current)setChecking(false);}
+ }
+ function downloadDraft(){if(!doc)return;const url=URL.createObjectURL(new Blob([JSON.stringify({savedRevision:snapshot?.revision,pricesInDollars:true,draft:doc},null,2)],{type:"application/json"}));const link=document.createElement("a");link.href=url;link.download="copper-demo-menu-draft.json";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+ function useLatest(){if(!latest || pending.current)return;if(dirty && !replaceArmed){setReplaceArmed(true);return;}setDoc(toMenuDraft(latest.doc));setSnapshot(latest);onSaved(latest.doc);setDirty(false);setError("");setSavedFlash(false);setLatest(null);setReplaceArmed(false);setOpenItem(null);setArmDelete(null);}
+ if(!doc)return <p role={error?"alert":undefined} className="py-10 text-sm text-cream-dim">{error || "Loading the saved menu…"}</p>;
+ return (<div>
+  <p className="mb-4 text-sm text-cream-dim">This edits the parked demo menu. Copper’s customers order through Toast; this does not update Toast. Drafts stay here when you switch kitchen tabs. Download your draft before reloading or signing out.</p>
+  <div className="sticky top-0 z-30 mb-4 flex flex-wrap items-center gap-3 border-b border-ink-line bg-ink/95 py-3 backdrop-blur">
+   <button type="button" onClick={save} disabled={!dirty || saving || checking} className="display rounded-sm bg-copper px-6 py-3 text-sm uppercase tracking-widest text-ink disabled:opacity-40">{saving?"Saving…":"Save menu"}</button>
+   <button type="button" onClick={compareLatest} disabled={saving || checking} className={smallBtn}>{checking?"Checking…":"Compare latest saved menu"}</button>
+   <button type="button" onClick={downloadDraft} className={smallBtn}>Download draft</button>
+   {dirty && <span className="text-sm text-copper-light">Unsaved changes</span>}
+   {savedFlash && !dirty && <span role="status" className="text-sm text-[#7dd18a]">Saved to the demo menu. Check the demo order page; cached pages may take a few seconds.</span>}
+   {error && <p role="alert" className="w-full text-sm text-[#d9736b]">{error}</p>}
+  </div>
+  <p className="mb-4 text-sm"><a href="/order" target="_blank" rel="noreferrer" className="underline">View demo order page</a> · <a href="/workroom" target="_blank" rel="noreferrer" className="underline">Owner sign-in</a></p>
+  {latest && <section aria-label="Latest saved menu" className="mb-6 rounded-sm border border-copper p-4 text-sm text-cream">
+   <h2 className="mb-2 font-semibold">Latest saved menu</h2><p>Your draft remains in the editor below. Compare prices, visibility and options before replacing it.</p>
+   <details className="my-3"><summary>Read saved items and options</summary>{latest.doc.map((s,index)=><div key={index} className="my-3"><h3>{s.name}{s.ageRestricted?" · 21+":""}</h3>{s.items.map(i=><div key={i.id} className="my-2 border-t border-ink-line pt-2"><p>{i.name} · ${(i.priceCents/100).toFixed(2)}{i.hidden?" · Hidden":""}</p><p>{i.desc}</p>{i.image && <p className="break-all">Photo: {i.image}</p>}{i.groups.map((g,gi)=><p key={gi}>{g.name} · {g.required?"Required":"Optional"} · {g.multi?"Pick many":"Pick one"}: {g.choices.map(c=>c.name+" +$"+(c.priceCents/100).toFixed(2)).join(", ")}</p>)}</div>)}</div>)}</details>
+   <button type="button" disabled={saving || checking} onClick={useLatest} className={smallBtn}>{replaceArmed?"Replace my draft with this saved copy":"Use latest saved menu"}</button>
+   {replaceArmed && <p className="mt-2 text-copper-light">This replaces your unsaved edits. Download the draft first if you want to keep it.</p>}
+  </section>}
+  <details className="mb-5 text-sm text-cream-dim"><summary>Recent menu saves</summary>{snapshot?.history.length?<ul>{snapshot.history.map(h=><li key={h.id}>Owner save · {new Date(h.changedAt).toLocaleString("en-US",{timeZone:"America/Detroit"})} Eastern</li>)}</ul>:<p>No owner saves recorded yet.</p>}<p>Before and after copies are retained privately. Restoring history requires a reviewed change.</p></details>
+  <fieldset disabled={saving || checking} className="min-w-0" aria-label="Demo menu fields">
       {doc.map((section, si) => (
         <section key={si} className="mb-8 rounded-sm border border-ink-line bg-ink-soft p-4">
           <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -132,7 +86,7 @@ export default function MenuEditor() {
                     id: `${slug(section.name)}-${slug(name)}-${Math.random().toString(36).slice(2, 7)}`,
                     name,
                     desc: "",
-                    priceCents: 0,
+                    priceCents: "0.00",
                     image: null,
                     groups: [],
                   });
@@ -175,6 +129,7 @@ export default function MenuEditor() {
       >
         + Add section
       </button>
+    </fieldset>
     </div>
   );
 }
@@ -187,12 +142,12 @@ function ItemRow({
   onDelete,
   onChange,
 }: {
-  item: MenuDocItem;
+  item: MenuDraftItem;
   open: boolean;
   armDelete: boolean;
   onToggle: () => void;
   onDelete: () => void;
-  onChange: (fn: (i: MenuDocItem) => void) => void;
+  onChange: (fn: (i: MenuDraftItem) => void) => void;
 }) {
   return (
     <li className="py-3">
@@ -205,7 +160,7 @@ function ItemRow({
             <span className="display ml-2 text-[10px] uppercase tracking-widest text-cream-dim/60">hidden</span>
           )}
         </button>
-        <span className="text-sm text-cream-dim tabular-nums">${toDollars(item.priceCents)}</span>
+        <span className="text-sm text-cream-dim tabular-nums">${item.priceCents || "—"}</span>
         <button type="button" onClick={onToggle} className={smallBtn}>
           {open ? "Close" : "Edit"}
         </button>
@@ -222,12 +177,8 @@ function ItemRow({
               Price $
               <input
                 inputMode="decimal"
-                defaultValue={toDollars(item.priceCents)}
-                onBlur={(e) => {
-                  const cents = toCents(e.target.value);
-                  e.target.value = toDollars(cents);
-                  onChange((i) => { i.priceCents = cents; });
-                }}
+                value={item.priceCents}
+                onChange={(e) => onChange((i) => { i.priceCents = e.target.value; })}
                 className={`mt-1 ${inputCls} tabular-nums`}
               />
             </label>
@@ -282,8 +233,8 @@ function OptionGroups({
   item,
   onChange,
 }: {
-  item: MenuDocItem;
-  onChange: (fn: (i: MenuDocItem) => void) => void;
+  item: MenuDraftItem;
+  onChange: (fn: (i: MenuDraftItem) => void) => void;
 }) {
   return (
     <div className="space-y-3">
@@ -334,12 +285,8 @@ function OptionGroups({
               <span className="text-xs text-cream-dim">+$</span>
               <input
                 inputMode="decimal"
-                defaultValue={toDollars(choice.priceCents)}
-                onBlur={(e) => {
-                  const cents = toCents(e.target.value);
-                  e.target.value = toDollars(cents);
-                  onChange((i) => { i.groups[gi].choices[ci].priceCents = cents; });
-                }}
+                value={choice.priceCents}
+                onChange={(e) => onChange((i) => { i.groups[gi].choices[ci].priceCents = e.target.value; })}
                 aria-label="Choice price"
                 className={`w-20 ${inputCls} tabular-nums`}
               />
@@ -356,7 +303,7 @@ function OptionGroups({
           <button
             type="button"
             className={smallBtn}
-            onClick={() => onChange((i) => { i.groups[gi].choices.push({ name: "", priceCents: 0 }); })}
+            onClick={() => onChange((i) => { i.groups[gi].choices.push({ name: "", priceCents: "0.00" }); })}
           >
             + Choice
           </button>
@@ -367,7 +314,7 @@ function OptionGroups({
         className={smallBtn}
         onClick={() =>
           onChange((i) => {
-            i.groups.push({ name: "New options", required: false, multi: true, choices: [{ name: "", priceCents: 0 }] });
+            i.groups.push({ name: "New options", required: false, multi: true, choices: [{ name: "", priceCents: "0.00" }] });
           })
         }
       >
