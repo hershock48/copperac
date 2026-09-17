@@ -1,3 +1,4 @@
+import {loginClient} from '@/lib/workroom/login-limit';
 import { NextResponse } from "next/server";
 import { clearKitchenCookie, kitchenPin, kitchenPinMatches, kitchenRole, kitchenSessionReady, setKitchenCookie } from "@/lib/ordering/auth";
 import { allowKitchenLogin } from "@/lib/ordering/login-limit";
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
   const pin = kitchenPin();
   if (!pin || !kitchenSessionReady()) return reply({ error: "Staff sign-in is not configured. Ask the owner to finish kitchen setup." }, 503);
   try {
-    if (!(await allowKitchenLogin())) return NextResponse.json({ error: "Too many sign-in attempts. Wait ten minutes, or use owner sign-in." }, { status: 429, headers: { ...headers, "Retry-After": "600" } });
+    if (!(await allowKitchenLogin(loginClient(req)))) return NextResponse.json({ error: "Too many sign-in attempts. Wait ten minutes, or use owner sign-in." }, { status: 429, headers: { ...headers, "Retry-After": "600" } });
   } catch { return reply({ error: "Sign-in storage is unavailable. Try again later." }, 503); }
   const candidate = await readPin(req);
   if (candidate === null || !kitchenPinMatches(candidate, pin)) return reply({ error: "That kitchen PIN is not right." }, 401);

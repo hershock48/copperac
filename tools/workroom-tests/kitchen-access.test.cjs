@@ -21,6 +21,8 @@ function load(file, mocks = {}, env = {}, clock = { now: 1_800_000_000_000 }) {
    if (Object.hasOwn(mocks,name)) return mocks[name];
    if (name === 'server-only') return {};
    if (name === 'node:crypto') return crypto;
+   if(name==='node:net')return require('node:net');
+   if(name==='../workroom/login-limit')return load('lib/workroom/login-limit.ts',{'./store':mocks['../workroom/store']},env,clock);
    throw Error('Unexpected dependency: '+name);
   }
  });
@@ -38,7 +40,7 @@ function authentication(env = production(), clock = { now: 1_800_000_000_000 }) 
 }
 const next = { NextResponse: { json: (body,init) => Response.json(body,init) } };
 function loginRoute(a, allowKitchenLogin = async () => true) {
- return load('app/api/kitchen/login/route.ts', { 'next/server': next, '@/lib/ordering/auth': a.auth, '@/lib/workroom/auth': a.owner, '@/lib/ordering/login-limit': { allowKitchenLogin } });
+ return load('app/api/kitchen/login/route.ts', { 'next/server': next, '@/lib/ordering/auth': a.auth, '@/lib/workroom/auth': a.owner, '@/lib/ordering/login-limit': { allowKitchenLogin }, '@/lib/workroom/login-limit':{loginClient:()=> 'a'} });
 }
 const request = (body,headers = {},method = 'POST') => new Request('https://fixture.invalid/api/kitchen/login', { method, headers: { 'Content-Type':'application/json', Origin:'https://fixture.invalid', ...headers }, ...(method === 'POST' ? {body:JSON.stringify(body)} : {}) });
 
@@ -126,9 +128,9 @@ test('browser origin matches the public Host through internal Next URLs but not 
 test('local kitchen counters are bounded and production cannot use memory sign-in', async () => {
  const mocks={'../workroom/store':{connectionVar:()=>null,workroomDatabase:async()=>{throw Error('not configured');}}};
  const local=load('lib/ordering/login-limit.ts',mocks,{NODE_ENV:'development'});
- assert.deepEqual(await Promise.all(Array.from({length:9},()=>local.allowKitchenLogin(1000000))),[true,true,true,true,true,false,false,false,false]);
- assert.equal(await local.allowKitchenLogin(1600000),true);
- await assert.rejects(load('lib/ordering/login-limit.ts',mocks,{NODE_ENV:'production'}).allowKitchenLogin());
+ assert.deepEqual(await Promise.all(Array.from({length:9},()=>local.allowKitchenLogin('a',1000000))),[true,true,true,true,true,false,false,false,false]);
+ assert.equal(await local.allowKitchenLogin('a',1600000),true);
+ await assert.rejects(load('lib/ordering/login-limit.ts',mocks,{NODE_ENV:'production'}).allowKitchenLogin('a'));
 });
 
 test('atomic kitchen reservations share a bounded bucket across instances and survive database restart independently of owner', async () => {
@@ -136,13 +138,30 @@ test('atomic kitchen reservations share a bounded bucket across instances and su
  const instance=()=>load('lib/ordering/login-limit.ts',{'../workroom/store':{connectionVar:()=> 'DATABASE_URL',workroomDatabase:async()=>({query:(sql,params)=>db.query(sql,params)})}},{NODE_ENV:'production'});
  try {
   await db.exec(`CREATE TABLE ${prefix}_login_attempts(id text PRIMARY KEY,attempts integer NOT NULL,started bigint NOT NULL); INSERT INTO ${prefix}_login_attempts VALUES('owner',3,1000000)`);
-  const a=instance(),b=instance(); const results=await Promise.all(Array.from({length:12},(_,i)=>(i%2?a:b).allowKitchenLogin(1000000)));
+  const a=instance(),b=instance(); const results=await Promise.all(Array.from({length:12},(_,i)=>(i%2?a:b).allowKitchenLogin('a',1000000)));
   assert.equal(results.filter(Boolean).length,5);
   assert.equal((await db.query(`SELECT attempts FROM ${prefix}_login_attempts WHERE id='owner'`)).rows[0].attempts,3);
-  assert.equal((await db.query(`SELECT attempts FROM ${prefix}_login_attempts WHERE id='kitchen'`)).rows[0].attempts,6);
-  await db.close(); db=new PGlite(dir); assert.equal(await instance().allowKitchenLogin(1000001),false);
-  assert.equal(await instance().allowKitchenLogin(1600000),true);
+  assert.equal((await db.query(`SELECT attempts FROM ${prefix}_login_attempts WHERE id='kitchen:a'`)).rows[0].attempts,6);
+  await db.close(); db=new PGlite(dir); assert.equal(await instance().allowKitchenLogin('a',1000001),false);
+  assert.equal(await instance().allowKitchenLogin('a',1600000),true);
  } finally { await db.close(); fs.rmSync(dir,{recursive:true,force:true}); }
+});
+
+test('trusted client buckets isolate an attacker from another owner and from kitchen sign-in',async()=>{
+ const db=new PGlite();
+ const env={NODE_ENV:'production',VERCEL:'1'};
+ const instance=()=>load('lib/workroom/login-limit.ts',{'./store':{connectionVar:()=> 'DATABASE_URL',workroomDatabase:async()=>({query:(sql,values)=>db.query(sql,values)})}},env);
+ try{
+  await db.exec('CREATE TABLE copper_login_attempts(id text PRIMARY KEY, attempts integer NOT NULL, started bigint NOT NULL);');
+  const a=instance(),b=instance(),request=ip=>new Request('https://fixture.invalid/api/workroom/login',{headers:{'x-vercel-forwarded-for':ip,'x-forwarded-for':'198.51.100.99'}});
+  const attacker=a.loginClient(request('192.0.2.1')),owner=a.loginClient(request('192.0.2.2'));
+  const results=await Promise.all(Array.from({length:15},(_,i)=>(i%2?a:b).allowLogin(attacker,1000000)));
+  assert.equal(results.filter(Boolean).length,5);assert.equal(await b.allowLogin(owner,1000000),true);assert.equal(await b.allowLogin(attacker,1000000,'kitchen'),true);
+  await a.clearLoginAttempts(owner);assert.equal(await b.allowLogin(attacker,1000001),false);
+  assert.equal(a.loginClient(request('2001:db8::1')),a.loginClient(request('2001:0db8:0:0:0:0:0:1')));
+  assert.throws(()=>a.loginClient(request('192.0.2.1, 192.0.2.2')));
+  assert.throws(()=>load('lib/workroom/login-limit.ts',{'./store':{}},{NODE_ENV:'production'}).loginClient(request('192.0.2.1')),/unavailable/);
+ }finally{await db.close();}
 });
 
 if(app==='copperac')test('parked menu price API refuses staff before reading body or touching storage, and accepts signed owner access', async()=>{

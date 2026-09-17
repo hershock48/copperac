@@ -482,7 +482,7 @@ Production owner sign-in requires `WORKROOM_PASSCODE`, a separate random
 `WORKROOM_SESSION_SECRET` of at least 32 characters, and persistent Postgres.
 Sessions expire after 18 hours; rotating either credential invalidates them.
 Existing cookies from the earlier implementation require a fresh sign-in.
-The shared owner login counter permits five attempts per ten-minute window.
+Owner sign-in permits five attempts per ten-minute window per trusted client address. Kitchen sign-in has a separate bucket for each address. Atomic database counters persist across instances; empty requests from one remote address cannot lock out another address. Expired rows are pruned and successful owner sign-in clears only that owner/address bucket. Vercel uses its overwritten x-vercel-forwarded-for header. Other hosts must configure an overwriting trusted proxy and WORKROOM_TRUSTED_IP_HEADER. Production closes on missing identity or storage; never configure trusted headers on a directly reachable server. Clients behind the same address share its limit.
 
 Set an explicit `DATABASE_URL` when multiple database integrations exist.
 Database TLS uses the provider's connection configuration; certificate
