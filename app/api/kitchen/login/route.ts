@@ -50,8 +50,11 @@ export async function POST(req: Request) {
   if (!sameOrigin(req)) return reply({ error: "Open the kitchen on this website to sign in." }, 403);
   const pin = kitchenPin();
   if (!pin || !kitchenSessionReady()) return reply({ error: "Staff sign-in is not configured. Ask the owner to finish kitchen setup." }, 503);
+  let client: string;
+  try { client = loginClient(req); }
+  catch { return reply({ error: "Sign-in cannot identify your address. Ask the site administrator to check trusted-proxy configuration.", reason: "trusted_address_unavailable" }, 503); }
   try {
-    if (!(await allowKitchenLogin(loginClient(req)))) return NextResponse.json({ error: "Too many sign-in attempts. Wait ten minutes, or use owner sign-in." }, { status: 429, headers: { ...headers, "Retry-After": "600" } });
+    if (!(await allowKitchenLogin(client))) return NextResponse.json({ error: "Too many sign-in attempts. Wait ten minutes, or use owner sign-in." }, { status: 429, headers: { ...headers, "Retry-After": "600" } });
   } catch { return reply({ error: "Sign-in storage is unavailable. Try again later." }, 503); }
   const candidate = await readPin(req);
   if (candidate === null || !kitchenPinMatches(candidate, pin)) return reply({ error: "That kitchen PIN is not right." }, 401);

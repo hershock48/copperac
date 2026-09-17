@@ -542,3 +542,9 @@ Owner menu drafts keep exact price input and survive kitchen-tab switches. Saves
 Printer job binding, owner review/recovery, coordinated Basic-auth configuration and remaining hardware gates: [printer release](docs/printer-release.md).
 
 Guest confirmation dispatch, provider status and owner recovery: [notification release](docs/notification-release.md). Sending and hosted scheduling require deliberate configuration.
+
+## Trusted address setup for sign-in
+
+On Vercel, enable **Automatically expose System Environment Variables** in the project environment settings and redeploy. The deployed server must receive `VERCEL=1` and the platform-provided `x-vercel-forwarded-for` header. Leave `WORKROOM_TRUSTED_IP_HEADER` unset there. A missing or invalid trusted address returns HTTP 503 with `reason: trusted_address_unavailable`; database failures instead report sign-in storage unavailable. This distinction does not bypass throttling or accept an arbitrary forwarded header.
+
+On another host, configure an overwriting trusted proxy, block direct access to the application, and set `WORKROOM_TRUSTED_IP_HEADER` to that header. Verify a correct login and an independent address after deployment. The hosted toggle and actual edge header have not been verified by the local tests.

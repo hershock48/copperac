@@ -7,8 +7,9 @@ export async function POST(req: Request) {
   const passcode = workroomPasscode();
   if (!passcode || !workroomSessionReady()) return NextResponse.json({ error: "The workroom is not configured for secure sign-in yet.", reason: "unconfigured" }, { status: 503 });
   let client:string;
+  try { client=loginClient(req); }
+  catch { return NextResponse.json({ error: "Sign-in cannot identify your address. Ask the site administrator to check trusted-proxy configuration.", reason: "trusted_address_unavailable" }, { status: 503 }); }
   try {
-    client=loginClient(req);
     if (!(await allowLogin(client))) return NextResponse.json({ error: "Too many tries. Wait ten minutes." }, { status: 429, headers: { "Retry-After": "600" } });
   } catch { return NextResponse.json({ error: "Sign-in storage is unavailable. Try again later." }, { status: 503 }); }
   const body = await req.json().catch(() => null);

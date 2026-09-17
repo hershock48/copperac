@@ -53,15 +53,12 @@ test('review requires every displayed line price, age requirement and each total
  for(const changed of [null,{...good,lines:[]},{...good,hasAlcohol:true},{...good,totals:{...good.totals,totalCents:1}},{...good,lines:[{...good.lines[0],lineCents:1},good.lines[1]]}])assert.equal(q.isQuoteForSubmission(changed,lines),false);
 });
 function harness() {
- const copper=root.endsWith('copperac');
- let menuItems=[{name:'Burger',desc:'Fixture',price:'10.00'}];
  let doc=[{name:'Food',ageRestricted:false,items:[{id:'food-burger',name:'Burger',desc:'Fixture',priceCents:1000,image:null,groups:[]}]}];
  const effects={tickets:0,orders:[],prints:0,emails:0};
  const bag={attempts:new Map(),orders:new Map(),printJobs:[],confirmations:new Map()};
  const store={getAttempt:async id=>bag.attempts.get(id)??null,settleAttempt:async(a,o,j)=>{const r=acceptance.settleMemory(bag,a,o,j);if(r.created&&o){effects.orders.push(o);effects.prints+=(j??[]).length;}return r;},claimConfirmation:async()=>true,backend:'postgres',getState:async()=>({unavailable:[],busyMinutes:0,pausedUntil:null}),getMenuDoc:async()=>structuredClone(doc),nextTicketNumber:async()=>++effects.tickets,createOrder:async o=>effects.orders.push(o),enqueuePrintJob:async()=>effects.prints++};
- const seed=copper?{SEED_MENU:doc}:load('lib/ordering/seed.ts',{'@/lib/menu':{FOOD_MENU:[]}});
- const content={getMenus:async()=>({food:[{name:'Food',items:structuredClone(menuItems)}]})};
- const menu=load('lib/ordering/menu.ts',{'./seed':seed,'./toast-menu.json':{default:doc},'@/lib/content':content});
+ // This is Copper's menu adapter even in a renamed scratch checkout.
+ const menu=load('lib/ordering/menu.ts',{'./toast-menu.json':{default:doc}});
  const env={NODE_ENV:'production',STRIPE_SECRET_KEY:'fixture-does-not-activate-payment'};
  const time={orderingWindow:()=>({open:true})};
  const config={ORDERING:{feeCents:99,taxBasisPoints:600,basePickupMinutes:15}};
@@ -69,7 +66,7 @@ function harness() {
  const route=load('app/api/ordering/order/route.ts',mocks,env);
  const body=(patch={})=>({attemptId:require('node:crypto').randomUUID(),guestName:'Fixture',guestPhone:'2025550123',guestEmail:'',tipCents:0,lines:[line()],expectedTotals:quote().quote.totals,...patch});
  const post=async b=>route.POST(new Request('https://fixture.invalid/api/ordering/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}));
- return {store,effects,menu,post,body,mocks,env,time,changePrice(cents){doc[0].items[0].priceCents=cents;menuItems[0].price=(cents/100).toFixed(2);},hide(){doc[0].items[0].hidden=true;menuItems=[];}};
+ return {store,effects,menu,post,body,mocks,env,time,changePrice(cents){doc[0].items[0].priceCents=cents;},hide(){doc[0].items[0].hidden=true;}};
 }
 test('warm page cache cannot authorize stale checkout prices; review is free of order/ticket/print/email effects',async()=>{
  const h=harness();assert.equal((await h.menu.guestMenu(h.store)).index.get('food-burger').priceCents,1000);
@@ -99,10 +96,4 @@ test('malformed requests, forged totals and legacy requests fail before writes; 
  assert.deepEqual(h.effects,{tickets:0,orders:[],prints:0,emails:0});
  const state=load('app/api/ordering/state/route.ts',h.mocks,h.env);assert.equal((await (await state.GET()).json()).demo,true);
  h.store.backend='memory';assert.equal((await (await state.GET()).json()).open,false);
-});
-if(root.endsWith('mikesplace'))test('generated display prices are exact decimals; unpriced or malformed text never becomes an invented amount',()=>{
- const seed=load('lib/ordering/seed.ts',{'@/lib/menu':{FOOD_MENU:[]}});
- const rows=['10.01','1.1','0','1.005','1e2','0x10','Market','',null,' 12 ',true].map((price,i)=>({name:'Item '+i,desc:'',price}));
- const items=seed.seedFrom([{name:'Food',items:rows}])[0].items;
- assert.deepEqual(clean(items.map(i=>i.priceCents)),[1001,110,0]);
 });

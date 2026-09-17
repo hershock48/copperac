@@ -44,6 +44,27 @@ function loginRoute(a, allowKitchenLogin = async () => true) {
 }
 const request = (body,headers = {},method = 'POST') => new Request('https://fixture.invalid/api/kitchen/login', { method, headers: { 'Content-Type':'application/json', Origin:'https://fixture.invalid', ...headers }, ...(method === 'POST' ? {body:JSON.stringify(body)} : {}) });
 
+test('owner and kitchen sign-in distinguish proxy setup from storage failure before counting a guess',async()=>{
+ for(const role of ['owner','kitchen'])for(const scenario of ['missing-env','missing-header','invalid-header','database']) {
+  let counts=0;
+  const env=scenario==='missing-env'?production():{...production(),VERCEL:'1'};
+  const limiter=load('lib/workroom/login-limit.ts',{'./store':{}},env);
+  const reserve=async()=>{counts++;throw Error('database offline');};
+  const route=load(role==='owner'?'app/api/workroom/login/route.ts':'app/api/kitchen/login/route.ts',{
+   'next/server':next,
+   '@/lib/workroom/auth':{workroomPasscode:()=> 'fixture-pin',workroomSessionReady:()=>true},
+   '@/lib/ordering/auth':{kitchenPin:()=> 'fixture-pin',kitchenSessionReady:()=>true},
+   '@/lib/workroom/login-limit':{...limiter,allowLogin:reserve},
+   '@/lib/ordering/login-limit':{allowKitchenLogin:reserve},
+  });
+  const headers=scenario==='missing-header'?{}:{'x-vercel-forwarded-for':scenario==='invalid-header'?'spoof, chain':'192.0.2.1'};
+  const response=await route.POST(request({},headers));assert.equal(response.status,503);
+  const body=await response.json();
+  if(scenario==='database'){assert.match(body.error,/storage/);assert.equal(counts,1);}
+  else {assert.equal(body.reason,'trusted_address_unavailable');assert.equal(counts,0);}
+ }
+});
+
 test('kitchen sessions reject raw PINs, forgery, other apps and owner-role tokens', async () => {
  const a = authentication();
  a.values.set(cookie,a.env.KITCHEN_PIN); assert.equal(await a.auth.isKitchenAuthed(),false);
