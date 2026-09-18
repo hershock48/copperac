@@ -144,6 +144,8 @@ function connectionString(): string | undefined {
 
 type PgPool = {
   query: (sql: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }>;
+  /* Optional so a test double can stand in with query() alone. */
+  end?: () => Promise<void>;
 };
 
 const JSON_TABLES = ["workroom_content", "workroom_events", "workroom_images"] as const;
@@ -168,15 +170,25 @@ export async function workroomDatabase(): Promise<PgPool> {
       store at BUILD time and Next prerenders with several workers at once;
       CREATE TABLE IF NOT EXISTS is not atomic against a concurrent creator
       (anchor's first facts deploy died exactly there). A failed init is
-      never cached: pool and promise are dropped so the next request retries.
+      never cached: pool and promise are dropped so the next request retries,
+      and the failed pool is closed on the way out (see the catch below).
     */
     const creates = JSON_TABLES.map(
       (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
     ).join("\n") + "\nCREATE TABLE IF NOT EXISTS copper_login_attempts (id text PRIMARY KEY, attempts integer NOT NULL, started bigint NOT NULL);";
     await g.__copperWorkroomPool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}\n${CONTENT_HISTORY_SCHEMA}`);
-    })().catch((err: unknown) => {
+    })().catch(async (err: unknown) => {
+        // Dropping the reference alone leaks the sockets the pool already
+        // opened. Neon's free tier counts connections, and a database that
+        // is refusing the schema statement is usually refusing every request,
+        // so each retry would add another `max: 3` set of them until the
+        // deployment could not connect at all. Close it, then let the next
+        // request build a fresh one. end() failing is not interesting here;
+        // the original error is what the caller needs.
+        const failed = g.__copperWorkroomPool;
         g.__copperWorkroomPool = undefined;
         g.__copperWorkroomReady = undefined;
+        if (failed?.end) await failed.end().catch(() => {});
         throw err;
       });
   }
