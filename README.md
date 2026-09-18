@@ -494,7 +494,12 @@ return an error. Memory writes are for local development only.
 `/api/status` reports session configuration and the selected storage backend;
 these configuration indicators do not prove database health. Inquiry success
 requires a Resend acceptance ID and the request times out after 12 seconds.
-Provider acceptance does not prove delivery to the owner's inbox.
+The send carries an idempotency key hashed from the message, so a duplicate
+submit within Resend's 24 hour window is one email rather than two.
+Provider acceptance does not prove delivery to the owner's inbox. Nothing
+about an enquiry is stored by the site: the inbox is the record, and
+`docs/intake-trace-2026-09-17.md` traces the whole path, including the
+workroom surfaces that do not exist for it.
 
 Before deploying this review, verify actual database saves survive a restart,
 owner sign-in and credential rotation, and a controlled inquiry reaches the

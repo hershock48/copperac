@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { SITE } from "@/lib/site";
 
@@ -32,7 +33,14 @@ import { SITE } from "@/lib/site";
  * Known gap when unconfigured: the mailto fallback needs the visitor to have
  * a registered mail handler. Desktop webmail users get nothing from that
  * click beyond the on-screen note and the phone number.
+ *
+ * Nothing is stored. The club's inbox is the only record of an enquiry and
+ * the runtime log is the only record of a refusal. docs/intake-trace-2026-09-17.md
+ * traces the whole path, including what the owner cannot do about one.
  */
+
+// createHash below needs it, and every other route in this app declares it.
+export const runtime = "nodejs";
 
 const REQUIRED = ["first", "last", "email", "phone"] as const;
 
@@ -117,6 +125,27 @@ export async function POST(request: Request) {
     .map(([k, label]) => `${label}: ${get(k)}`);
   lines.push("", `Sent from ${SITE.url}${variant === "reserve" ? "/reserve" : "/contact"}`);
 
+  const text = lines.join("\n");
+
+  /*
+   * One enquiry, one email. A double-click, a back-then-resubmit, a second
+   * tab, or a retry after the 12s abort below all POST the same content
+   * again, and before this key each one put another copy in the club's
+   * inbox. Resend holds an idempotency key for 24 hours and replays its
+   * original answer, so the repeat still returns an acceptance id and the
+   * guest still sees the success panel while the club sees one message.
+   *
+   * Keyed on exactly what we are about to send: a guest who writes a genuinely
+   * different message, or writes again next week about a different date, gets
+   * a different key and a second email, which is what they meant. The hash is
+   * over content the guest chose, so it carries their words; it is truncated
+   * and never logged or returned.
+   */
+  const idempotencyKey = `copper-inquiry-${createHash("sha256")
+    .update(`${variant}\n${to}\n${subject}\n${text}`)
+    .digest("hex")
+    .slice(0, 40)}`;
+
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -124,13 +153,14 @@ export async function POST(request: Request) {
       headers: {
         authorization: `Bearer ${apiKey}`,
         "content-type": "application/json",
+        "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify({
         from,
         to: [to],
         reply_to: get("email"),
         subject,
-        text: lines.join("\n"),
+        text,
       }),
     });
     if (!res.ok) {

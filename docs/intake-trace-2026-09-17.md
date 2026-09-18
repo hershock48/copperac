@@ -166,3 +166,29 @@ Items 1, 3 and 4 are described, not changed. Item 1 is a product decision for
 Kevin: an inbox in the workroom is a build, not a fix. Item 4 needs durable
 storage the workroom already requires, and is worth doing with the same
 `copper_login_attempts` table rather than a per-instance counter.
+
+## 9. What this branch changed after the trace
+
+Sections 1 to 7 describe the code as it was when the trace was written. Two
+of them have moved since.
+
+- **Section 4, idempotency.** The Resend call now carries an
+  `idempotency-key` header built from a SHA-256 of the variant, the
+  destination, the subject and the message text
+  (`app/api/inquiry/route.ts`). Resend holds a key for 24 hours and replays
+  its original answer, so a duplicate submit is one email in the club's
+  inbox and still a success panel for the guest. A genuinely different
+  enquiry hashes differently and sends.
+- **Section 5, duplicate submit row.** Two identical POSTs are now one
+  email, and the abort's "two copies" risk shrinks to the mail-app fallback,
+  which is the guest writing from their own address and cannot be deduped
+  from here.
+- **Finding 5, coverage.** `lib/__tests__/launch-readiness.cjs` now covers
+  the happy path for both variants, control characters in the subject, the
+  duplicate key, every refusal (unconfigured, malformed, oversized, missing,
+  bad email, provider error, no acceptance id) and the 12 second ceiling by
+  the number. The parked API paths are read off disk instead of listed by
+  hand, and the host gate is asserted against the proxy matcher as well as
+  the handler.
+
+Findings 1, 3 and 4 are unchanged and still open.
