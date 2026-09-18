@@ -43,7 +43,7 @@ submission or as a direct email the site never sees.
 | --- | --- | --- |
 | `request.json()` | `:62-66` | 400 `bad_request` |
 | body is object, not null, not array | `:69-71` | 400 `bad_request` |
-| read, strip C0/C1 controls and DEL, trim | `:76-79` | none, sanitizing only |
+| read, strip C0 controls and DEL, trim | `:76-79` | none, sanitizing only |
 | per-field ceiling | `:81-89` | 422 `too_long` plus the field name |
 | `first`, `last`, `email`, `phone` present | `:91-94` | 422 `missing_fields` |
 | email shape | `:95-97` | 422 `bad_email` |
@@ -55,7 +55,10 @@ submission or as a direct email the site never sees.
 
 Ceilings are `message` 4000 characters and everything else 200
 (`:57-58`). The control-character strip at `:78` is what stops a guest
-smuggling a line break into the subject built at `:110-113`.
+smuggling a line break into the subject built at `:110-113`. Its class is
+U+0000 to U+001F plus U+007F, which is C0 and DEL. C1, U+0080 to U+009F,
+is not stripped, and nothing is open on that: a header break needs CR or
+LF and both are C0.
 
 The subject is `Copper Reserve enquiry: <type> on <date>` for reserve and
 `Website enquiry: <subject>` for contact (`:110-113`). The text body is one
@@ -107,7 +110,7 @@ the route and to the guest, who has already been told "Thanks, we got it".
 | Provider unreachable, DNS or TLS failure | `:150-153` returns 502 `network_error` | Same mail-app handoff |
 | The 12 second abort | `AbortSignal.timeout(12000)` at `:123` rejects the fetch with a `TimeoutError`, which lands in the same catch at `:150` and answers 502 `network_error`. The route cannot tell an abort from a socket failure, and the log line reads the same. Whether Resend accepted the message before the abort is unknowable from here, so a slow accept can produce both a delivered email and a mail-app handoff. | Same mail-app handoff, with the risk of a second copy if they use it |
 | Storage down | No effect on intake. The route never touches Postgres. A dead database takes the workroom and the events page's owner-edited contact block, not this form. | Nothing |
-| Duplicate submit | Two emails. `disabled={busy}` (`InquiryForm.tsx:170`) stops a double-click in one live tab and nothing else: back-and-resubmit, a second tab, a refresh of a POSTed form, or a mail-app handoff after a slow accept all send again. | "Thanks, we got it" both times |
+| Duplicate submit | Two emails. `disabled={busy}` (`InquiryForm.tsx:171`) stops a double-click in one live tab and nothing else: back-and-resubmit, a second tab, a refresh of a POSTed form, or a mail-app handoff after a slow accept all send again. | "Thanks, we got it" both times |
 | Malformed body (not JSON, or JSON `null`/array/string/number) | 400 `bad_request` at `:65` or `:70`. The array and scalar guard at `:69-71` is load-bearing; without it `fields[k]` would throw and the handler would 500. | Mail-app handoff, because 400 is not 422 |
 | Oversized field | 422 `too_long` naming the field (`:84-89`) | Inline message telling them the two ceilings |
 | Oversized raw body | **Unbounded before the ceiling check.** `request.json()` at `:63` buffers and parses the whole payload before any length is measured, and App Router route handlers apply no body-size limit of their own. A megabyte of JSON is fully parsed, then refused with 422 or 400. The ceiling protects our sending reputation, not the function's memory. | 422 or 400 |

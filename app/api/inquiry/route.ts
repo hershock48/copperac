@@ -39,7 +39,8 @@ import { SITE } from "@/lib/site";
  * traces the whole path, including what the owner cannot do about one.
  */
 
-// createHash below needs it, and every other route in this app declares it.
+// createHash below needs it. Most of the other routes in this app declare it
+// too; the three under app/api/ordering do not, and those are parked.
 export const runtime = "nodejs";
 
 const REQUIRED = ["first", "last", "email", "phone"] as const;
