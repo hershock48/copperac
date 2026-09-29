@@ -18,7 +18,7 @@ const TABS = [
 
 export default function WorkroomChrome() {
   const path = usePathname() || "/workroom";
-  const isActive = (href: string) => path === href || path.startsWith(href + "/");
+  const isActive = (href: string) => href === "/workroom" ? path === href : path === href || path.startsWith(href + "/");
 
   async function lock() {
     await fetch("/api/workroom/logout", { method: "POST" });

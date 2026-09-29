@@ -75,8 +75,7 @@ export async function POST(request: Request) {
   // types can smuggle a line break into the email subject built from these.
   const get = (k: string) =>
     typeof fields[k] === "string"
-      ? // eslint-disable-next-line no-control-regex
-        (fields[k] as string).replace(/[\u0000-\u001f\u007f]/g, " ").trim()
+      ? (fields[k] as string).replace(/[\u0000-\u001f\u007f]/g, " ").trim()
       : "";
 
   const oversized = Object.keys(LABELS).find(
@@ -121,6 +120,7 @@ export async function POST(request: Request) {
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
+      signal: AbortSignal.timeout(12000),
       headers: {
         authorization: `Bearer ${apiKey}`,
         "content-type": "application/json",
@@ -142,6 +142,10 @@ export async function POST(request: Request) {
         { ok: false, reason: "provider_error", status: res.status },
         { status: 502 }
       );
+    }
+    const accepted = await res.json().catch(() => null);
+    if (typeof accepted?.id !== "string" || !accepted.id) {
+      return NextResponse.json({ ok: false, reason: "provider_error" }, { status: 502 });
     }
   } catch (err) {
     console.error("[inquiry] 502 network_error: call to Resend failed:", err);

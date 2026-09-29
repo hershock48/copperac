@@ -1,32 +1,63 @@
-// Kitchen auth: a PIN and a cookie.
-//
-// This is a gate, not a vault. It keeps passers-by and search crawlers off the
-// kitchen screen; it is not defense against a determined attacker, and nothing
-// behind it moves money or exposes more than tonight's ticket queue. If that
-// ever changes, this is the file that has to grow up first.
+import "server-only";
 
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { isWorkroomAuthed, workroomPasscode } from "../workroom/auth";
+import { issueSession, sessionRole, SESSION_SECONDS } from "../workroom/session";
 import { KITCHEN_PIN_FALLBACK } from "./config";
 
 const COOKIE = "copper_kitchen";
 
-export function kitchenPin(): string {
-  return process.env.KITCHEN_PIN || KITCHEN_PIN_FALLBACK;
+/** Published demo PINs only work in local development. */
+export function kitchenPin(): string | null {
+  const configured = process.env.KITCHEN_PIN?.trim();
+  if (process.env.NODE_ENV !== "production") return configured || KITCHEN_PIN_FALLBACK;
+  if (!configured || !/^\d{6,12}$/.test(configured) || configured === KITCHEN_PIN_FALLBACK || configured === workroomPasscode()) return null;
+  return configured;
 }
 
-export async function isKitchenAuthed(): Promise<boolean> {
-  const jar = await cookies();
-  return jar.get(COOKIE)?.value === kitchenPin();
+function sessionSecret(): string | null {
+  let secret = process.env.WORKROOM_SESSION_SECRET?.trim();
+  if (!secret && process.env.NODE_ENV !== "production") {
+    const local = globalThis as typeof globalThis & { __copperKitchenSecret?: string };
+    secret = local.__copperKitchenSecret ||= randomBytes(32).toString("hex");
+  }
+  if (!secret || secret.length < 32 || secret === kitchenPin() || secret === workroomPasscode()) return null;
+  // Separate app and purpose: a staff token can never become an owner token.
+  return createHmac("sha256", secret).update("copperac-kitchen-v1").digest("hex");
 }
 
-export async function setKitchenCookie(): Promise<void> {
+export function kitchenSessionReady(): boolean { return Boolean(kitchenPin() && sessionSecret()); }
+
+export function kitchenPinMatches(candidate: string, expected: string): boolean {
+  const digest = (value: string) => createHash("sha256").update(value).digest();
+  return timingSafeEqual(digest(candidate), digest(expected));
+}
+
+export async function kitchenRole(): Promise<"staff" | "owner" | null> {
+  if (await isWorkroomAuthed()) return "owner";
+  const pin = kitchenPin(), secret = sessionSecret();
+  if (!pin || !secret) return null;
   const jar = await cookies();
-  jar.set(COOKIE, kitchenPin(), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    // A shift, with margin. Not a year: a stolen tablet should age out.
-    maxAge: 60 * 60 * 18,
-    path: "/",
+  return sessionRole(jar.get(COOKIE)?.value, secret, { staff: pin, owner: null });
+}
+
+export async function isKitchenAuthed(): Promise<boolean> { return (await kitchenRole()) !== null; }
+
+export async function setKitchenCookie(candidate: string): Promise<void> {
+  const pin = kitchenPin(), secret = sessionSecret();
+  if (!pin || !secret || !kitchenPinMatches(candidate, pin)) throw new Error("Kitchen sign-in is unavailable.");
+  const jar = await cookies();
+  jar.set(COOKIE, issueSession("staff", pin, secret), {
+    httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production",
+    maxAge: SESSION_SECONDS, path: "/",
+  });
+}
+
+export async function clearKitchenCookie(): Promise<void> {
+  const jar = await cookies();
+  jar.set(COOKIE, "", {
+    httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production",
+    maxAge: 0, path: "/",
   });
 }

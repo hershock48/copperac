@@ -11,10 +11,15 @@
 // why the PIN screen doubles as the audio unlock. The oscillator chime needs
 // no asset file and cannot 404.
 
+import NotificationInbox from "./NotificationInbox";
+import PrinterReview from "./PrinterReview";
+import type { PrintIssue } from "@/lib/ordering/printer-jobs";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toOrderable, type MenuDocSection } from "@/lib/ordering/menu-document-fields";
 import MenuEditor from "@/components/ordering/MenuEditor";
 import type { OrderableSection } from "@/lib/ordering/menu";
 import type { KitchenState, Order } from "@/lib/ordering/store";
+import { requestKitchen, type KitchenDraft } from "@/lib/ordering/kitchen-request";
 
 function money(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -27,7 +32,13 @@ function age(ms: number): string {
 }
 
 export default function KitchenClient({ sections }: { sections: OrderableSection[] }) {
+  const [editedSections,setEditedSections] = useState<OrderableSection[] | null>(null);
+  const menuSaved = useCallback((doc:MenuDocSection[]) => setEditedSections(toOrderable(doc,{includeHidden:true})),[]);
   const [authed, setAuthed] = useState(false);
+  const [role, setRole] = useState<"staff" | "owner" | null>(null);
+  const [authPending, setAuthPending] = useState(false);
+  const authPendingRef = useRef(false);
+  const authEpoch = useRef(0);
   const [audioReady, setAudioReady] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
@@ -38,15 +49,25 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // function of state and ticks with the 5s poll.
   const [now, setNow] = useState(0);
   const [backend, setBackend] = useState<"postgres" | "memory" | null>(null);
-  const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean }[]>([]);
+  const [printers, setPrinters] = useState<{ id: string; label: string; role: string; online: boolean; reportedStatus: string | null }[]>([]);
+  const [printIssues,setPrintIssues]=useState<PrintIssue[]>([]);
+  const [printIssueCount,setPrintIssueCount]=useState(0);
   // The board opens on 86s and hours (Kevin's call): that is the tab staff
   // reach for on their own; orders announce themselves with the chime and the
   // badge, so they do not need to be the front page.
   const [tab, setTab] = useState<"orders" | "menu" | "editor">("menu");
   const [filter, setFilter] = useState("");
-  // Two-tap refund: first tap arms, second tap fires. Arming clears when the
-  // list refreshes so a stale armed button cannot refund the wrong ticket.
-  const [refundArm, setRefundArm] = useState<string | null>(null);
+  // Cancellation needs owner access and a reason. It never moves money.
+  const [cancelArm, setCancelArm] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [operation, setOperation] = useState<KitchenDraft | null>(null);
+  const operationRef = useRef<KitchenDraft | null>(null);
+  const operationBusy = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [notice, setNotice] = useState<{ text: string; phone?: string } | null>(null);
+  const [pollError, setPollError] = useState("");
+  const pollSequence = useRef(0);
   const audioRef = useRef<AudioContext | null>(null);
   const knownRef = useRef<Set<string>>(new Set());
 
@@ -71,17 +92,25 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   }, []);
 
   const poll = useCallback(async () => {
+    if (authPendingRef.current) return;
+    const epoch = authEpoch.current, sequence = ++pollSequence.current;
     try {
       const [ordersRes, stateRes] = await Promise.all([
-        fetch("/api/kitchen/orders", { cache: "no-store" }),
-        fetch("/api/kitchen/state", { cache: "no-store" }),
+        fetch("/api/kitchen/orders", { cache: "no-store", signal: AbortSignal.timeout(12000) }),
+        fetch("/api/kitchen/state", { cache: "no-store", signal: AbortSignal.timeout(12000) }),
       ]);
-      if (ordersRes.status === 401) {
+      const ordersData = ordersRes.ok ? await ordersRes.json() : null;
+      const stateData = stateRes.ok ? await stateRes.json() : null;
+      if (epoch !== authEpoch.current || sequence !== pollSequence.current || authPendingRef.current) return;
+      if (ordersRes.status === 401 || stateRes.status === 401) {
+        authEpoch.current++;
+        setOrders([]); setState(null); setRole(null); setTab("menu");
         setAuthed(false);
         return;
       }
+      setPollError(ordersRes.ok && stateRes.ok ? "" : "The board could not refresh. These may be older values; check again before changing an order.");
       if (ordersRes.ok) {
-        const data = await ordersRes.json();
+        const data = ordersData;
         setOrders(data.orders);
         setBackend(data.backend);
         const fresh = (data.orders as Order[]).filter((o) => o.status === "new");
@@ -93,13 +122,13 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         knownRef.current = new Set((data.orders as Order[]).map((o) => o.id));
       }
       if (stateRes.ok) {
-        const data = await stateRes.json();
+        const data = stateData;
         setNow(Date.now());
         setState(data.state);
-        setPrinters(data.printers ?? []);
+        setPrinters(data.printers ?? []);setPrintIssues(data.printIssues ?? []);setPrintIssueCount(data.printIssueCount ?? 0);
       }
     } catch {
-      /* next poll retries; the backend badge covers persistent trouble */
+      if (epoch === authEpoch.current && sequence === pollSequence.current) setPollError("The board could not refresh. These may be older values; check your connection.");
     }
   }, [chime]);
 
@@ -108,15 +137,26 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   // stays locked until a tap either way (browser rule), so the board shows a
   // "turn sound on" chip until someone touches it.
   useEffect(() => {
-    fetch("/api/kitchen/state", { cache: "no-store" }).then((r) => {
-      if (r.ok) setAuthed(true);
-    }).catch(() => {});
+    let active = true;
+    const epoch = authEpoch.current;
+    fetch("/api/kitchen/login", { cache: "no-store", signal: AbortSignal.timeout(12000) })
+      .then(async (r) => { if (!r.ok) throw Error(); return r.json(); })
+      .then((data) => {
+        if (!active || epoch !== authEpoch.current) return;
+        if (data.authed && (data.role === "staff" || data.role === "owner")) {
+          setRole(data.role); setAuthed(true);
+        } else if (!data.configured) {
+          setPinError("Staff sign-in is not configured. Ask the owner to finish kitchen setup.");
+        }
+      }).catch(() => {
+        if (active && epoch === authEpoch.current) setPinError("Could not check your session. Try signing in again.");
+      });
+    return () => { active = false; };
   }, []);
 
   const ensureAudio = useCallback(() => {
     audioRef.current ??= new AudioContext();
-    audioRef.current.resume();
-    setAudioReady(true);
+    void audioRef.current.resume().then(() => setAudioReady(true)).catch(() => setAudioReady(false));
   }, []);
 
   useEffect(() => {
@@ -133,44 +173,80 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
   }, [authed, poll]);
 
   async function login() {
-    setPinError("");
-    const r = await fetch("/api/kitchen/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin }),
-    });
-    if (r.ok) {
-      // The login tap is the user gesture that unlocks audio for the shift.
-      ensureAudio();
-      setAuthed(true);
-      setPin("");
+    if (authPendingRef.current) return;
+    authPendingRef.current = true; authEpoch.current++;
+    setAuthPending(true); setPinError("");
+    // Audio permission must begin on the tap; an audio failure cannot block sign-in.
+    try { ensureAudio(); } catch { /* The sound button remains available. */ }
+    try {
+      const r = await fetch("/api/kitchen/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }), signal: AbortSignal.timeout(12000),
+      });
+      const data = await r.json();
+      if (r.ok && data.ok === true && data.role === "staff") {
+        setRole("staff"); setAuthed(true); setPin(""); setTab("menu");
+      } else {
+        setPinError(typeof data.error === "string" ? data.error : "Sign-in could not be confirmed. Reload to check your session.");
+      }
+    } catch { setPinError("Sign-in could not be confirmed. Check your connection, or reload to check your session."); }
+    finally { authPendingRef.current = false; setAuthPending(false); }
+  }
+
+  async function logout() {
+    if (authPendingRef.current) return;
+    authPendingRef.current = true; authEpoch.current++;
+    setAuthPending(true); setPinError("");
+    try {
+      const r = await fetch("/api/kitchen/login", { method: "DELETE", signal: AbortSignal.timeout(12000) });
+      const data = await r.json();
+      if (!r.ok || data.ok !== true) throw Error();
+      authEpoch.current++;
+      setAuthed(false); setRole(null); setOrders([]); setState(null); setPrinters([]);
+      setBackend(null); setTab("menu"); setPin(""); knownRef.current = new Set();
+    } catch { setPinError("Sign-out could not be confirmed. Try again or reload to check your session."); }
+    finally { authPendingRef.current = false; setAuthPending(false); }
+  }
+
+  async function runAction(draft: KitchenDraft, action: "submit" | "check") {
+    if (operationBusy.current || authPendingRef.current) return;
+    operationBusy.current = true; setSaving(true); setActionError(""); pollSequence.current++;
+    operationRef.current = draft; setOperation(draft);
+    const result = await requestKitchen(draft, action);
+    if (result.outcome === "unknown") {
+      setActionError(result.error || "This action has not been confirmed.");
     } else {
-      setPinError("Wrong PIN.");
+      operationRef.current = null; setOperation(null);
+      if (result.outcome === "rejected") setActionError(result.error || "The action was not saved.");
+      else {
+        setCancelArm(null); setCancelReason("");
+        const order = result.order;
+        setNotice(order?.status === "cancelled"
+          ? { text: "Order #" + order.number + " cancelled. This action did not issue a refund. Contact the guest to confirm; handle any payment separately in the register or payment provider.", phone: order.guestPhone }
+          : { text: order ? "Order #" + order.number + " updated." : "Kitchen controls saved." });
+      }
     }
+    operationBusy.current = false; setSaving(false);
+    await poll();
   }
 
-  async function patchState(patch: Record<string, unknown>) {
-    const r = await fetch("/api/kitchen/state", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    });
-    if (r.ok) setState((await r.json()).state);
+  function startAction(kind: KitchenDraft["kind"], body: Record<string, unknown>) {
+    if (operationRef.current || operationBusy.current || authPendingRef.current) return;
+    if (pollError) { setActionError("Refresh the board before making another change."); return; }
+    const id = crypto.randomUUID();
+    const draft = { id, kind, body: JSON.stringify({ operationId: id, kind, ...body }) };
+    setNotice(null); void runAction(draft,"submit");
   }
 
-  async function setOrderStatus(id: string, status: "accepted" | "done" | "refunded") {
-    // Optimistic: the tap has to feel instant behind a bar.
-    setRefundArm(null);
-    setOrders((os) =>
-      status === "done" || status === "refunded"
-        ? os.filter((o) => o.id !== id)
-        : os.map((o) => (o.id === id ? { ...o, status } : o))
-    );
-    await fetch("/api/kitchen/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
+  function patchState(change: Record<string, unknown>) {
+    if (!state?.revision) { setActionError("Wait for the latest kitchen state before changing it."); return; }
+    startAction("state", { revision: state.revision, change });
+  }
+
+  function setOrderStatus(id: string, status: "accepted" | "done" | "cancelled") {
+    const order = orders.find(o => o.id === id);
+    if (!order?.revision) { setActionError("Refresh the order before changing it."); return; }
+    startAction("order", { orderId: id, status, revision: order.revision, ...(status === "cancelled" ? { reason: cancelReason } : {}) });
   }
 
   if (!authed) {
@@ -181,6 +257,8 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         <label className="mt-8 block text-left text-sm text-cream-dim">
           Kitchen PIN
           <input
+            disabled={authPending}
+            maxLength={12}
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}
@@ -196,10 +274,12 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         <button
           type="button"
           onClick={login}
+          disabled={authPending}
           className="display mt-5 w-full rounded-sm bg-copper px-6 py-4 text-sm uppercase tracking-widest text-ink transition-colors hover:bg-copper-light"
         >
-          Open the board
+          {authPending ? "Signing in…" : "Open the board"}
         </button>
+        <a href="/workroom" className="mt-5 inline-block text-sm text-cream underline">Owner sign-in</a>
         <p className="mt-6 text-xs leading-relaxed text-cream-dim/60">
           Signing in turns the sound on. Keep this open behind the bar; it rings until an order is accepted.
         </p>
@@ -219,6 +299,31 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         </p>
       )}
 
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-cream-dim">
+        <span>{role === "owner" ? "Owner access" : "Kitchen staff access"}</span>
+        <button type="button" onClick={logout} disabled={authPending} className="rounded-sm border border-ink-line px-4 py-3 text-cream">
+          {authPending ? "Signing out…" : "Sign out of kitchen and workroom"}
+        </button>
+      </div>
+      {pinError && <p role="alert" className="mb-4 text-sm text-[#d9736b]">{pinError}</p>}
+      {pollError && <p role="alert" className="mb-4 text-sm text-[#d9736b]">{pollError}</p>}
+      {actionError && <p role="alert" className="mb-4 text-sm text-[#d9736b]">{actionError}</p>}
+      {notice && <p role="status" className="mb-4 rounded-sm border border-ink-line p-4 text-sm text-cream">
+        {notice.text} {notice.phone && <a className="underline" href={"tel:" + notice.phone.replace(/\D/g, "")}>Call guest</a>}
+      </p>}
+      {operation && <section aria-label="Check kitchen action" className="mb-5 rounded-sm border border-ink-line p-4 text-sm text-cream">
+        <p>{saving ? "Saving this action…" : "This action may already be saved. Check its result before making another change."}</p>
+        <p className="mt-2 break-all text-xs text-cream-dim">Reference: {operation.id}</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <button type="button" disabled={saving} className="rounded-sm border border-ink-line px-4 py-3" onClick={() => runAction(operation,"check")}>Check action result</button>
+          <button type="button" disabled={saving} className="rounded-sm border border-ink-line px-4 py-3" onClick={() => runAction(operation,"submit")}>Retry same action</button>
+        </div>
+      </section>}
+      {!operation && <button type="button" onClick={() => void poll()} className="mb-4 text-sm text-cream underline">Refresh board</button>}
+      {role==="owner"&&<NotificationInbox/>}
+      <PrinterReview issues={printIssues} count={printIssueCount} owner={role==="owner"} printers={printers} onSaved={poll}/>
+
+      <fieldset disabled={Boolean(operation)} className="min-w-0">
       {/* Tab rail */}
       <div className="mb-8 flex flex-wrap gap-2">
         {(
@@ -227,7 +332,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
             ["orders", newCount > 0 ? `Orders · ${newCount} new` : "Orders"],
             ["editor", "Edit Menu"],
           ] as const
-        ).map(([key, label]) => (
+        ).filter(([key]) => key !== "editor" || role === "owner").map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -250,9 +355,8 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
         )}
       </div>
 
-      {tab === "editor" ? (
-        <MenuEditor />
-      ) : tab === "orders" ? (
+      {role === "owner" && <div hidden={tab!=="editor"}><MenuEditor onSaved={menuSaved} /></div>}
+      {tab === "editor" ? null : tab === "orders" ? (
         <>
           {orders.length === 0 ? (
             <p className="rounded-sm border border-ink-line bg-ink-soft px-5 py-10 text-center text-sm text-cream-dim/70">
@@ -297,7 +401,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                     ))}
                     {o.note && <li className="pt-1 text-copper-light">Note: {o.note}</li>}
                   </ul>
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-4 flex flex-wrap gap-3">
                     {o.status === "new" ? (
                       <button
                         type="button"
@@ -321,20 +425,23 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                     >
                       Call
                     </a>
-                    <button
+                    {role === "owner" && <button
                       type="button"
-                      onClick={() =>
-                        refundArm === o.id ? setOrderStatus(o.id, "refunded") : setRefundArm(o.id)
-                      }
-                      className={`display rounded-sm border px-4 py-3.5 text-sm uppercase tracking-widest transition-colors ${
-                        refundArm === o.id
-                          ? "border-[#d9736b] bg-[#d9736b] text-ink"
-                          : "border-ink-line text-cream-dim/70 hover:border-[#d9736b] hover:text-[#d9736b]"
-                      }`}
-                    >
-                      {refundArm === o.id ? "Confirm refund" : "Refund"}
-                    </button>
+                      onClick={() => { setCancelArm(o.id); setCancelReason(""); }}
+                      className="display rounded-sm border border-ink-line px-4 py-3.5 text-sm uppercase tracking-widest text-cream-dim"
+                    >Cancel order</button>}
+
                   </div>
+                  {role === "owner" && cancelArm === o.id && <div className="mt-4 rounded-sm border border-[#d9736b]/40 p-4 text-sm text-cream">
+                    <p>This stops fulfillment. It does not issue a refund or send an email. Contact the guest and handle any payment separately.</p>
+                    <label className="mt-3 block">Cancellation reason
+                      <input value={cancelReason} onChange={e => setCancelReason(e.target.value)} maxLength={240} className="mt-2 w-full rounded-sm border border-ink-line bg-ink-soft p-3 text-cream" />
+                    </label>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      <button type="button" disabled={!cancelReason.trim()} onClick={() => setOrderStatus(o.id,"cancelled")} className="rounded-sm border border-[#d9736b] px-4 py-3">Confirm cancellation</button>
+                      <button type="button" onClick={() => { setCancelArm(null); setCancelReason(""); }} className="rounded-sm border border-ink-line px-4 py-3">Keep order</button>
+                    </div>
+                  </div>}
                 </li>
               ))}
             </ul>
@@ -397,13 +504,13 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                     }`}
                   >
                     <span className={`h-2 w-2 rounded-full ${p.online ? "bg-[#7dd18a]" : "bg-[#d9736b]"}`} aria-hidden />
-                    {p.label} {p.online ? "" : "· OFFLINE"}
+                    {p.label} · {p.online ? (p.reportedStatus || "Connected") : "Not recently seen"}
                   </span>
                 ))}
               </div>
             )}
             <p className="mt-3 text-xs text-cream-dim/60">
-              Every tap saves by itself and hits the order page within seconds. No save button, nothing to submit.
+              Each tap waits for a saved result. Another device’s changes require a refresh before retrying.
               Ordering follows the posted hours; last online order 9:30 PM.
             </p>
           </div>
@@ -416,13 +523,13 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
               </p>
               <div className="flex flex-wrap gap-2">
                 {state!.unavailable.map((id) => {
-                  const item = sections.flatMap((s) => s.items).find((i) => i.id === id);
+                  const item = (editedSections ?? sections).flatMap((s) => s.items).find((i) => i.id === id);
                   if (!item) return null;
                   return (
                     <button
                       key={id}
                       type="button"
-                      onClick={() => patchState({ toggle86: id })}
+                      onClick={() => patchState({ itemId: id, unavailable: false })}
                       className="rounded-sm border border-[#d9736b] bg-[#d9736b]/15 px-4 py-3 text-sm text-[#d9736b] line-through"
                     >
                       {item.name}
@@ -442,7 +549,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
             className="mb-6 w-full max-w-sm rounded-sm border border-ink-line bg-ink-soft px-4 py-3 text-sm text-cream outline-none placeholder:text-cream-dim/50 focus:border-copper-light"
           />
 
-          {sections
+          {(editedSections ?? sections)
             .map((section) => ({
               ...section,
               items: filter
@@ -460,7 +567,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
                       <button
                         key={item.id}
                         type="button"
-                        onClick={() => patchState({ toggle86: item.id })}
+                        onClick={() => patchState({ itemId: item.id, unavailable: !off })}
                         aria-pressed={off}
                         className={`rounded-sm border px-4 py-3 text-sm transition-colors ${
                           off
@@ -477,6 +584,7 @@ export default function KitchenClient({ sections }: { sections: OrderableSection
             ))}
         </div>
       )}
+      </fieldset>
     </div>
   );
 }

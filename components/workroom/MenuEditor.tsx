@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveOwnerDraft, isMenuSaveState } from "@/lib/workroom/owner-save";
 import { priceError } from "@/lib/workroom/menu-def";
 import type { MenuEditorState } from "@/lib/content";
 
@@ -15,12 +16,18 @@ import type { MenuEditorState } from "@/lib/content";
 
 type Draft = Record<string, { price: string; desc: string; hidden: boolean }>;
 
+function validMetadata(value: unknown): value is MenuEditorState {
+  if (!value || typeof value !== "object") return false;
+  const state = value as Partial<MenuEditorState>;
+  return typeof state.revision === "string" && /^[a-f0-9]{64}$/.test(state.revision) && Array.isArray(state.history) && state.history.every(entry => typeof entry?.id === "string" && typeof entry.changedAt === "string" && Number.isFinite(Date.parse(entry.changedAt)));
+}
 export default function MenuEditor() {
   const [state, setState] = useState<MenuEditorState | null>(null);
   const [draft, setDraft] = useState<Draft>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
+  const saving = useRef(false);
   const [saved, setSaved] = useState("");
   const [failed, setFailed] = useState("");
 
@@ -36,7 +43,7 @@ export default function MenuEditor() {
       try {
         const res = await fetch("/api/workroom/menu", { headers: { Accept: "application/json" } });
         const data = (await res.json().catch(() => ({}))) as Partial<MenuEditorState> & { error?: string };
-        if (!res.ok || !data.menus) {
+        if (!res.ok || !isMenuSaveState({ ...data, ok: true }) || !validMetadata(data)) {
           setLoadError(data.error || "Could not load the menu.");
           return;
         }
@@ -54,6 +61,7 @@ export default function MenuEditor() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (saving.current) return;
     setSaved("");
     setFailed("");
     const found: Record<string, string> = {};
@@ -66,27 +74,21 @@ export default function MenuEditor() {
       setFailed("Check the marked prices.");
       return;
     }
+    saving.current = true;
     setBusy(true);
     try {
-      const res = await fetch("/api/workroom/menu", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: draft }),
-      });
-      const data = (await res.json().catch(() => ({}))) as Partial<MenuEditorState> & { error?: string; errors?: Record<string, string> };
-      if (res.ok && data.menus) {
-        adopt(data as MenuEditorState);
-        setSaved("Saved. The menu shows it within a few seconds.");
-      } else if (data.errors) {
-        setErrors(data.errors);
-        setFailed(data.error || "Check the marked prices.");
+      const result = await saveOwnerDraft<MenuEditorState>("/api/workroom/menu", { items: draft, revision: state?.revision }, (value): value is MenuEditorState => isMenuSaveState(value, Object.keys(draft)) && validMetadata(value));
+      if (result.kind === "saved") {
+        adopt(result.data);
+        setSaved(result.data.backend === "memory" ? "Saved for this demo session. These edits disappear after a restart." : result.message);
       } else {
-        setFailed(data.error || "That did not save. Your typing is still on screen.");
+        if (result.errors) setErrors(result.errors);
+        setFailed(result.message);
       }
-    } catch {
-      setFailed("That did not save. Your typing is still on screen.");
+    } finally {
+      saving.current = false;
+      setBusy(false);
     }
-    setBusy(false);
   }
 
   if (loadError) {
@@ -110,12 +112,14 @@ export default function MenuEditor() {
 
       {state.backend === "memory" && (
         <p className="wr-warn" role="status">
-          <strong>No database is connected yet</strong>, so anything saved here is held only in memory and can be
-          forgotten by the next restart. Connect a database in Vercel (Storage, then Neon) and this warning goes away.
+          <strong>Permanent saving is unavailable.</strong> Contact Glazed Web to connect storage.
+          Published sites refuse saves until it is connected. Local demo edits disappear after a restart.
         </p>
       )}
 
-      <form onSubmit={save} noValidate>
+      <details><summary>Recent menu saves</summary>{state.history?.length ? <ol>{state.history.map(entry => <li key={entry.id}>Owner saved the menu <time dateTime={entry.changedAt}>{new Intl.DateTimeFormat("en-US", { timeZone: "America/Detroit", dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.changedAt))}</time></li>)}</ol> : <p className="wr-muted">No saved edit history recorded yet.</p>}</details>
+      <form onSubmit={save} noValidate aria-busy={busy}>
+        <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }} aria-label="Menu edits">
         {state.menus.map((m) => (
           <section key={m.id} aria-labelledby={`wr-m-${m.id}`}>
             <h2 className="wr-h2" id={`wr-m-${m.id}`} style={{ fontSize: 18, marginTop: 40 }}>
@@ -142,6 +146,7 @@ export default function MenuEditor() {
                           {(i.edited || changed) && <span className="wr-chip wr-chip-on">Edited</span>}
                         </div>
                         <textarea
+                          maxLength={Math.max(400, i.builtInDesc.length)}
                           aria-label={`${i.name} description`}
                           value={v.desc}
                           placeholder={i.builtInDesc || "No description on the printed menu"}
@@ -180,6 +185,7 @@ export default function MenuEditor() {
           </section>
         ))}
 
+        </fieldset>
         <div className="wr-save-row wr-save-sticky">
           <button className="wr-btn" type="submit" disabled={busy}>
             {busy ? "Saving…" : "Save and publish"}
@@ -191,7 +197,7 @@ export default function MenuEditor() {
           )}
           {failed && (
             <span className="wr-error" role="alert">
-              {failed}
+              {failed} {" "}<a href="/workroom/menu" target="_blank" rel="noreferrer">Check latest menu ↗</a>
             </span>
           )}
         </div>

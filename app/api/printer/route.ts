@@ -1,75 +1,55 @@
-// The CloudPRNT endpoint: what the physical printers talk to.
-//
-// Star's protocol, three verbs from the printer's side:
-//   POST   "I am alive; anything to print?"  -> { jobReady, mediaTypes }
-//   GET    "give me the job"                 -> text/plain body
-//   DELETE "here is how printing went"       -> we mark the job, and a
-//          successful KITCHEN print auto-accepts the order: paper at the
-//          pass IS the acceptance. No tablet tap needed on printer nights.
-//
-// Every request carries ?token=; tokens live in ORDERING_PRINTERS and are
-// per-device, so one leaked URL revokes one printer, not the fleet. Every
-// poll is recorded as a heartbeat; the kitchen board turns a printer's chip
-// red after missed polls, which is the whole monitoring story: the server
-// notices a dead printer before the kitchen does.
-//
-// Jobs older than the TTL are expired unfetched: a printer that was off for
-// an hour must not print an hour of cold orders on reconnect.
-
+// Star CloudPRNT HTTP: Basic authentication identifies the device; the token
+// query parameter identifies the exact job announced by POST. Never advance
+// the queue merely because a DELETE arrived.
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { configuredPrinters } from "@/lib/ordering/printing";
 import { getStore } from "@/lib/ordering/store";
-
-export const dynamic = "force-dynamic";
-
-const JOB_TTL_MS = 20 * 60 * 1000;
-
-function printerFor(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get("token") ?? "";
-  return configuredPrinters().find((p) => p.token === token) ?? null;
+import { isPrintId, parsePrinterPoll, printerCode } from "@/lib/ordering/printer-jobs";
+export const dynamic="force-dynamic";
+export const runtime="nodejs";
+const headers={"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer"};
+const response=(status:number,body:string|null=null)=>new NextResponse(body,{status,headers});
+function printerFor(req:NextRequest){
+ const auth=req.headers.get("authorization")??"";if(auth.length>2048 || !/^Basic [A-Za-z0-9+/]+={0,2}$/i.test(auth))return null;
+ const value=Buffer.from(auth.slice(6),"base64").toString("utf8"),colon=value.indexOf(":");if(colon<1)return null;
+ const id=value.slice(0,colon),secret=value.slice(colon+1),printer=configuredPrinters().find(p=>p.id===id);
+ if(!printer)return null;
+ const digest=(s:string)=>createHash("sha256").update(s).digest();return timingSafeEqual(digest(secret),digest(printer.token))?printer:null;
 }
-
-export async function POST(req: NextRequest) {
-  const printer = printerFor(req);
-  if (!printer) return NextResponse.json({ error: "unknown printer" }, { status: 401 });
-  const store = getStore();
-  await store.printerSeen(printer.id);
-  const job = await store.nextPrintJob(printer.id, JOB_TTL_MS);
-  return NextResponse.json({
-    jobReady: job !== null,
-    mediaTypes: job ? ["text/plain"] : undefined,
-  });
+function unauthorized(){return new NextResponse(null,{status:401,headers:{...headers,"WWW-Authenticate":'Basic realm="Kitchen printer", charset="UTF-8"'}});}
+async function pollBody(req:Request):Promise<unknown>{
+ if(req.headers.get("content-type")?.split(";")[0].trim().toLowerCase()!=="application/json" || !req.body)return null;
+ const reader=req.body.getReader(),chunks:Uint8Array[]=[];let size=0;
+ try{while(true){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>16384){await reader.cancel();return null;}chunks.push(value);}return JSON.parse(Buffer.concat(chunks).toString("utf8"));}catch{return null;}finally{reader.releaseLock();}
 }
-
-export async function GET(req: NextRequest) {
-  const printer = printerFor(req);
-  if (!printer) return NextResponse.json({ error: "unknown printer" }, { status: 401 });
-  const store = getStore();
-  const job = await store.nextPrintJob(printer.id, JOB_TTL_MS);
-  if (!job) return new NextResponse(null, { status: 404 });
-  return new NextResponse(job.body, {
-    status: 200,
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+export async function POST(req:NextRequest){
+ try{
+  const printer=printerFor(req);if(!printer)return unauthorized();
+  const store=getStore();if(store.backend!=="postgres")return response(503);
+  const poll=parsePrinterPoll(await pollBody(req));if(!poll)return response(400);
+  const job=await store.printerPoll(printer.id,poll);
+  return NextResponse.json(job?{jobReady:true,jobToken:job.id,mediaTypes:["text/plain"],deleteMethod:"DELETE"}:{jobReady:false},{headers});
+ }catch{return response(503);}
 }
-
-export async function DELETE(req: NextRequest) {
-  const printer = printerFor(req);
-  if (!printer) return NextResponse.json({ error: "unknown printer" }, { status: 401 });
-  const store = getStore();
-  const job = await store.nextPrintJob(printer.id, JOB_TTL_MS);
-  if (!job) return NextResponse.json({ ok: true });
-
-  // CloudPRNT reports the outcome as ?code=OK (or an error string).
-  const code = (req.nextUrl.searchParams.get("code") ?? "OK").toUpperCase();
-  const printed = code === "OK" || code === "200";
-  await store.setPrintJobStatus(job.id, printed ? "printed" : "failed");
-
-  if (printed && printer.role === "kitchen") {
-    const order = await store.getOrder(job.orderId);
-    if (order && order.status === "new") {
-      await store.setOrderStatus(order.id, "accepted");
-    }
-  }
-  return NextResponse.json({ ok: true });
+export async function GET(req:NextRequest){
+ if(req.nextUrl.searchParams.has("delete"))return DELETE(req);
+ try{
+  const printer=printerFor(req);if(!printer)return unauthorized();
+  const store=getStore();if(store.backend!=="postgres")return response(503);
+  const token=req.nextUrl.searchParams.get("token");if(!isPrintId(token))return response(400);
+  const type=req.nextUrl.searchParams.get("type");if(type && type!=="text/plain")return response(406);
+  const result=await store.printerFetch(printer.id,token);
+  if(result.status!==200 || !result.job)return response(result.status);
+  return new NextResponse(result.job.body,{headers:{...headers,"Content-Type":"text/plain; charset=utf-8"}});
+ }catch{return response(503);}
+}
+export async function DELETE(req:NextRequest){
+ try{
+  const printer=printerFor(req);if(!printer)return unauthorized();
+  const store=getStore();if(store.backend!=="postgres")return response(503);
+  const token=req.nextUrl.searchParams.get("token"),code=printerCode(req.nextUrl.searchParams.get("code"));
+  if(!isPrintId(token)||!code)return response(400);
+  const result=await store.printerConfirm(printer.id,token,printer.role,code);return response(result.status);
+ }catch{return response(503);}
 }

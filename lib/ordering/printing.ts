@@ -14,10 +14,11 @@
 // polling.
 //
 // Printers are configured in ORDERING_PRINTERS (see .env.example): id, role
-// (kitchen | front), and a token the device carries in its poll URL. Tokens
-// gate the endpoint; a printer URL is a capability, treat it like one.
+// (kitchen | front), and a secret used as its HTTP Basic password. Tokens
+// gate the endpoint. The protocol token query parameter identifies a print job.
 //
-// v1 prints text/plain, which every CloudPRNT printer accepts: 42-column
+// This integration offers text/plain; verify support on the exact model and
+// firmware at the printer bench before enabling it. Layout uses 42-column
 // ASCII layout, cut after each job. Star Document Markup (bold, wide type)
 // is a later upgrade behind the same interface; the templates are the only
 // thing that would change.
@@ -29,16 +30,15 @@ export type PrinterRole = "kitchen" | "front";
 export type PrinterConfig = { id: string; token: string; role: PrinterRole; label: string };
 
 export function configuredPrinters(): PrinterConfig[] {
-  const raw = process.env.ORDERING_PRINTERS;
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw) as PrinterConfig[];
-    return parsed.filter((p) => p.id && p.token && (p.role === "kitchen" || p.role === "front"));
-  } catch {
-    // A malformed env var must not take orders down; printers just vanish
-    // and the kitchen board shows none configured.
-    return [];
-  }
+  const raw=process.env.ORDERING_PRINTERS;if(!raw)return [];
+  let parsed:unknown;try{parsed=JSON.parse(raw);}catch{throw Error("Printer configuration is not valid JSON.");}
+  if(!Array.isArray(parsed)||parsed.length>16)throw Error("Printer configuration must be an array of at most 16 devices.");
+  const ids=new Set<string>(),tokens=new Set<string>();
+  return parsed.map(p=>{
+    if(!p || typeof p!=="object" || typeof p.id!=="string" || !/^[a-zA-Z0-9_-]{1,80}$/.test(p.id) || typeof p.token!=="string" || !/^[a-zA-Z0-9_-]+$/.test(p.token) || p.token.length<(process.env.NODE_ENV==="production"?32:16) || p.token.length>256 || !["kitchen","front"].includes(p.role) || ids.has(p.id) || tokens.has(p.token))throw Error("Each printer needs a unique id, unique long secret and kitchen/front role.");
+    if(p.label!==undefined && (typeof p.label!=="string" || p.label.length>100))throw Error("Invalid printer label.");
+    ids.add(p.id);tokens.add(p.token);return {id:p.id,token:p.token,role:p.role,label:p.label?.trim() || p.id};
+  });
 }
 
 /* ------------------------------ templates ------------------------------ */

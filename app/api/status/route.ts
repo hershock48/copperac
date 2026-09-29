@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDrinks } from "@/lib/taplist";
-import { workroomPasscode } from "@/lib/workroom/auth";
+import { workroomPasscode, workroomSessionReady } from "@/lib/workroom/auth";
 import { getStore } from "@/lib/workroom/store";
 
 export const runtime = "nodejs";
@@ -39,6 +39,7 @@ export async function GET() {
       // signing in to look for the memory banner.
       workroom: {
         passcode: workroomPasscode() === null ? "unset" : "set",
+        session: workroomSessionReady() ? "configured" : "unavailable",
         storage: getStore().backend,
         // The Taps tab's handoff into Scooplist needs the org's key here.
         tapsHandoff: process.env.SCOOPLIST_HANDOFF_KEY?.trim() ? "set" : "unset",

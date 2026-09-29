@@ -13,11 +13,9 @@ import "server-only";
  *              database the parked ordering system would use; different
  *              tables, no overlap.
  *
- *   memory     so local dev and the build need nothing. Deployed, this only
- *              holds within one warm lambda, so a saved event can vanish on
- *              the next cold start. Every workroom screen says so in plain
- *              words when it is on memory, because a screen that half-saves
- *              silently is worse than one that says what is wrong.
+ *   memory     for local development and build-time reads. Production writes
+ *              are rejected so a temporary save cannot be mistaken for a
+ *              durable owner edit.
  *
  * Photos live here too, as base64 in their own table, served by
  * app/img/events/[id]. A bar's events run to a handful a month and a resized
@@ -25,6 +23,8 @@ import "server-only";
  * is not worth the extra dashboard step. The upload route caps the size.
  */
 
+import { compareEvent } from "./event-cas";
+import { compareContent, compareMemory, CONTENT_HISTORY_SCHEMA, type ContentAudit } from "./content-cas";
 import type { WorkroomEvent } from "./events-def";
 
 type Row = { id: string; createdAt: number };
@@ -49,6 +49,10 @@ export type Store = {
   /** One named jsonb value. Null when nothing has been saved under the key. */
   getValue<T>(key: string): Promise<T | null>;
   setValue(key: string, value: unknown): Promise<void>;
+  compareAndSetValue(key: string, expected: unknown, value: unknown): Promise<boolean>;
+  contentHistory(key: string): Promise<ContentAudit[]>;
+  compareAndSetEvent(key: string, expected: WorkroomEvent | null, value: WorkroomEvent): Promise<boolean>;
+  eventHistory(): Promise<ContentAudit[]>;
 };
 
 export function newId(prefix: string): string {
@@ -57,7 +61,7 @@ export function newId(prefix: string): string {
 
 /* ------------------------------ memory ------------------------------ */
 
-type Bag = { content: Map<string, unknown>; tables: Map<string, Map<string, Row>> };
+type Bag = { history?: ContentAudit[]; content: Map<string, unknown>; tables: Map<string, Map<string, Row>> };
 
 function bag(): Bag {
   const g = globalThis as typeof globalThis & { __copperWorkroomBag?: Bag };
@@ -76,9 +80,11 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
       return rows().get(id) ?? null;
     },
     async put(row) {
+      requireDurableWrite();
       rows().set(row.id, row);
     },
     async remove(id) {
+      requireDurableWrite();
       rows().delete(id);
     },
     async list(limit = 1000) {
@@ -88,6 +94,19 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
 }
 
 const memoryStore: Store = {
+  async compareAndSetEvent(key, expected, value) {
+    requireDurableWrite();
+    const tables = bag().tables;
+    if (!tables.has("workroom_events")) tables.set("workroom_events", new Map());
+    const rows = tables.get("workroom_events")!;
+    const content = new Map<string, unknown>([["event:" + key, rows.get(key) ?? null]]);
+    if (!compareMemory(content, bag().history ||= [], "event:" + key, expected, value)) return false;
+    rows.set(key, structuredClone(value));
+    return true;
+  },
+  async eventHistory() { return structuredClone((bag().history || []).filter(entry => entry.key.startsWith("event:")).slice(-10).reverse()); },
+  async compareAndSetValue(key, expected, value) { requireDurableWrite(); return compareMemory(bag().content, bag().history ||= [], key, expected, value); },
+  async contentHistory(key) { return structuredClone((bag().history || []).filter(entry => entry.key === key).slice(-10).reverse()); },
   backend: "memory",
   events: memoryCollection<WorkroomEvent>("workroom_events"),
   images: memoryCollection<StoredImage>("workroom_images"),
@@ -95,6 +114,7 @@ const memoryStore: Store = {
     return (bag().content.get(key) as never) ?? null;
   },
   async setValue(key, value) {
+    requireDurableWrite();
     bag().content.set(key, value);
   },
 };
@@ -111,12 +131,10 @@ export function connectionVar(): string | null {
   const env = process.env;
   if (env.DATABASE_URL) return "DATABASE_URL";
   if (env.POSTGRES_URL) return "POSTGRES_URL";
-  const keys = Object.keys(env).sort();
-  return (
-    keys.find((k) => k.endsWith("_DATABASE_URL") && env[k]) ??
-    keys.find((k) => k.endsWith("_POSTGRES_URL") && env[k]) ??
-    null
-  );
+  const keys = Object.keys(env).filter(k => (k.endsWith("_DATABASE_URL") || k.endsWith("_POSTGRES_URL")) && env[k]);
+  // Never choose an arbitrary client database when several integrations exist.
+  const values = new Set(keys.map(k => env[k]));
+  return values.size === 1 ? keys.sort()[0] : null;
 }
 
 function connectionString(): string | undefined {
@@ -130,19 +148,20 @@ type PgPool = {
 
 const JSON_TABLES = ["workroom_content", "workroom_events", "workroom_images"] as const;
 
-async function pgPool(): Promise<PgPool> {
+export async function workroomDatabase(): Promise<PgPool> {
   const g = globalThis as typeof globalThis & {
     __copperWorkroomPool?: PgPool;
     __copperWorkroomReady?: Promise<unknown>;
   };
-  if (!g.__copperWorkroomPool) {
+  if (!g.__copperWorkroomReady) {
+    g.__copperWorkroomReady = (async () => {
     const { Pool } = await import("pg");
     const cs = connectionString();
-    const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
+    if (!cs) throw new Error("Persistent workroom storage is not configured.");
     g.__copperWorkroomPool = new Pool({
       connectionString: cs,
-      ssl: local ? undefined : { rejectUnauthorized: false },
       max: 3,
+      connectionTimeoutMillis: 7000,
     }) as unknown as PgPool;
     /*
       The init takes an advisory lock because the customer pages read this
@@ -153,12 +172,9 @@ async function pgPool(): Promise<PgPool> {
     */
     const creates = JSON_TABLES.map(
       (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
-    ).join("\n");
-    g.__copperWorkroomReady = g.__copperWorkroomPool
-      .query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`)
-      .catch((err: unknown) => {
-        const code = (err as { code?: string } | null)?.code;
-        if (code === "23505" || code === "42P07") return;
+    ).join("\n") + "\nCREATE TABLE IF NOT EXISTS copper_login_attempts (id text PRIMARY KEY, attempts integer NOT NULL, started bigint NOT NULL);";
+    await g.__copperWorkroomPool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}\n${CONTENT_HISTORY_SCHEMA}`);
+    })().catch((err: unknown) => {
         g.__copperWorkroomPool = undefined;
         g.__copperWorkroomReady = undefined;
         throw err;
@@ -171,23 +187,23 @@ async function pgPool(): Promise<PgPool> {
 function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Collection<T> {
   return {
     async get(id) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       const { rows } = await pool.query(`SELECT data FROM ${table} WHERE key = $1`, [id]);
       return rows.length ? (rows[0].data as T) : null;
     },
     async put(row) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       await pool.query(
         `INSERT INTO ${table} (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2`,
         [row.id, JSON.stringify(row)]
       );
     },
     async remove(id) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       await pool.query(`DELETE FROM ${table} WHERE key = $1`, [id]);
     },
     async list(limit = 1000) {
-      const pool = await pgPool();
+      const pool = await workroomDatabase();
       const { rows } = await pool.query(
         `SELECT data FROM ${table} ORDER BY (data->>'createdAt')::bigint DESC NULLS LAST LIMIT $1`,
         [limit]
@@ -198,16 +214,28 @@ function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Colle
 }
 
 const postgresStore: Store = {
+  async compareAndSetEvent(key, expected, value) { const pool = await workroomDatabase(); return compareEvent((sql, params) => pool.query(sql, params), key, expected, value); },
+  async eventHistory() {
+    const pool = await workroomDatabase();
+    const { rows } = await pool.query("SELECT id,key,changed_at,actor,before_data,after_data FROM workroom_content_history WHERE key LIKE 'event:%' ORDER BY changed_at DESC,id DESC LIMIT 10");
+    return rows.map(r => ({ id: String(r.id), key: String(r.key), changedAt: new Date(String(r.changed_at)).toISOString(), actor: String(r.actor), before: r.before_data, after: r.after_data }));
+  },
+  async compareAndSetValue(key, expected, value) { const pool = await workroomDatabase(); return compareContent((sql, params) => pool.query(sql, params), key, expected, value); },
+  async contentHistory(key) {
+    const pool = await workroomDatabase();
+    const { rows } = await pool.query('SELECT id,key,changed_at,actor,before_data,after_data FROM workroom_content_history WHERE key=$1 ORDER BY changed_at DESC,id DESC LIMIT 10', [key]);
+    return rows.map(r => ({ id: String(r.id), key: String(r.key), changedAt: new Date(String(r.changed_at)).toISOString(), actor: String(r.actor), before: r.before_data, after: r.after_data }));
+  },
   backend: "postgres",
   events: pgCollection<WorkroomEvent>("workroom_events"),
   images: pgCollection<StoredImage>("workroom_images"),
   async getValue(key) {
-    const pool = await pgPool();
+    const pool = await workroomDatabase();
     const { rows } = await pool.query(`SELECT data FROM workroom_content WHERE key = $1`, [key]);
     return rows.length ? (rows[0].data as never) : null;
   },
   async setValue(key, value) {
-    const pool = await pgPool();
+    const pool = await workroomDatabase();
     await pool.query(
       `INSERT INTO workroom_content (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2`,
       [key, JSON.stringify(value)]
@@ -217,4 +245,8 @@ const postgresStore: Store = {
 
 export function getStore(): Store {
   return connectionString() ? postgresStore : memoryStore;
+}
+
+function requireDurableWrite() {
+  if (process.env.NODE_ENV === "production") throw new Error("Persistent storage is required for workroom edits.");
 }
