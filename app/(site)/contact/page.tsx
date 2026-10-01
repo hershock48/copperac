@@ -80,6 +80,18 @@ export default function ContactPage() {
                 ))}
               </dl>
               <p className="mt-4 text-sm text-cream-dim/70">{KITCHEN_NOTE}</p>
+              <p className="mt-2 text-sm text-cream-dim/70">
+                Waiting on a table?{" "}
+                <a
+                  href={SITE.waitlistUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-copper-light underline underline-offset-4 hover:text-copper"
+                >
+                  Join the waitlist
+                </a>{" "}
+                from your phone and get a text when it is ready.
+              </p>
             </div>
 
             <div className="mt-10 rounded-sm border border-ink-line p-6">

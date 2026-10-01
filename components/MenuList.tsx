@@ -31,6 +31,9 @@ export default function MenuList({ sections }: { sections: MenuSection[] }) {
                   />
                   <span className="display shrink-0 text-base text-copper-light">
                     {price(item.price)}
+                    {item.unit && item.price && (
+                      <span className="ml-1.5 text-xs normal-case tracking-normal text-cream-dim/70">{item.unit}</span>
+                    )}
                   </span>
                 </div>
                 {item.desc && (

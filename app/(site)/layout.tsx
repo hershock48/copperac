@@ -44,7 +44,7 @@ const restaurantSchema = {
     longitude: SITE.geo.lng,
   },
   hasMap: SITE.mapUrl,
-  sameAs: [SITE.instagram, SITE.facebook],
+  sameAs: [SITE.instagram, SITE.facebook, SITE.yelp],
   hasMenu: `${SITE.url}/menu`,
   // No acceptsReservations field: "False" is true for tables (walk in) but
   // Google renders it as "Doesn't accept reservations" beside a site whose

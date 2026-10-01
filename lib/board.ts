@@ -214,6 +214,32 @@ export type Board = {
   ok: boolean;
 };
 
+/**
+ * How far back a result, or ahead a game, can be and still earn a team its
+ * guaranteed row. Two weeks covers a bye week. A team outside it is in its
+ * offseason and takes its chances with the rest.
+ */
+const TEAM_ROW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+
+const newestFirst = (a: BoardGame, b: BoardGame) => +new Date(b.date) - +new Date(a.date);
+const soonestFirst = (a: BoardGame, b: BoardGame) => +new Date(a.date) - +new Date(b.date);
+
+/**
+ * One row per ESPN event. The rivalry game is one event fetched twice, once
+ * under each school, so without this it sits on the board twice (and React
+ * gets two rows with one key). First copy wins, which with CARD_ORDER means
+ * Michigan's reading of it; the game is on the board either way.
+ */
+function uniqueById(games: BoardGame[]): BoardGame[] {
+  const seen = new Set<string>();
+  return games.filter((g) => (seen.has(g.id) ? false : (seen.add(g.id), true)));
+}
+
+/** The guaranteed rows first, then the rest in their own order, up to the cap, no repeats. */
+function fill(first: BoardGame[], rest: BoardGame[], cap: number): BoardGame[] {
+  return uniqueById([...first, ...rest]).slice(0, cap);
+}
+
 async function buildBoard(): Promise<Board> {
   const all = (await Promise.all(TEAMS.map(fetchTeam))).flat();
   const now = Date.now();
@@ -222,25 +248,43 @@ async function buildBoard(): Promise<Board> {
   const isLive = (g: BoardGame) =>
     !isFinal(g) && g.detScore !== null && new Date(g.date).getTime() <= now;
 
-  const recent = all
-    .filter(isFinal)
-    .sort((a, b) => +new Date(b.date) - +new Date(a.date))
-    .slice(0, 6);
+  const live = uniqueById(all.filter(isLive));
 
-  const live = all.filter(isLive);
+  /*
+    One row per team first, then the rest by date. Meeting note, 1 Oct 2026:
+    "add Michigan and Michigan State to the ticker". They had been in TEAMS
+    since 8 Sep and still barely appeared, and this is why: "Last out" was the
+    six newest finals and "On the screens" the eight soonest games, full stop.
+    In September the Tigers play every night, so six finals were six Tigers
+    games, the two schools, who play on Saturday, fell off both panels, and
+    the ticker is built from the panels, so they fell off that too. Now every
+    team with a result in the last two weeks gets its latest one, every team
+    with a game in the next two weeks gets its next one, and the leftover
+    slots fill by date exactly as before. A team deep in its offseason still
+    drops out rather than parking an April result under "Last out".
+  */
+  const finals = all.filter(isFinal).sort(newestFirst);
+  const lastByTeam = CARD_ORDER
+    .map((label) => finals.find((g) => g.league === label && new Date(g.date).getTime() >= now - TEAM_ROW_WINDOW_MS))
+    .filter((g): g is BoardGame => Boolean(g));
+  const recent = fill(lastByTeam, finals, 6).sort(newestFirst);
 
-  const upcoming = all
+  const scheduled = all
     .filter((g) => !isFinal(g) && !isLive(g) && new Date(g.date).getTime() > now - 60 * 60 * 1000)
-    .sort((a, b) => +new Date(a.date) - +new Date(b.date))
-    .slice(0, 8);
+    .sort(soonestFirst);
 
+  // Every team's next game, for the cards; a game not yet started cannot be
+  // live, so nothing here overlaps `live`. Not deduped: a card per team is
+  // the point, and in rivalry week both schools' cards show the same game.
   const nextByTeam = CARD_ORDER
     .map((label) =>
       all
         .filter((g) => g.league === label && !isFinal(g) && new Date(g.date).getTime() > now)
-        .sort((a, b) => +new Date(a.date) - +new Date(b.date))[0]
+        .sort(soonestFirst)[0]
     )
     .filter((g): g is BoardGame => Boolean(g));
+  const soonByTeam = nextByTeam.filter((g) => new Date(g.date).getTime() <= now + TEAM_ROW_WINDOW_MS);
+  const upcoming = fill(soonByTeam, scheduled, 8).sort(soonestFirst);
 
   return {
     recent,
@@ -258,8 +302,11 @@ async function buildBoard(): Promise<Board> {
  * still refresh on their own.
  */
 // Key bumped when the game shape changed (8 Sep 2026: us, school), so a
-// cached board from before the change cannot render blank labels.
-const cachedBoard = unstable_cache(buildBoard, ["copper-board-v2"], {
+// cached board from before the change cannot render blank labels, and again
+// when the panels started guaranteeing every team a row (1 Oct 2026), so the
+// schools show on the first request after the deploy and not fifteen
+// minutes later.
+const cachedBoard = unstable_cache(buildBoard, ["copper-board-v3"], {
   revalidate: 900,
 });
 

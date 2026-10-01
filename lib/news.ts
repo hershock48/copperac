@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { CLUBS, names, type Club } from "./news-match";
 
 /**
  * Detroit sports headlines, for the news crawl under the score ticker.
@@ -59,31 +60,6 @@ export type NewsItem = {
   published: string | null;
 };
 
-type Club = {
-  /** ESPN's sport/league path segment */
-  path: string;
-  team: "TIGERS" | "LIONS" | "PISTONS" | "RED WINGS" | "MICHIGAN" | "MICH STATE";
-  league: "MLB" | "NFL" | "NBA" | "NHL" | "CFB" | "CBB";
-  /** Matched against article categories and, failing that, the text */
-  needles: string[];
-};
-
-/*
-  The two schools joined on 8 Sep 2026 with the board. Their needles are the
-  nicknames on purpose: "michigan" alone would file every Michigan State
-  story under Michigan, and the reverse. College news is one national feed
-  per sport, so the two schools share a fetch (see buildNews).
-*/
-const CLUBS: Club[] = [
-  { path: "baseball/mlb", team: "TIGERS", league: "MLB", needles: ["detroit tigers", "tigers"] },
-  { path: "football/nfl", team: "LIONS", league: "NFL", needles: ["detroit lions", "lions"] },
-  { path: "basketball/nba", team: "PISTONS", league: "NBA", needles: ["detroit pistons", "pistons"] },
-  { path: "hockey/nhl", team: "RED WINGS", league: "NHL", needles: ["detroit red wings", "red wings"] },
-  { path: "football/college-football", team: "MICHIGAN", league: "CFB", needles: ["michigan wolverines", "wolverines"] },
-  { path: "basketball/mens-college-basketball", team: "MICHIGAN", league: "CBB", needles: ["michigan wolverines", "wolverines"] },
-  { path: "football/college-football", team: "MICH STATE", league: "CFB", needles: ["michigan state", "spartans"] },
-  { path: "basketball/mens-college-basketball", team: "MICH STATE", league: "CBB", needles: ["michigan state", "spartans"] },
-];
 
 /** The slice of ESPN's news payload we read. All optional, on purpose. */
 type EspnCategory = {
@@ -139,16 +115,17 @@ const ROUNDUP_TEAM_TAGS = 3;
  */
 const MAX_AGE_DAYS = 10;
 
+
 function concernsClub(a: EspnArticle, club: Club): boolean {
   const text = `${a.headline ?? a.title ?? ""} ${a.description ?? ""}`.toLowerCase();
   // The real test: the story says who it is about. "Teddy Bridgewater leaves Lions to retire"
   // passes; "Latest intel for all 32 teams" does not, whatever it is tagged with.
-  if (club.needles.some((n) => text.includes(n))) return true;
+  if (names(text, club)) return true;
 
   // Tagged but not named. Trust the tag only if this is not a league sweep -- otherwise every
   // roundup in the league arrives wearing Detroit's name. See the note at the top of the file.
   const cats = categoryText(a);
-  const tagged = Boolean(cats) && club.needles.some((n) => cats.includes(n));
+  const tagged = Boolean(cats) && names(cats, club);
   return tagged && teamCategoryCount(a) <= ROUNDUP_TEAM_TAGS;
 }
 

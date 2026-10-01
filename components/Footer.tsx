@@ -55,14 +55,24 @@ export default function Footer() {
                 </a>
               </p>
             </address>
-            <a
-              href={SITE.mapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-block text-sm text-copper-light underline underline-offset-4 hover:text-copper"
-            >
-              Get directions
-            </a>
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <a
+                href={SITE.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-copper-light underline underline-offset-4 hover:text-copper"
+              >
+                Get directions
+              </a>
+              <a
+                href={SITE.waitlistUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-copper-light underline underline-offset-4 hover:text-copper"
+              >
+                Join the waitlist
+              </a>
+            </div>
           </div>
 
           <div>

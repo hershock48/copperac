@@ -201,6 +201,41 @@ that fallback mode only: the `mailto:` handoff needs a registered mail handler
 on the visitor's machine; desktop webmail users get the on-screen note and the
 phone number and nothing else.
 
+## The Reserve menu, priced
+
+Received 1 Oct 2026, the printed Copper Reserve buffet sheet, after the
+meeting note that the Reserve page showed its food with no prices. It did:
+until the sheet nothing priced it. The page's two unpriced lists are gone
+and the full sheet is `RESERVE_MENU` in `lib/menu.ts`, four sections
+(entrees, salads, sides, breakfast and brunch) with a `unit` on each price
+("per person", "per burger", "per dog"; the charcuterie board is a flat
+$100 for up to 25, the pie has no printed price). `MenuList` renders the
+unit after the figure. The 20% gratuity line is `RESERVE_GRATUITY_NOTE`.
+Two typos on the print are fixed in the data and noted there.
+
+It is the workroom's third menu, so the club reprices it the same way as
+the other two. An item added to it from the workroom has no unit, so it
+reads as a flat price unless the description says "per person".
+
+## The waitlist: Yelp's, linked rather than embedded
+
+Meeting note, Oct 2026: "Call for a Large Party" came off the brunch page and a
+link to the waitlist took its place. The bar runs its waitlist through Yelp;
+the live site has it as Yelp's red widget at the very bottom of the homepage,
+which is how it got written off in the proposal as "two other companies get
+the last word". The widget was the problem, not the waitlist. Here it is one
+text link in the brand's own type, in the four places a guest deciding
+whether to come over is looking: the homepage hero beside the live status and
+the phone number, the brunch page as its one action, the contact page under
+the hours, and the footer beside "Get directions". The Yelp listing is also
+in the Restaurant schema's `sameAs` now.
+
+Both addresses are constants in `lib/site.ts` (`yelp`, `waitlistUrl`) so the
+day the bar moves off Yelp Waitlist it is one line. The waitlist URL has not
+been loaded end to end, see the cutover item below, and nothing on the site
+promises a wait time or an opening hour for it, so there is nothing here to
+go stale if Yelp changes the hours it accepts remote check-ins.
+
 ## Online ordering: Toast's for now, ours built and parked
 
 Kevin kept Toast when he took the site (Aug 2026): every "Order Online"
@@ -270,6 +305,7 @@ Decisions worth knowing before touching it:
 - [x] Verify the lat/lng pin (2 Sep 2026): the old pin was on the Brooks Memorial Fountain roundabout, a block and a half west. Moved to mid-block on the south side of the 100 block, see the note at `geo` in `lib/site.ts`. Worth a glance on a phone in Google Maps to be sure of the exact storefront
 - [ ] Shoot new photography, or at least re-shoot the hero. Current photos date to 2019
 - [ ] Point `copperac.com` at the deploy, keeping the `/menus` to `/menu` redirect
+- [ ] **Tap the waitlist link on a phone.** `SITE.waitlistUrl` follows Yelp's `/waitlist/{alias}` pattern and was written while Yelp was unreachable from the build container, so it has not been loaded end to end. It should land on the club's Yelp waitlist with a "Join the waitlist" button; if it lands on the plain listing instead, the waitlist is off on Yelp's side, not a bad link
 - The **Ordering** items below apply only if the club switches from Toast to the in-house `/order` channel, it is parked for now (see the ordering section above), so none of them block launch
 - [ ] **Ordering: add the free Postgres** (Vercel project > Storage > Create Database > Neon). Without it orders live in one lambda's memory and the kitchen screen warns loudly
 - [ ] **Ordering: set `KITCHEN_PIN`** (falls back to 0133, the street number, a placeholder not a secret)
@@ -300,10 +336,18 @@ runs their social media and events. Two screens behind one passcode:
   reports it under `workroom.tapsHandoff`. The same key signs the
   case-changed ping Scooplist sends to `app/api/scooplist/revalidate`
   (below), so one secret covers both directions.
-- **Menu.** A price, a description and an on/off switch per item, main menu
-  and Sunday brunch. Names and sections stay in `lib/menu.ts`, because the
-  printed menu is still the truth for shape. Clearing a price restores the
-  printed one.
+- **Menu.** A price, a description and an on/off switch per printed item,
+  main menu and Sunday brunch; clearing a price restores the printed one.
+  Printed names and sections stay in `lib/menu.ts`, because the print is
+  still the truth for what it has. Since 1 Oct 2026 (meeting note: the
+  brunch menu changes every month) she can also **add an item** under any
+  section, **start a new section** ("October Specials"), and **remove** what
+  she added when it is gone. Additions are their own rows in the store
+  (`menu-additions`, see `MenuAddition` in `lib/workroom/menu-def.ts`),
+  not overrides of a printed item, and they render after the printed items
+  of their section, a new section after the printed sections. Names must be
+  unique within a section, since the menu keys its rows by name. Removing
+  every edit still puts the menu back exactly as printed.
 
 It is a port of the anchor repo's workroom (the newest copy in the studio's
 workroom family): passcode gate with a hashed cookie and a five-misses lockout
