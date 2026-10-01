@@ -25,7 +25,7 @@ export default async function BrunchPage() {
     <>
       <PageHero
         title="Sunday Brunch"
-        subtitle="Every Sunday, 9 AM to 2 PM. Walk in, bring the whole table, and start with a mimosa flight."
+        subtitle="Every Sunday, 9 AM to 2 PM. Walk in, bring the whole family, and start with a mimosa flight."
         image="/img/interior-bar.webp"
         imageAlt="The Copper Athletic Club bar set for service on a Sunday morning"
       />
