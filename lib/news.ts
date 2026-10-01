@@ -66,6 +66,12 @@ type Club = {
   league: "MLB" | "NFL" | "NBA" | "NHL" | "CFB" | "CBB";
   /** Matched against article categories and, failing that, the text */
   needles: string[];
+  /**
+   * A looser needle that counts only when none of `unless` is present. For
+   * Michigan: "michigan" on its own, unless the text names another Michigan
+   * school. See the note at CLUBS.
+   */
+  bare?: { needle: string; unless: string[] };
 };
 
 /*
@@ -73,14 +79,30 @@ type Club = {
   nicknames on purpose: "michigan" alone would file every Michigan State
   story under Michigan, and the reverse. College news is one national feed
   per sport, so the two schools share a fetch (see buildNews).
+
+  1 Oct 2026, meeting note "add Michigan and Michigan State to the ticker":
+  Michigan State's needles work because ESPN writes "Michigan State" out.
+  Michigan's did not, because ESPN's college copy says "Michigan" far more
+  often than "Wolverines" ("No. 20 Michigan holds off Nebraska"), so most
+  Michigan stories fell through the filter and the school was nearly absent
+  from the crawl. The fix is the `bare` needle: a plain "michigan" counts,
+  unless the text names another Michigan school. A story about the rivalry
+  game names both, fails Michigan's bare test on "michigan state", and
+  files under MICH STATE, which is one entry for one story and fine.
+  lib/__tests__/news-filter.mjs pins the shapes.
 */
+const MICHIGAN_BARE: NonNullable<Club["bare"]> = {
+  needle: "michigan",
+  unless: ["michigan state", "central michigan", "western michigan", "eastern michigan", "northern michigan", "michigan tech", "spartans"],
+};
+
 const CLUBS: Club[] = [
   { path: "baseball/mlb", team: "TIGERS", league: "MLB", needles: ["detroit tigers", "tigers"] },
   { path: "football/nfl", team: "LIONS", league: "NFL", needles: ["detroit lions", "lions"] },
   { path: "basketball/nba", team: "PISTONS", league: "NBA", needles: ["detroit pistons", "pistons"] },
   { path: "hockey/nhl", team: "RED WINGS", league: "NHL", needles: ["detroit red wings", "red wings"] },
-  { path: "football/college-football", team: "MICHIGAN", league: "CFB", needles: ["michigan wolverines", "wolverines"] },
-  { path: "basketball/mens-college-basketball", team: "MICHIGAN", league: "CBB", needles: ["michigan wolverines", "wolverines"] },
+  { path: "football/college-football", team: "MICHIGAN", league: "CFB", needles: ["michigan wolverines", "wolverines"], bare: MICHIGAN_BARE },
+  { path: "basketball/mens-college-basketball", team: "MICHIGAN", league: "CBB", needles: ["michigan wolverines", "wolverines"], bare: MICHIGAN_BARE },
   { path: "football/college-football", team: "MICH STATE", league: "CFB", needles: ["michigan state", "spartans"] },
   { path: "basketball/mens-college-basketball", team: "MICH STATE", league: "CBB", needles: ["michigan state", "spartans"] },
 ];
@@ -139,16 +161,23 @@ const ROUNDUP_TEAM_TAGS = 3;
  */
 const MAX_AGE_DAYS = 10;
 
+/** Does this lowercased text name the club? The needles, or the bare needle with nothing ruling it out. */
+function names(text: string, club: Club): boolean {
+  if (club.needles.some((n) => text.includes(n))) return true;
+  const b = club.bare;
+  return Boolean(b && text.includes(b.needle) && !b.unless.some((u) => text.includes(u)));
+}
+
 function concernsClub(a: EspnArticle, club: Club): boolean {
   const text = `${a.headline ?? a.title ?? ""} ${a.description ?? ""}`.toLowerCase();
   // The real test: the story says who it is about. "Teddy Bridgewater leaves Lions to retire"
   // passes; "Latest intel for all 32 teams" does not, whatever it is tagged with.
-  if (club.needles.some((n) => text.includes(n))) return true;
+  if (names(text, club)) return true;
 
   // Tagged but not named. Trust the tag only if this is not a league sweep -- otherwise every
   // roundup in the league arrives wearing Detroit's name. See the note at the top of the file.
   const cats = categoryText(a);
-  const tagged = Boolean(cats) && club.needles.some((n) => cats.includes(n));
+  const tagged = Boolean(cats) && names(cats, club);
   return tagged && teamCategoryCount(a) <= ROUNDUP_TEAM_TAGS;
 }
 

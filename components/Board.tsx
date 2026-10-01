@@ -19,7 +19,13 @@ export default async function Board() {
     minute: "2-digit",
   }).format(new Date(board.builtAt));
 
-  const tickerItems = [...board.live, ...board.recent, ...board.upcoming].slice(0, 10);
+  // Everything the two panels show, in one crawl. It used to stop at ten, and
+  // since the panels run newest-first and soonest-first, the cut landed on the
+  // far end of "On the screens", which is where a Saturday college game sits
+  // on a Tuesday. The crawl's speed comes from its character count (see the
+  // note below), so a longer run is a longer lap at the same pace, not a
+  // faster one.
+  const tickerItems = [...board.live, ...board.recent, ...board.upcoming].slice(0, 16);
 
   return (
     <section id="board" className="border-y border-ink-line bg-ink-soft px-5 py-16 lg:px-8 lg:py-20">
