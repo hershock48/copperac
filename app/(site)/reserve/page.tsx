@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import InquiryForm from "@/components/InquiryForm";
+import MenuList from "@/components/MenuList";
 import { Button, Eyebrow, Heading, Section } from "@/components/ui";
+import { getMenus } from "@/lib/content";
+import { RESERVE_GRATUITY_NOTE } from "@/lib/menu";
 import { ACCESSIBILITY_NOTE, RESERVE, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -26,7 +29,7 @@ const SPECS = [
   { label: "Rate", value: `$${RESERVE.hourlyRate} per hour, or $${RESERVE.halfHourRate} per half hour` },
   { label: "Includes", value: "A personal bartender for your party" },
   { label: "Capacity", value: `Seating for up to ${RESERVE.seats} guests` },
-  { label: "Food", value: "Buffet style, built around your group" },
+  { label: "Food", value: "Buffet style, priced per person. The menu is below." },
   // From the constant, not spelled out. This number and the homepage's are
   // different rooms and both are real, which is exactly the pair most likely to
   // be "corrected" into agreement by someone who does not know that.
@@ -50,24 +53,6 @@ const OCCASIONS = [
   "Wedding receptions",
 ];
 
-const BUFFET = [
-  "Taco / nacho bar",
-  "Coney and hot dog bar",
-  "BBQ pulled pork sandwich bar",
-  "Salad bowls",
-  "Mac n cheese",
-  "Homemade soups",
-];
-
-const BRUNCH_OPTIONS = [
-  "Scrambled eggs",
-  "Biscuits and gravy",
-  "Seasonal bake",
-  "Bacon",
-  "Sausage",
-  "Copper hashbrowns",
-];
-
 const GALLERY = [
   { src: "/img/reserve-eastwall.webp", alt: "The east wall of the Copper Reserve, lined with framed sports photography" },
   { src: "/img/reserve-party.webp", alt: "The Copper Reserve set up for a birthday party with balloons and centerpieces" },
@@ -75,7 +60,9 @@ const GALLERY = [
   { src: "/img/reserve-shelves.webp", alt: "Liquor shelves behind the private bar in the Copper Reserve" },
 ];
 
-export default function ReservePage() {
+export default async function ReservePage() {
+  // The Reserve's buffet menu, with the workroom's edits laid over the print.
+  const { reserve: reserveMenu } = await getMenus();
   return (
     <>
       {/* Same copper-on-black system as the rest of the site. The current
@@ -172,37 +159,20 @@ export default function ReservePage() {
         </div>
       </Section>
 
-      <Section dark>
+      {/* The buffet menu with its prices, from the printed sheet (1 Oct 2026).
+          Before the sheet existed this section was two unpriced lists of
+          "popular options", which was the meeting note: the food showed, the
+          prices did not. See RESERVE_MENU in lib/menu.ts. */}
+      <Section dark id="food">
         <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
           <div>
             <Eyebrow>And the food</Eyebrow>
             <Heading className="mt-5">Let us handle it</Heading>
             <p className="mt-7 text-base leading-relaxed text-cream-dim">
-              We offer a range of buffet options so your guests eat well and you focus on
-              your people. Tell us your group and we will build the spread.
+              Buffet style, priced per person, so the bill is easy to work out before you
+              book. Tell us your group and we will build the spread.
             </p>
-            <div className="mt-10 grid gap-10 sm:grid-cols-2">
-              <div>
-                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper-light">
-                  Popular options
-                </h3>
-                <ul className="mt-5 space-y-2.5 text-base text-cream-dim">
-                  {BUFFET.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="display text-sm uppercase tracking-[0.2em] text-copper-light">
-                  Breakfast &amp; brunch
-                </h3>
-                <ul className="mt-5 space-y-2.5 text-base text-cream-dim">
-                  {BRUNCH_OPTIONS.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <p className="mt-4 text-sm leading-relaxed text-cream-dim/70">{RESERVE_GRATUITY_NOTE}</p>
           </div>
           <div className="relative aspect-4/3 overflow-hidden rounded-sm sm:min-h-80">
             <Image
@@ -213,6 +183,9 @@ export default function ReservePage() {
               className="object-cover"
             />
           </div>
+        </div>
+        <div className="mt-16">
+          <MenuList sections={reserveMenu} />
         </div>
       </Section>
 

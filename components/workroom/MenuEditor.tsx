@@ -5,7 +5,8 @@ import { additionErrors, priceError, type MenuAddition, type MenuId } from "@/li
 import type { MenuEditorState } from "@/lib/content";
 
 /**
- * The menu, editable, for the main menu and Sunday brunch.
+ * The menu, editable, for the main menu, Sunday brunch and the Reserve's
+ * buffet menu (the last added 1 Oct 2026 with its printed prices).
  *
  * Printed items: a price, a description and an on/off switch each. Their
  * names and sections come from the printed menu and stay in code; a box
@@ -36,7 +37,7 @@ export default function MenuEditor() {
   const [state, setState] = useState<MenuEditorState | null>(null);
   const [draft, setDraft] = useState<Draft>({});
   const [added, setAdded] = useState<MenuAddition[]>([]);
-  const [newSection, setNewSection] = useState<Record<MenuId, string>>({ food: "", brunch: "" });
+  const [newSection, setNewSection] = useState<Record<MenuId, string>>({ food: "", brunch: "", reserve: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -168,6 +169,8 @@ export default function MenuEditor() {
           Change a price or a description and the menu page shows it within a few seconds. Clear a price to go back
           to the printed one. Switch an item off to take it off the site without losing it. Add an item under any
           section, or start a new section, for what the printed menu does not have yet; remove it when it is gone.
+          The Reserve menu is priced per person; the "per person" stays with each printed item, and an item added
+          there reads as a flat price unless the description says otherwise.
         </p>
       </div>
 
@@ -339,7 +342,7 @@ export default function MenuEditor() {
                   id={`ns-${m.id}`}
                   type="text"
                   value={newSection[m.id]}
-                  placeholder={m.id === "brunch" ? "October Specials" : "Pizza"}
+                  placeholder={{ food: "Pizza", brunch: "October Specials", reserve: "Desserts" }[m.id]}
                   onChange={(e) => setNewSection((n) => ({ ...n, [m.id]: e.target.value }))}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {

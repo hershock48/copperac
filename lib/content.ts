@@ -1,6 +1,6 @@
 import "server-only";
 
-import { BRUNCH_MENU, COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu";
+import { BRUNCH_MENU, COCKTAILS, FOOD_MENU, RESERVE_MENU, type MenuSection } from "@/lib/menu";
 import { EVENTS, type CACEvent } from "@/lib/site";
 import { getStore } from "@/lib/workroom/store";
 import type { EventsContact, WorkroomEvent } from "@/lib/workroom/events-def";
@@ -27,6 +27,13 @@ const EVENT_GRACE_MS = 4 * 60 * 60 * 1000;
 export const EVENTS_CONTACT_KEY = "events-contact";
 export const MENU_OVERRIDES_KEY = "menu-overrides";
 export const MENU_ADDITIONS_KEY = "menu-additions";
+
+/** Every printed menu the workroom can lay edits over, by id. */
+const PRINTED_MENUS = [
+  ["food", FOOD_MENU],
+  ["brunch", BRUNCH_MENU],
+  ["reserve", RESERVE_MENU],
+] as const;
 
 /* ------------------------------ events ------------------------------ */
 
@@ -124,7 +131,7 @@ export async function getMenuOverrides(): Promise<MenuOverrides> {
   // Re-filter on read: only keys that name an item this build knows, only
   // the whitelisted fields, so a row from another build cannot misprice.
   const known = new Set<string>();
-  for (const [menu, sections] of [["food", FOOD_MENU], ["brunch", BRUNCH_MENU]] as const) {
+  for (const [menu, sections] of PRINTED_MENUS) {
     for (const s of sections) for (const i of s.items) known.add(menuItemKey(menu, s.name, i.name));
   }
   const clean: MenuOverrides = {};
@@ -153,7 +160,7 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
   // the read-time half, for the day lib/menu.ts catches up to the print and
   // gains the very item she added in the meantime. Her copy yields.
   const printed = new Set<string>();
-  for (const [menu, sections] of [["food", FOOD_MENU], ["brunch", BRUNCH_MENU]] as const) {
+  for (const [menu, sections] of PRINTED_MENUS) {
     for (const s of sections) for (const i of s.items) printed.add(`${menu}|${s.name}|${i.name.toLowerCase()}`);
   }
   const clean: MenuAddition[] = [];
@@ -220,11 +227,18 @@ function applyEdits(
  * checked-in name so the menu page can still swap it for the live Scooplist
  * list (it matches by name, since these are new objects).
  */
-export async function getMenus(): Promise<{ food: MenuSection[]; brunch: MenuSection[]; cocktailsName: string }> {
+export async function getMenus(): Promise<{
+  food: MenuSection[];
+  brunch: MenuSection[];
+  /** The Copper Reserve's buffet menu (1 Oct 2026), priced per person; see RESERVE_MENU. */
+  reserve: MenuSection[];
+  cocktailsName: string;
+}> {
   const [overrides, additions] = await Promise.all([getMenuOverrides(), getMenuAdditions()]);
   return {
     food: applyEdits("food", FOOD_MENU, overrides, additions),
     brunch: applyEdits("brunch", BRUNCH_MENU, overrides, additions),
+    reserve: applyEdits("reserve", RESERVE_MENU, overrides, additions),
     cocktailsName: COCKTAILS.name,
   };
 }
@@ -276,7 +290,11 @@ export async function menuEditorState(): Promise<MenuEditorState> {
     })),
   });
   return {
-    menus: [build("food", "Main menu", FOOD_MENU), build("brunch", "Sunday brunch", BRUNCH_MENU)],
+    menus: [
+      build("food", "Main menu", FOOD_MENU),
+      build("brunch", "Sunday brunch", BRUNCH_MENU),
+      build("reserve", "The Copper Reserve", RESERVE_MENU),
+    ],
     additions,
     backend: getStore().backend,
   };

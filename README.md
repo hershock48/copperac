@@ -201,6 +201,22 @@ that fallback mode only: the `mailto:` handoff needs a registered mail handler
 on the visitor's machine; desktop webmail users get the on-screen note and the
 phone number and nothing else.
 
+## The Reserve menu, priced
+
+Received 1 Oct 2026, the printed Copper Reserve buffet sheet, after the
+meeting note that the Reserve page showed its food with no prices. It did:
+until the sheet nothing priced it. The page's two unpriced lists are gone
+and the full sheet is `RESERVE_MENU` in `lib/menu.ts`, four sections
+(entrees, salads, sides, breakfast and brunch) with a `unit` on each price
+("per person", "per burger", "per dog"; the charcuterie board is a flat
+$100 for up to 25, the pie has no printed price). `MenuList` renders the
+unit after the figure. The 20% gratuity line is `RESERVE_GRATUITY_NOTE`.
+Two typos on the print are fixed in the data and noted there.
+
+It is the workroom's third menu, so the club reprices it the same way as
+the other two. An item added to it from the workroom has no unit, so it
+reads as a flat price unless the description says "per person".
+
 ## The waitlist: Yelp's, linked rather than embedded
 
 Meeting note, Oct 2026: "Call for a Large Party" came off the brunch page and a

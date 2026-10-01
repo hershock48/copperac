@@ -27,8 +27,8 @@
  * true.
  */
 
-export type MenuId = "food" | "brunch";
-export const MENU_IDS: readonly MenuId[] = ["food", "brunch"];
+export type MenuId = "food" | "brunch" | "reserve";
+export const MENU_IDS: readonly MenuId[] = ["food", "brunch", "reserve"];
 
 export type MenuOverride = {
   /** "12.00" style, or absent to keep the built-in price */

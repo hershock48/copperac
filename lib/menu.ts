@@ -3,7 +3,15 @@
 // markup, which had drifted: Greek salad price, section notes, item order,
 // the chips-and-dips living under the wrong heading). When the print
 // changes, this file changes; the print is the truth, not the old site.
-export type MenuItem = { name: string; desc: string; price: string };
+export type MenuItem = {
+  name: string;
+  desc: string;
+  price: string;
+  /** What the price is per, when it is not the plate: "per person", "per dog".
+      The Reserve's buffet menu prices everything this way. Rendered after
+      the figure in smaller type; absent on the dining menus. */
+  unit?: string;
+};
 export type MenuSection = {
   name: string;
   /** The line under the section title on the printed menu, when it has one
@@ -224,3 +232,61 @@ export const BRUNCH_MENU: MenuSection[] = [
     ],
   },
 ];
+
+/*
+  The Copper Reserve's buffet menu, from the printed sheet Kevin sent on
+  1 Oct 2026 (the meeting note was that the Reserve page listed its food
+  with no prices; it did, because until this sheet nothing priced it).
+  Everything is per person unless the unit says otherwise: the burger bar
+  is per burger, the coney bar per dog, the charcuterie board a flat $100
+  for up to 25. Two typos on the print are fixed here: the Caesar's "Add
+  chicken breast" line was printed twice, and "automaticallty" in the
+  gratuity line. The pie has no printed price and stays that way.
+*/
+export const RESERVE_MENU: MenuSection[] = [
+  {
+    name: "Entrees",
+    items: [
+      { name: "Taco / Nacho Bar", desc: "Flour tortillas, tortilla chips, lettuce, onion, tomato, black olive, jalapeno, shredded cheese, guacamole, queso, and crema. Choice of two meats: beef, chicken, or pork.", price: "14.00", unit: "per person" },
+      { name: "Copper Burger Bar", desc: "1/3 lb. beef patties with Velveeta cheese, ketchup, mustard, pickle, and onion on sesame seed buns. Add deluxe toppings for $1 per burger.", price: "10.00", unit: "per burger" },
+      { name: "Coney / Hot Dog Bar", desc: "Dearborn brand natural casing dogs, with Detroit style coney sauce, buns, mustard, and onion.", price: "3.00", unit: "per dog" },
+      { name: "Chicken Sandwich Bar", desc: "Marinated grilled chicken breast with lettuce, tomato, onion, and garlic mayo on pretzel buns.", price: "12.00", unit: "per person" },
+      { name: "BBQ Pulled Pork Sandwich Bar", desc: "Slow-roasted pork with homemade BBQ sauce, pickles, and coleslaw on brioche buns.", price: "9.00", unit: "per person" },
+    ],
+  },
+  {
+    name: "Salads",
+    items: [
+      { name: "Chopped Salad", desc: "Mixed greens, red onion, tomato, bleu cheese crumbles, asiago cheese, boiled egg, bacon, chicken breast, choice of two dressings: ranch, spicy ranch, bleu cheese, lime vinaigrette.", price: "10.00", unit: "per person" },
+      { name: "House Salad", desc: "Romaine lettuce, tomato, cucumber, onion, cheese, choice of two dressings: ranch, spicy ranch, bleu cheese, or lime vinaigrette. Add chicken breast for $4 per person.", price: "4.00", unit: "per person" },
+      { name: "Caesar Salad", desc: "Romaine lettuce, Parmesan cheese, Asiago cheese, and croutons. Served with Caesar dressing on the side. Add chicken breast for $4 per person.", price: "4.00", unit: "per person" },
+      { name: "Greek Salad", desc: "Romaine lettuce, feta cheese, red onion, pepperoncinis, kalamata olives, beets, and cucumbers. Served with Greek dressing on the side. Add chicken breast for $4 per person.", price: "4.00", unit: "per person" },
+    ],
+  },
+  {
+    name: "Sides",
+    items: [
+      { name: "Charcuterie Board", desc: "A beautifully arranged selection of assorted meats, cheeses, nuts, and crackers, thoughtfully curated on a shareable board. Serves up to 25 guests.", price: "100.00" },
+      { name: "Tortilla Chips", desc: "Served with salsa, guacamole, and queso.", price: "8.00", unit: "per person" },
+      { name: "Mac n Cheese", desc: "Mixed with bacon and onion.", price: "5.00", unit: "per person" },
+      { name: "Spinach and Artichoke Dip", desc: "House-made spinach and artichoke dip served with tortilla chips.", price: "8.00", unit: "per person" },
+      { name: "Coleslaw", desc: "", price: "2.00", unit: "per person" },
+      { name: "Housemade Soup", desc: "", price: "5.00", unit: "per person" },
+      { name: "Housemade Pie", desc: "", price: "" },
+    ],
+  },
+  {
+    name: "Breakfast and Brunch",
+    items: [
+      { name: "Scrambled Eggs", desc: "", price: "4.00", unit: "per person" },
+      { name: "Biscuits and Gravy", desc: "", price: "8.00", unit: "per person" },
+      { name: "Seasonal Bake", desc: "", price: "6.00", unit: "per person" },
+      { name: "Bacon", desc: "", price: "3.00", unit: "per person" },
+      { name: "Sausage", desc: "", price: "3.00", unit: "per person" },
+      { name: "Copper Hash Browns", desc: "", price: "4.00", unit: "per person" },
+    ],
+  },
+];
+
+/** The line at the foot of the Reserve's printed menu. */
+export const RESERVE_GRATUITY_NOTE = "A 20% gratuity is added to your final bill.";
