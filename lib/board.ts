@@ -224,17 +224,20 @@ const TEAM_ROW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const newestFirst = (a: BoardGame, b: BoardGame) => +new Date(b.date) - +new Date(a.date);
 const soonestFirst = (a: BoardGame, b: BoardGame) => +new Date(a.date) - +new Date(b.date);
 
+/**
+ * One row per ESPN event. The rivalry game is one event fetched twice, once
+ * under each school, so without this it sits on the board twice (and React
+ * gets two rows with one key). First copy wins, which with CARD_ORDER means
+ * Michigan's reading of it; the game is on the board either way.
+ */
+function uniqueById(games: BoardGame[]): BoardGame[] {
+  const seen = new Set<string>();
+  return games.filter((g) => (seen.has(g.id) ? false : (seen.add(g.id), true)));
+}
+
 /** The guaranteed rows first, then the rest in their own order, up to the cap, no repeats. */
 function fill(first: BoardGame[], rest: BoardGame[], cap: number): BoardGame[] {
-  const out = first.slice(0, cap);
-  const taken = new Set(out.map((g) => g.id));
-  for (const g of rest) {
-    if (out.length >= cap) break;
-    if (taken.has(g.id)) continue;
-    out.push(g);
-    taken.add(g.id);
-  }
-  return out;
+  return uniqueById([...first, ...rest]).slice(0, cap);
 }
 
 async function buildBoard(): Promise<Board> {
@@ -245,7 +248,7 @@ async function buildBoard(): Promise<Board> {
   const isLive = (g: BoardGame) =>
     !isFinal(g) && g.detScore !== null && new Date(g.date).getTime() <= now;
 
-  const live = all.filter(isLive);
+  const live = uniqueById(all.filter(isLive));
 
   /*
     One row per team first, then the rest by date. Meeting note, 1 Oct 2026:
@@ -270,6 +273,9 @@ async function buildBoard(): Promise<Board> {
     .filter((g) => !isFinal(g) && !isLive(g) && new Date(g.date).getTime() > now - 60 * 60 * 1000)
     .sort(soonestFirst);
 
+  // Every team's next game, for the cards; a game not yet started cannot be
+  // live, so nothing here overlaps `live`. Not deduped: a card per team is
+  // the point, and in rivalry week both schools' cards show the same game.
   const nextByTeam = CARD_ORDER
     .map((label) =>
       all
@@ -277,9 +283,7 @@ async function buildBoard(): Promise<Board> {
         .sort(soonestFirst)[0]
     )
     .filter((g): g is BoardGame => Boolean(g));
-  const soonByTeam = nextByTeam.filter(
-    (g) => !isLive(g) && new Date(g.date).getTime() <= now + TEAM_ROW_WINDOW_MS
-  );
+  const soonByTeam = nextByTeam.filter((g) => new Date(g.date).getTime() <= now + TEAM_ROW_WINDOW_MS);
   const upcoming = fill(soonByTeam, scheduled, 8).sort(soonestFirst);
 
   return {

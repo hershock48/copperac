@@ -19,13 +19,14 @@ export default async function Board() {
     minute: "2-digit",
   }).format(new Date(board.builtAt));
 
-  // Everything the two panels show, in one crawl. It used to stop at ten, and
-  // since the panels run newest-first and soonest-first, the cut landed on the
-  // far end of "On the screens", which is where a Saturday college game sits
-  // on a Tuesday. The crawl's speed comes from its character count (see the
-  // note below), so a longer run is a longer lap at the same pace, not a
-  // faster one.
-  const tickerItems = [...board.live, ...board.recent, ...board.upcoming].slice(0, 16);
+  // Everything the two panels show, in one crawl, no cap. It used to stop at
+  // ten, and since the panels run newest-first and soonest-first, the cut
+  // landed on the far end of "On the screens", which is where a Saturday
+  // college game sits on a Tuesday. The panels are already capped (6 and 8,
+  // plus whatever is live), and the crawl's speed comes from its character
+  // count (see the note below), so a longer run is a longer lap at the same
+  // pace, not a faster one.
+  const tickerItems = [...board.live, ...board.recent, ...board.upcoming];
 
   return (
     <section id="board" className="border-y border-ink-line bg-ink-soft px-5 py-16 lg:px-8 lg:py-20">
@@ -92,7 +93,7 @@ export default async function Board() {
         {board.nextByTeam.length > 0 && (
           <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {board.nextByTeam.map((g) => (
-              <div key={`team-${g.id}`} className="board-team">
+              <div key={`team-${g.league}-${g.id}`} className="board-team">
                 {/* A school plays three sports under one name, so its card says which is next. */}
                 <span className="board-team-name">
                   {g.league}

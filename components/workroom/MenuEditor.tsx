@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { additionError, priceError, type MenuAddition, type MenuId } from "@/lib/workroom/menu-def";
+import { additionErrors, priceError, type MenuAddition, type MenuId } from "@/lib/workroom/menu-def";
 import type { MenuEditorState } from "@/lib/content";
 
 /**
@@ -16,6 +16,11 @@ import type { MenuEditorState } from "@/lib/content";
  * under any section puts a blank row there, "Add a section" starts a new
  * one with its first row, and "Remove" takes an added row out again. None
  * of it reaches the site until Save, which sends the whole screen at once.
+ * Errors on an added row are keyed "<id>:<field>", the route's shape too,
+ * so the box that is wrong is the one that gets marked.
+ *
+ * The cocktails section is the one exception: the menu page swaps it for
+ * the bar's live Scooplist list, so it takes no additions here and says so.
  */
 
 type Draft = Record<string, { price: string; desc: string; hidden: boolean }>;
@@ -79,20 +84,21 @@ export default function MenuEditor() {
 
   function removeAdded(id: string) {
     setAdded((list) => list.filter((a) => a.id !== id));
-    setErrors((e) => {
-      const next = { ...e };
-      delete next[id];
-      return next;
-    });
+    setErrors((e) => Object.fromEntries(Object.entries(e).filter(([k]) => !k.startsWith(`${id}:`))));
     setSaved("");
   }
 
   /** A new section is just a first row with a section name the print does not have. */
   function addSection(menu: MenuId) {
-    const name = newSection[menu].replace(/\s+/g, " ").trim();
+    const name = newSection[menu].replace(/\s+/g, " ").trim().slice(0, 60);
     if (!name) return;
     // If she typed a section that already exists, join it rather than make a twin.
     const existing = sectionsOf(menu).find((s) => s.toLowerCase() === name.toLowerCase());
+    const printed = state?.menus.find((m) => m.id === menu)?.sections.find((s) => s.name === existing);
+    if (printed?.live) {
+      setFailed(`${printed.name} come from the Scooplist board, so add it there.`);
+      return;
+    }
     addItem(menu, existing ?? name);
     setNewSection((n) => ({ ...n, [menu]: "" }));
   }
@@ -115,8 +121,7 @@ export default function MenuEditor() {
       if (err) found[key] = err;
     }
     for (const a of added) {
-      const err = additionError(a);
-      if (err) found[a.id] = err;
+      for (const [field, msg] of Object.entries(additionErrors(a))) found[`${a.id}:${field}`] = msg;
     }
     setErrors(found);
     if (Object.keys(found).length > 0) {
@@ -239,33 +244,49 @@ export default function MenuEditor() {
                   })}
 
                   {mine.map((a) => {
-                    const err = errors[a.id];
-                    const nameId = `a-${a.id}`;
+                    const rowId = `a-${a.id}`;
+                    // Section and description complaints are rare and have no box of their
+                    // own worth marking; they read under the description.
+                    const nameErr = errors[`${a.id}:name`];
+                    const priceErr = errors[`${a.id}:price`];
+                    const otherErr = errors[`${a.id}:section`] ?? errors[`${a.id}:desc`];
                     return (
                       <div key={a.id} className="wr-menu-item wr-field">
                         <div>
                           <div className="wr-name">
-                            <label htmlFor={nameId} style={{ margin: 0 }} className="wr-visually-hidden">
+                            <label htmlFor={rowId} style={{ margin: 0 }} className="wr-visually-hidden">
                               Item name
                             </label>
                             <input
-                              id={nameId}
+                              id={rowId}
                               type="text"
                               style={{ flex: 1, minWidth: 160 }}
                               value={a.name}
                               placeholder="Name, as it should read on the menu"
                               onChange={(e) => updateAdded(a.id, { name: e.target.value })}
-                              aria-invalid={err ? true : undefined}
-                              aria-describedby={err ? `${nameId}-err` : undefined}
+                              aria-invalid={nameErr ? true : undefined}
+                              aria-describedby={nameErr ? `${rowId}-name-err` : undefined}
                             />
                             <span className="wr-chip wr-chip-on">Added</span>
                           </div>
+                          {nameErr && (
+                            <p className="wr-field-error" id={`${rowId}-name-err`} role="alert">
+                              {nameErr}
+                            </p>
+                          )}
                           <textarea
                             aria-label={`${a.name || "New item"} description`}
                             value={a.desc}
                             placeholder="Description, or leave it blank"
                             onChange={(e) => updateAdded(a.id, { desc: e.target.value })}
+                            aria-invalid={otherErr ? true : undefined}
+                            aria-describedby={otherErr ? `${rowId}-other-err` : undefined}
                           />
+                          {otherErr && (
+                            <p className="wr-field-error" id={`${rowId}-other-err`} role="alert">
+                              {otherErr}
+                            </p>
+                          )}
                           <button type="button" className="wr-link wr-link-danger" onClick={() => removeAdded(a.id)}>
                             Remove
                           </button>
@@ -274,18 +295,20 @@ export default function MenuEditor() {
                           <div className="wr-price">
                             <span aria-hidden="true">$</span>
                             <input
+                              id={`${rowId}-price`}
                               type="text"
                               inputMode="decimal"
                               aria-label={`${a.name || "New item"} price`}
                               value={a.price}
                               placeholder="none"
                               onChange={(e) => updateAdded(a.id, { price: e.target.value })}
-                              aria-invalid={err ? true : undefined}
+                              aria-invalid={priceErr ? true : undefined}
+                              aria-describedby={priceErr ? `${rowId}-price-err` : undefined}
                             />
                           </div>
-                          {err && (
-                            <p className="wr-field-error" id={`${nameId}-err`} role="alert">
-                              {err}
+                          {priceErr && (
+                            <p className="wr-field-error" id={`${rowId}-price-err`} role="alert">
+                              {priceErr}
                             </p>
                           )}
                         </div>
@@ -293,11 +316,18 @@ export default function MenuEditor() {
                     );
                   })}
 
-                  <div className="wr-save-row" style={{ marginTop: 12 }}>
-                    <button type="button" className="wr-btn wr-btn-ghost" onClick={() => addItem(m.id, sectionName)}>
-                      Add an item
-                    </button>
-                  </div>
+                  {printed?.live ? (
+                    <p className="wr-help" style={{ marginTop: 12 }}>
+                      The site shows the live list from the Scooplist board here, so new cocktails are added there
+                      (the Taps tab). These printed ones are what shows if the board is ever down.
+                    </p>
+                  ) : (
+                    <div className="wr-save-row" style={{ marginTop: 12 }}>
+                      <button type="button" className="wr-btn wr-btn-ghost" onClick={() => addItem(m.id, sectionName)}>
+                        Add an item
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

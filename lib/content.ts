@@ -148,8 +148,17 @@ export async function getMenuOverrides(): Promise<MenuOverrides> {
 export async function getMenuAdditions(): Promise<MenuAddition[]> {
   const stored = await getStore().getValue<unknown>(MENU_ADDITIONS_KEY);
   if (!Array.isArray(stored)) return [];
+  // Names the print already uses, per section, so an addition cannot shadow
+  // a printed item. The save route refuses the twin at write time; this is
+  // the read-time half, for the day lib/menu.ts catches up to the print and
+  // gains the very item she added in the meantime. Her copy yields.
+  const printed = new Set<string>();
+  for (const [menu, sections] of [["food", FOOD_MENU], ["brunch", BRUNCH_MENU]] as const) {
+    for (const s of sections) for (const i of s.items) printed.add(`${menu}|${s.name}|${i.name.toLowerCase()}`);
+  }
   const clean: MenuAddition[] = [];
   const ids = new Set<string>();
+  const names = new Set<string>();
   for (const raw of stored) {
     if (!raw || typeof raw !== "object") continue;
     const r = raw as Record<string, unknown>;
@@ -159,9 +168,14 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
     const section = r.section.trim().slice(0, 60);
     const name = r.name.trim().slice(0, 80);
     if (!section || !name) continue;
+    // The live section belongs to Scooplist (see getMenus); nothing added here could render.
+    if (r.menu === "food" && section === COCKTAILS.name) continue;
+    const nameKey = `${r.menu}|${section}|${name.toLowerCase()}`;
+    if (printed.has(nameKey) || names.has(nameKey)) continue;
     const price = typeof r.price === "string" && /^\d{1,3}\.\d{2}$/.test(r.price) ? r.price : "";
     const desc = typeof r.desc === "string" ? r.desc.slice(0, 400) : "";
     ids.add(r.id);
+    names.add(nameKey);
     clean.push({ id: r.id, menu: r.menu as MenuId, section, name, desc, price });
   }
   return clean;
@@ -227,8 +241,11 @@ export type MenuEditorItem = {
 };
 
 export type MenuEditorState = {
-  /** The printed menus, with the overrides laid on. */
-  menus: { id: MenuId; label: string; sections: { name: string; items: MenuEditorItem[] }[] }[];
+  /** The printed menus, with the overrides laid on. A `live` section is the
+      cocktails list, which the menu page swaps for Scooplist's rows: its
+      printed items can still be edited (they are the fallback when the feed
+      is down) but nothing can be added to it from here. */
+  menus: { id: MenuId; label: string; sections: { name: string; live: boolean; items: MenuEditorItem[] }[] }[];
   /** The club's own items, every menu together; the editor files them by menu and section. */
   additions: MenuAddition[];
   backend: "postgres" | "memory";
@@ -241,6 +258,7 @@ export async function menuEditorState(): Promise<MenuEditorState> {
     label,
     sections: sections.map((s) => ({
       name: s.name,
+      live: id === "food" && s.name === COCKTAILS.name,
       items: s.items.map((i) => {
         const key = menuItemKey(id, s.name, i.name);
         const o = overrides[key];
