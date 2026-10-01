@@ -4,7 +4,7 @@ import { BRUNCH_MENU, COCKTAILS, FOOD_MENU, type MenuSection } from "@/lib/menu"
 import { EVENTS, type CACEvent } from "@/lib/site";
 import { getStore } from "@/lib/workroom/store";
 import type { EventsContact, WorkroomEvent } from "@/lib/workroom/events-def";
-import { menuItemKey, type MenuId, type MenuOverrides } from "@/lib/workroom/menu-def";
+import { MENU_IDS, menuItemKey, type MenuAddition, type MenuId, type MenuOverrides } from "@/lib/workroom/menu-def";
 
 /**
  * The content seam: what the customer pages read instead of lib/site.ts and
@@ -26,6 +26,7 @@ const TZ = "America/Detroit";
 const EVENT_GRACE_MS = 4 * 60 * 60 * 1000;
 export const EVENTS_CONTACT_KEY = "events-contact";
 export const MENU_OVERRIDES_KEY = "menu-overrides";
+export const MENU_ADDITIONS_KEY = "menu-additions";
 
 /* ------------------------------ events ------------------------------ */
 
@@ -138,11 +139,46 @@ export async function getMenuOverrides(): Promise<MenuOverrides> {
   return clean;
 }
 
-function applyOverrides(menu: MenuId, sections: MenuSection[], overrides: MenuOverrides): MenuSection[] {
-  return sections
-    .map((s) => ({
-      ...s,
-      items: s.items
+/**
+ * The items the club added from the workroom, re-checked on read the same
+ * way the overrides are: a row this code cannot make sense of is dropped,
+ * never rendered half-right. Stored in insertion order, which is the order
+ * they show in their section.
+ */
+export async function getMenuAdditions(): Promise<MenuAddition[]> {
+  const stored = await getStore().getValue<unknown>(MENU_ADDITIONS_KEY);
+  if (!Array.isArray(stored)) return [];
+  const clean: MenuAddition[] = [];
+  const ids = new Set<string>();
+  for (const raw of stored) {
+    if (!raw || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    if (typeof r.id !== "string" || !/^add_[a-z0-9]+$/.test(r.id) || ids.has(r.id)) continue;
+    if (!MENU_IDS.includes(r.menu as MenuId)) continue;
+    if (typeof r.section !== "string" || typeof r.name !== "string") continue;
+    const section = r.section.trim().slice(0, 60);
+    const name = r.name.trim().slice(0, 80);
+    if (!section || !name) continue;
+    const price = typeof r.price === "string" && /^\d{1,3}\.\d{2}$/.test(r.price) ? r.price : "";
+    const desc = typeof r.desc === "string" ? r.desc.slice(0, 400) : "";
+    ids.add(r.id);
+    clean.push({ id: r.id, menu: r.menu as MenuId, section, name, desc, price });
+  }
+  return clean;
+}
+
+function applyEdits(
+  menu: MenuId,
+  sections: MenuSection[],
+  overrides: MenuOverrides,
+  additions: MenuAddition[]
+): MenuSection[] {
+  const mine = additions.filter((a) => a.menu === menu);
+  const asItem = (a: MenuAddition) => ({ name: a.name, desc: a.desc, price: a.price });
+  const out: MenuSection[] = sections.map((s) => ({
+    ...s,
+    items: [
+      ...s.items
         .map((i) => {
           const o = overrides[menuItemKey(menu, s.name, i.name)];
           if (!o) return i;
@@ -150,8 +186,19 @@ function applyOverrides(menu: MenuId, sections: MenuSection[], overrides: MenuOv
           return { ...i, price: o.price ?? i.price, desc: o.desc ?? i.desc };
         })
         .filter((i): i is MenuSection["items"][number] => i !== null),
-    }))
-    .filter((s) => s.items.length > 0);
+      // Added items join the end of their printed section.
+      ...mine.filter((a) => a.section === s.name).map(asItem),
+    ],
+  }));
+  // A section the print does not have comes after the printed ones, in the
+  // order the club first used its name.
+  const known = new Set(sections.map((s) => s.name));
+  for (const a of mine) {
+    if (known.has(a.section)) continue;
+    known.add(a.section);
+    out.push({ name: a.section, items: mine.filter((x) => x.section === a.section).map(asItem) });
+  }
+  return out.filter((s) => s.items.length > 0);
 }
 
 /**
@@ -160,10 +207,10 @@ function applyOverrides(menu: MenuId, sections: MenuSection[], overrides: MenuOv
  * list (it matches by name, since these are new objects).
  */
 export async function getMenus(): Promise<{ food: MenuSection[]; brunch: MenuSection[]; cocktailsName: string }> {
-  const overrides = await getMenuOverrides();
+  const [overrides, additions] = await Promise.all([getMenuOverrides(), getMenuAdditions()]);
   return {
-    food: applyOverrides("food", FOOD_MENU, overrides),
-    brunch: applyOverrides("brunch", BRUNCH_MENU, overrides),
+    food: applyEdits("food", FOOD_MENU, overrides, additions),
+    brunch: applyEdits("brunch", BRUNCH_MENU, overrides, additions),
     cocktailsName: COCKTAILS.name,
   };
 }
@@ -180,12 +227,15 @@ export type MenuEditorItem = {
 };
 
 export type MenuEditorState = {
+  /** The printed menus, with the overrides laid on. */
   menus: { id: MenuId; label: string; sections: { name: string; items: MenuEditorItem[] }[] }[];
+  /** The club's own items, every menu together; the editor files them by menu and section. */
+  additions: MenuAddition[];
   backend: "postgres" | "memory";
 };
 
 export async function menuEditorState(): Promise<MenuEditorState> {
-  const overrides = await getMenuOverrides();
+  const [overrides, additions] = await Promise.all([getMenuOverrides(), getMenuAdditions()]);
   const build = (id: MenuId, label: string, sections: MenuSection[]) => ({
     id,
     label,
@@ -209,6 +259,7 @@ export async function menuEditorState(): Promise<MenuEditorState> {
   });
   return {
     menus: [build("food", "Main menu", FOOD_MENU), build("brunch", "Sunday brunch", BRUNCH_MENU)],
+    additions,
     backend: getStore().backend,
   };
 }

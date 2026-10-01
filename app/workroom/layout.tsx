@@ -94,6 +94,7 @@ export default function WorkroomLayout({ children }: { children: React.ReactNode
         .wr-btn-ghost:hover { background: rgba(184,109,42,.15); }
         .wr-link { font: inherit; font-size: 14px; font-weight: 600; color: var(--color-copper-light); background: none; border: 0; cursor: pointer; padding: 9px 2px; text-decoration: underline; text-underline-offset: 3px; }
         .wr-link-danger { color: #e08a80; }
+        .wr-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         .wr-photo { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
         .wr-photo img { width: 120px; height: 150px; object-fit: cover; border-radius: 3px; background: var(--color-ink); }
 

@@ -320,10 +320,18 @@ runs their social media and events. Two screens behind one passcode:
   reports it under `workroom.tapsHandoff`. The same key signs the
   case-changed ping Scooplist sends to `app/api/scooplist/revalidate`
   (below), so one secret covers both directions.
-- **Menu.** A price, a description and an on/off switch per item, main menu
-  and Sunday brunch. Names and sections stay in `lib/menu.ts`, because the
-  printed menu is still the truth for shape. Clearing a price restores the
-  printed one.
+- **Menu.** A price, a description and an on/off switch per printed item,
+  main menu and Sunday brunch; clearing a price restores the printed one.
+  Printed names and sections stay in `lib/menu.ts`, because the print is
+  still the truth for what it has. Since 1 Oct 2026 (meeting note: the
+  brunch menu changes every month) she can also **add an item** under any
+  section, **start a new section** ("October Specials"), and **remove** what
+  she added when it is gone. Additions are their own rows in the store
+  (`menu-additions`, see `MenuAddition` in `lib/workroom/menu-def.ts`),
+  not overrides of a printed item, and they render after the printed items
+  of their section, a new section after the printed sections. Names must be
+  unique within a section, since the menu keys its rows by name. Removing
+  every edit still puts the menu back exactly as printed.
 
 It is a port of the anchor repo's workroom (the newest copy in the studio's
 workroom family): passcode gate with a hashed cookie and a five-misses lockout
