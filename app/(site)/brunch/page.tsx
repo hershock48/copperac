@@ -32,7 +32,12 @@ export default async function BrunchPage() {
 
       <Section>
         <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Button href={SITE.phoneHref}>Call for a Large Party</Button>
+          {/* Was "Call for a Large Party", a tel: link. Meeting note, Oct 2026:
+              the bar seats walk-ins off its Yelp waitlist, so the one action
+              here is getting in line, not a phone call. */}
+          <Button href={SITE.waitlistUrl} external>
+            Join the Waitlist
+          </Button>
           <Button href="/menu" variant="outline">
             Full Menu
           </Button>

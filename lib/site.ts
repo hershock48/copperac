@@ -58,6 +58,23 @@ export const SITE = {
   orderUrl: "https://order.toasttab.com/online/copper-pub",
   instagram: "https://www.instagram.com/copper_ac/",
   facebook: "https://www.facebook.com/TheCopperAC",
+  // Yelp, which is also where the bar runs its waitlist. The listing alias
+  // is the-copper-athletic-club-marshall (4.4 stars, 99 reviews when checked
+  // 1 Oct 2026). The waitlist is theirs already: the live site embeds Yelp's
+  // waitlist widget at the foot of the homepage, in Yelp's red (see the
+  // proposal), and the listing's search snippet reads "Waitlist opens at
+  // 11:00 am", the bar's opening hour. Meeting note, Oct 2026: "Call for a
+  // Large Party" goes and a link to this waitlist takes its place, so the
+  // brunch page, the homepage hero, the contact page's hours and the footer
+  // all read waitlistUrl. One constant, because the link will move the day
+  // the bar leaves Yelp Waitlist for something else.
+  //
+  // waitlistUrl is Yelp's public get-in-line page, /waitlist/{alias}. Yelp was
+  // unreachable from the build container when this was written, so the
+  // address follows Yelp's published pattern rather than a fetched page. Tap
+  // it once on a phone before launch; it is on the cutover list in the README.
+  yelp: "https://www.yelp.com/biz/the-copper-athletic-club-marshall",
+  waitlistUrl: "https://www.yelp.com/waitlist/the-copper-athletic-club-marshall",
   // Checked 2 Sep 2026: the old pin (42.2717, -84.9636) sat on the Brooks
   // Memorial Fountain roundabout, a block and a half west of the building.
   // This one is mid-block on the south side of the 100 block of W Michigan,

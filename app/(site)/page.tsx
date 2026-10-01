@@ -127,6 +127,18 @@ export default async function Home() {
               >
                 {SITE.phone}
               </a>
+              {/* The Yelp waitlist, as one text link in the brand's own type.
+                  The live site has it too, as Yelp's red widget at the very
+                  bottom of the page; here it sits where a guest deciding
+                  whether to come over is actually looking. */}
+              <a
+                href={SITE.waitlistUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-copper-light underline underline-offset-4 hover:text-copper"
+              >
+                Join the waitlist
+              </a>
             </div>
           </div>
         </div>
