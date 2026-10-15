@@ -13,8 +13,14 @@ export default async function Board() {
   const [board, news] = await Promise.all([getBoard(), getNews()]);
   if (!board.ok) return null; // every league failed, so say nothing rather than lie
 
+  // Weekday included on purpose. A prerendered page that nobody has visited
+  // for a while is served stale once while Vercel regenerates it, and on
+  // 15 Oct 2026 copperac.vercel.app came back with a ten-day-old board whose
+  // label read "as of 2:02 PM" as if it were today's. "Mon 2:02 PM" on a
+  // Thursday is honest about it.
   const asOf = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Detroit",
+    weekday: "short",
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(board.builtAt));
