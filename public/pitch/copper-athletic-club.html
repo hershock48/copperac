@@ -144,6 +144,10 @@ nav a:hover{color:var(--pink-d)}
 .step h4{font-family:var(--sans);font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:4px}
 .step>div{min-width:0}
 .step p{font-size:.95rem;margin:0;overflow-wrap:anywhere}
+.step .paybtn{display:inline-block;font-family:var(--sans);font-weight:800;font-size:.9rem;color:#fff;background:var(--pink);padding:10px 16px;border-radius:999px;text-decoration:none}
+.mail{position:relative;margin-top:12px}
+.mail pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:.9rem;line-height:1.55;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px 14px;margin:0}
+.mail .copy{position:absolute;top:10px;right:10px;font-family:var(--sans);font-weight:800;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--pink);border:0;border-radius:999px;padding:7px 12px;cursor:pointer}
 
 footer{background:var(--ink);color:#B9A894;padding:44px 0;font-size:.86rem;margin-top:20px}
 footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
@@ -221,7 +225,7 @@ footer .gmark{height:78px;width:auto}
       <a href="#next">Next</a>
       <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">The agreement</a>
     </nav>
-    <a class="hdemo" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Launch ↗</a>
+    <a class="hdemo paylink" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
   </div>
 </div></header>
 
@@ -468,37 +472,46 @@ footer .gmark{height:78px;width:auto}
   <div class="k">Part six</div>
   <div class="rule"></div>
   <h2>What happens next.</h2>
+  <p>Three things, and the site is live on copperac.com.</p>
 
   <div class="step">
     <div class="no">1</div>
-    <div><h4>Have a look at it</h4><p>The whole thing is standing up at <a href="/demo">copperac.glazedweb.com/demo</a>. Open it on a phone, at the bar, on a Sunday morning. Check the hours against the clock and the taps against the chalkboard.</p></div>
+    <div><h4>Pay and start</h4><p>One page, card or bank, about a minute: the $1,000 build fee today, and the $100 a month set up to begin the day the site goes live, not before. The plain-English agreement is at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a> and says the same things.</p>
+    <p style="margin-top:10px"><a class="paylink paybtn" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a></p></div>
   </div>
   <div class="step">
     <div class="no">2</div>
-    <div><h4>Tell us what is wrong</h4><p>A dish described wrong, a price that has moved, a photo that is not yours any more, a line that does not sound like you. That list is worth more to us than a compliment and it is cheaper to fix now.</p></div>
+    <div><h4>Send this to whoever handles copperac.com</h4><p>Copy it, paste it into an email, send it. Your email address does not change; only the website records do.</p>
+    <div class="mail"><button type="button" class="copy" data-copy="dns-note">Copy</button><pre id="dns-note">Subject: copperac.com: pointing the domain at our new website
+
+Hi,
+
+We have a new website for the Copper Athletic Club ready to go, built by Kevin at Glazed Web, and we need copperac.com pointed at it. Nothing about our email changes. Whichever is easiest on your side:
+
+1. Easiest: give Glazed Web access to the domain. On GoDaddy: Account Settings, Delegate Access, Invite kevin@glazedweb.com with "Products, Domains and DNS". The domain stays in our name.
+
+2. Or move the domain to Glazed Web's GoDaddy account (kevin@glazedweb.com). Kevin accepts it on his side.
+
+3. Or set the records yourself: email kevin@glazedweb.com and he will send the exact A and CNAME records (they point at Vercel).
+
+Please leave the email records (MX, SPF, DKIM, DMARC) exactly as they are. reserve@copperac.com must keep working. Only the website records change.
+
+Also: where is the domain registered, when does it renew, and is the current website hosting on a separate account we should cancel once the new site is live?
+
+Thanks,
+Copper Athletic Club
+(269) 558-8222</pre></div></div>
   </div>
   <div class="step">
     <div class="no">3</div>
-    <div><h4>Launch</h4><p>Everything from here lives on one page, yours: <a href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">glazedweb.com/build/copperac</a>. Where things stand, the short list of what only you can supply, what happens in what order, and where your stuff is. We keep it current as things land, so if a circle is still open there, we have not received it yet. No meeting to schedule and nothing to remember; the page remembers. Questions along the way are a text or an email, whenever suits.</p></div>
+    <div><h4>Pick the day</h4><p>Once the domain is in hand the switch takes about an hour, and the old site stays up until the new one answers. Have the next event in the workroom by then: text it to us, or add it yourself at copperac.com/workroom.</p></div>
   </div>
-  <div class="step">
-    <div class="no">4</div>
-    <div><h4>Accept the agreement</h4><p>It is already written and waiting at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a>: the plain-English terms every client gets, and an Exhibit A with your scope and your numbers. You type your name and both of us get the signed record by email. The build fee is paid on the same page by card, in full or half now and half at launch, or we invoice it; the monthly begins once the site is live on copperac.com, and not before.</p></div>
-  </div>
-
-  <h3>What we would need from you</h3>
-  <p>Seven things, none of them long, and every one is on your build page with
-  the reason it is needed, in the order they block other work. Your name and
-  the business’s registered name come first, because the agreement waits on
-  them and nothing else does. The list lives there and not here on purpose:
-  one copy, ticked as it arrives, so it can never say two different things.</p>
 
   <div class="demo">
     <div class="k">The one thing to do</div>
-    <h3>Everything from here is on one page.</h3>
-    <p>Where things stand, what we need from you, what happens in what order,
-    and where your stuff is.</p>
-    <a href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Launch ↗</a>
+    <h3>Pay and start.</h3>
+    <p>The build fee today, the monthly from launch day, and everything above follows.</p>
+    <a class="paylink" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
   </div>
 
   <p class="note" style="margin-top:22px">If the answer is no, that is a fine
@@ -617,6 +630,23 @@ setInterval(paint, 30000);
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
 })();
+</script>
+<script>
+/* PAY_LINK: the Stripe Payment Link that takes the $1,000 build fee and sets
+   up the $100 a month in one checkout. Paste it between the quotes and every
+   "Pay and start" on this page points at it. Empty, they fall back to the
+   project page in the markup, so the page never carries a dead button. */
+var PAY_LINK = "";
+if (PAY_LINK) document.querySelectorAll('a.paylink').forEach(function (a) { a.href = PAY_LINK; });
+document.querySelectorAll('.copy[data-copy]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var t = document.getElementById(b.dataset.copy).innerText;
+    navigator.clipboard.writeText(t).then(function () {
+      b.textContent = 'Copied';
+      setTimeout(function () { b.textContent = 'Copy'; }, 1800);
+    });
+  });
+});
 </script>
 </body>
 </html>
