@@ -69,7 +69,8 @@ Rebuilt 8 Sep 2026 on the original layout, Kevin's call after a True North-style
 refresh earlier the same day read as a different document: six parts (what it
 adds, what it fixes, why, side by side, what it costs, what happens next), the
 Griffin Claw claim cards, comparison tables, clock widget and pink step discs.
-The price part is new: the published menu price ($2,000 build, $150 a month)
+The price part is new: the published menu price ($1,000 build, $100 a month
+since 15 Oct 2026; $2,000 and $150 before that)
 in Griffin Claw's own price boxes, the build figure counting down from the
 published $3,900 market figure the way the anchor proposal's does (data-to is
 the real number in the markup), the ownership terms and the three questions.
