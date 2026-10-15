@@ -228,7 +228,7 @@ footer .gmark{height:78px;width:auto}
       <a href="#cost">Price</a>
       <a href="#next">Next</a>
     </nav>
-    <a class="hdemo paylink" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
+    <a class="hdemo paylink" href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
   </div>
 </div></header>
 
@@ -479,8 +479,8 @@ footer .gmark{height:78px;width:auto}
 
   <div class="step">
     <div class="no">1</div>
-    <div><h4>Pay and start</h4><p>One page, card or bank, about a minute: the $1,000 build fee today, and the $100 a month set up to begin the day the site goes live, not before. The plain-English agreement is at <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">glazedweb.com/agreement/copperac</a> and says the same things.</p>
-    <p style="margin-top:10px"><a class="paylink paybtn" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a></p></div>
+    <div><h4>Pay and start</h4><p>One page, about a minute: the plain-English agreement, your name typed at the bottom, and the $1,000 build fee by card. The $100 a month starts the day the site goes live, from the same page, not before.</p>
+    <p style="margin-top:10px"><a class="paylink paybtn" href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">Pay and start ↗</a></p></div>
   </div>
   <div class="step">
     <div class="no">2</div>
@@ -514,7 +514,7 @@ Copper Athletic Club
     <div class="k">The one thing to do</div>
     <h3>Pay and start.</h3>
     <p>The build fee today, the monthly from launch day, and everything above follows.</p>
-    <a class="paylink" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
+    <a class="paylink" href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
   </div>
 
   <p class="note" style="margin-top:22px">If the answer is no, that is a fine
@@ -635,10 +635,12 @@ setInterval(paint, 30000);
 })();
 </script>
 <script>
-/* PAY_LINK: the Stripe Payment Link that takes the $1,000 build fee and sets
-   up the $100 a month in one checkout. Paste it between the quotes and every
-   "Pay and start" on this page points at it. Empty, they fall back to the
-   project page in the markup, so the page never carries a dead button. */
+/* "Pay and start" lands on glazedweb.com/agreement/copperac (15 Oct 2026):
+   the studio's own agreement page, where he types his name and pays the
+   $1,000 by card on glazedweb's Stripe, and where the $100 a month is
+   started the day the site is live. Stripe is the record and the build page
+   reads it, which a loose payment link would not give. PAY_LINK is kept as
+   an override: paste a URL between the quotes and every button repoints. */
 var PAY_LINK = "";
 if (PAY_LINK) document.querySelectorAll('a.paylink').forEach(function (a) { a.href = PAY_LINK; });
 document.querySelectorAll('.copy[data-copy]').forEach(function (b) {
