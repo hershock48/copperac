@@ -63,9 +63,14 @@ export async function PUT(req: Request) {
   // The section the menu page swaps for Scooplist's live list; an addition
   // filed there would save and never render, so it is refused instead.
   const live = new Set<string>();
+  // Section names as they are spelled, by menu and lowercased name, so
+  // "october specials" joins "October Specials" instead of starting a twin.
+  // The editor already does this on its side; this is for any other client.
+  const spelled = new Map<string, string>();
   for (const m of state.menus) {
     for (const s of m.sections) {
       if (s.live) live.add(`${m.id}|${s.name}`);
+      spelled.set(`${m.id}|${s.name.toLowerCase()}`, s.name);
       taken.set(`${m.id}|${s.name}`, new Set(s.items.map((i) => i.name.toLowerCase())));
       for (const i of s.items) builtIn.set(i.key, { price: i.builtInPrice, desc: i.builtInDesc });
     }
@@ -129,6 +134,9 @@ export async function PUT(req: Request) {
         for (const [field, msg] of Object.entries(errs)) errors[`${clientId}:${field}`] = msg;
         continue;
       }
+      const spelledKey = `${a.menu}|${a.section.toLowerCase()}`;
+      a.section = spelled.get(spelledKey) ?? a.section;
+      spelled.set(spelledKey, a.section);
       const sectionKey = `${a.menu}|${a.section}`;
       if (live.has(sectionKey)) {
         errors[`${clientId}:section`] = `${a.section} come from the Scooplist board, so add it there.`;
