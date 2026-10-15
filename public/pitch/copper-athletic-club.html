@@ -71,8 +71,12 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 .brand .bw{font-family:var(--sans);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.6px;line-height:1.1}
 .brand .bw span{font-weight:350;color:var(--mute)}
 .brand span{font-size:.72rem;color:var(--mute);font-style:italic}
-nav{display:flex;gap:20px;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
-nav a{color:var(--mute);text-decoration:none}
+nav{display:flex;gap:16px;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+/* nowrap, and four anchors not five: "Pay and start" is wider than the
+   "Launch" pill it replaced (15 Oct 2026), and in the 760px column five
+   uppercase labels beside it broke onto two lines. The agreement is linked
+   from step one and the price part. */
+nav a{color:var(--mute);text-decoration:none;white-space:nowrap}
 nav a:hover{color:var(--pink-d)}
 /* The one action the header sells. Lives outside <nav> so the 720px rule
    that hides the section anchors cannot take it with them. Griffin Claw's
@@ -223,7 +227,6 @@ footer .gmark{height:78px;width:auto}
       <a href="#found">What it fixes</a>
       <a href="#cost">Price</a>
       <a href="#next">Next</a>
-      <a href="https://www.glazedweb.com/agreement/copperac" target="_blank" rel="noopener">The agreement</a>
     </nav>
     <a class="hdemo paylink" href="https://www.glazedweb.com/build/copperac" target="_blank" rel="noopener">Pay and start ↗</a>
   </div>
