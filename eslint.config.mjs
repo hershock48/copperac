@@ -12,4 +12,14 @@ export default defineConfig([
   globalIgnores([".next/**", "node_modules/**", "out/**", "next-env.d.ts", "*.config.mjs"]),
   ...nextVitals,
   ...nextTs,
+  {
+    // The route tests are CommonJS on purpose: they compile a TypeScript
+    // route in a vm sandbox with a hand-rolled require, and `module` is the
+    // sandbox's own. The two rules below are about app code, not that.
+    files: ["lib/__tests__/**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@next/next/no-assign-module-variable": "off",
+    },
+  },
 ]);

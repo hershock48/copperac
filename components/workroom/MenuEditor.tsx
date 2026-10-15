@@ -169,7 +169,7 @@ export default function MenuEditor() {
           Change a price or a description and the menu page shows it within a few seconds. Clear a price to go back
           to the printed one. Switch an item off to take it off the site without losing it. Add an item under any
           section, or start a new section, for what the printed menu does not have yet; remove it when it is gone.
-          The Reserve menu is priced per person; the "per person" stays with each printed item, and an item added
+          The Reserve menu is priced per person; the &quot;per person&quot; stays with each printed item, and an item added
           there reads as a flat price unless the description says otherwise.
         </p>
       </div>
