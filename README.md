@@ -374,6 +374,24 @@ or memory), so a dashboard change can be confirmed without signing in.
 
 ## Cutover day
 
+**Where it stands, 16 Oct 2026.** Kyle, who looked after the old site, says
+the domain is registered at GoDaddy and has started a "transfer to another
+GoDaddy account" into Kevin's account. The nameservers are GoDaddy's own
+(`ns47`/`ns48.domaincontrol.com`, read from Vercel's domain check), so the
+DNS zone lives at GoDaddy and moves with the domain; deleting the old
+hosting cannot touch it. The club's email is Google Workspace, set up by
+Brandon; Kyle has no access to it. The apex still points at the old host
+(151.101.194.159) and `www` is a CNAME to the apex. `copperac.com` and
+`www.copperac.com` (308 to the apex) are attached to the Vercel project as
+of today, so step 1 below is done. Kyle will delete the old site when told
+the new one is live and keeps no archive: ask him for a backup first.
+
+On the day, in GoDaddy's DNS for copperac.com, with the nameservers left
+at GoDaddy: point the `@` A record at Vercel (`216.150.1.1`, and a second A
+record `216.150.16.1`, the values Vercel recommends) and the `www` CNAME at
+`cname.vercel-dns.com`. Touch nothing else; the MX, SPF, DKIM, DMARC and
+Google verification records stay exactly as they are.
+
 A fine-tooth pass on 2 Sep 2026 (three independent reviews plus the glaze
 audit, width, motion and perf checks, all clean) left the code ready and one
 operational blocker: **the production domains are not attached to the Vercel
