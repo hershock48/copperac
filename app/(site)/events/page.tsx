@@ -111,6 +111,11 @@ export default async function EventsPage() {
               <Button href={SITE.instagram} external>
                 Follow on Instagram
               </Button>
+              {/* The workroom's contact shows here too: an empty calendar is
+                  exactly when someone wants to ask about booking one. */}
+              <Button href={askHref} variant="outline">
+                {askLabel}
+              </Button>
               <Button href="/reserve" variant="outline">
                 Host your own
               </Button>

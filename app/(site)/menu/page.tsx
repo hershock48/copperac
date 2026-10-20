@@ -44,9 +44,18 @@ export default async function MenuPage() {
   // then yields to the live Scooplist list (matched by name: these are new
   // objects, not the COCKTAILS constant).
   const menus = await getMenus();
-  const sections: MenuSection[] = menus.food.map((s) =>
-    s.name === menus.cocktailsName ? { name: s.name, items: drinks.cocktails } : s,
-  );
+  // When the board is down, the printed cocktails WITH the workroom's edits
+  // are the fallback, not the raw constant (which is what lib/taplist.ts
+  // falls back to and what this page used to show, so a repriced cocktail
+  // never rendered anywhere; review, 20 Oct 2026).
+  const sections: MenuSection[] = menus.food
+    .map((s) =>
+      s.name === menus.cocktailsName && drinks.live.cocktails ? { name: s.name, items: drinks.cocktails } : s,
+    )
+    // getMenus keeps the cocktails section even when every printed item is
+    // off, so the swap above has somewhere to land; an empty one is dropped
+    // here rather than printed as a bare heading.
+    .filter((s) => s.items.length > 0);
 
   /*
     Built from the RESOLVED sections, inside the component, so the

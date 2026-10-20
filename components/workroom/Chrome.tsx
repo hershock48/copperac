@@ -18,7 +18,9 @@ const TABS = [
 
 export default function WorkroomChrome() {
   const path = usePathname() || "/workroom";
-  const isActive = (href: string) => path === href || path.startsWith(href + "/");
+  // Exact for the root tab: /workroom is a prefix of every workroom path, so
+  // the prefix test lit Events on the Menu screen too (review, 20 Oct 2026).
+  const isActive = (href: string) => (href === "/workroom" ? path === href : path === href || path.startsWith(href + "/"));
 
   async function lock() {
     await fetch("/api/workroom/logout", { method: "POST" });

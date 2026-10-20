@@ -60,19 +60,44 @@ export type EventErrors = Partial<Record<keyof EventDraft, string>>;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME = /^\d{2}:\d{2}$/;
 
+/**
+ * A real wall-clock time, 00:00 to 23:59. The shape test alone let "99:99"
+ * through (any client that is not <input type="time">), and lib/content.ts
+ * then built an invalid Date from it and threw while rendering the
+ * homepage and /events for every visitor (review, 20 Oct 2026).
+ */
+export function validTime(t: string): boolean {
+  if (!TIME.test(t)) return false;
+  const [h, m] = t.split(":").map(Number);
+  return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
+/**
+ * A real calendar date. Date.parse rolls "2026-02-31" forward to March 3
+ * instead of rejecting it, so the parts are checked against what the Date
+ * reads back.
+ */
+export function validDate(d: string): boolean {
+  if (!DATE.test(d)) return false;
+  const [y, mo, day] = d.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, mo - 1, day, 12));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === day;
+}
+
 export function eventErrors(e: EventDraft): EventErrors {
   const errors: EventErrors = {};
   const title = e.title.trim();
   if (title.length < 2) errors.title = "Give it a name.";
   else if (title.length > 80) errors.title = "Keep the name under 80 characters.";
 
-  if (!DATE.test(e.date) || Number.isNaN(Date.parse(`${e.date}T12:00:00Z`))) {
-    errors.date = "Pick the date.";
-  }
-  if (!TIME.test(e.startTime)) errors.startTime = "Pick a start time.";
-  if (e.endTime && !TIME.test(e.endTime)) errors.endTime = "That end time does not look right.";
-  if (e.endTime && TIME.test(e.startTime) && e.endTime <= e.startTime) {
-    errors.endTime = "The end has to come after the start.";
+  if (!validDate(e.date)) errors.date = "Pick the date.";
+  if (!validTime(e.startTime)) errors.startTime = "Pick a start time.";
+  if (e.endTime && !validTime(e.endTime)) errors.endTime = "That end time does not look right.";
+  // An end earlier than the start means after midnight (a watch party from
+  // 9 to 1), which the site prints as "9:00 PM – 1:00 AM". Only the same
+  // minute is refused, since that is a typo and not a late night.
+  if (e.endTime && validTime(e.startTime) && e.endTime === e.startTime) {
+    errors.endTime = "The end is the same as the start.";
   }
   if (e.price.length > 60) errors.price = "Keep the price line short.";
   if (e.ticketUrl.trim()) {

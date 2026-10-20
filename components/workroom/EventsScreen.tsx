@@ -89,9 +89,12 @@ export default function EventsScreen() {
     setFailed("");
   }
 
+  // A functional update, because pickPhoto calls this after an await: with
+  // the render-time snapshot, a photo finishing its upload overwrote the
+  // title typed in the meantime, and could reopen an editor she had
+  // cancelled (review, 20 Oct 2026). Cancelled stays cancelled.
   function set<K extends keyof EventDraft>(key: K, value: EventDraft[K]) {
-    if (!editing) return;
-    setEditing({ ...editing, draft: { ...editing.draft, [key]: value } });
+    setEditing((cur) => (cur ? { ...cur, draft: { ...cur.draft, [key]: value } } : cur));
     setNote("");
   }
 

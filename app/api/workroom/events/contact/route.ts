@@ -9,6 +9,8 @@ import { contactErrors, type EventsContact } from "@/lib/workroom/events-def";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// The events route's rule: control characters out, everything else kept.
+// Newlines are stripped too since no contact field is multi-line.
 const CONTROL = /[\x00-\x1f\x7f]/g;
 
 export async function PUT(req: Request) {
