@@ -65,7 +65,7 @@ const CARDS = [
     photo: "reserve-wide.webp",
     kicker: KICKER,
     lines: ["The Copper Reserve"],
-    sub: "Seats 72 · Its own bartender · Four TVs · $50 an hour",
+    sub: "Seats 75 · Its own bartender · Four TVs · $50 an hour",
   },
 ];
 
