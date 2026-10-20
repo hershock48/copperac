@@ -220,7 +220,17 @@ function applyEdits(
   additions: MenuAddition[]
 ): MenuSection[] {
   const mine = additions.filter((a) => a.menu === menu);
-  const asItem = (a: MenuAddition) => ({ name: a.name, desc: a.desc, price: a.price, unit: a.unit || undefined });
+  // The Reserve menu's own rule, printed on it: everything is per person
+  // unless the unit says otherwise. So an added Reserve item with an empty
+  // unit reads "per person" too, and "each" is how a flat price is said.
+  // Abbie's dessert nachos were saved before the unit field existed and
+  // read "$6" until this (20 Oct 2026); nothing in the workroom was needed.
+  const asItem = (a: MenuAddition) => ({
+    name: a.name,
+    desc: a.desc,
+    price: a.price,
+    unit: a.unit || (menu === "reserve" ? "per person" : undefined),
+  });
   const out: MenuSection[] = sections.map((s) => ({
     ...s,
     items: [
