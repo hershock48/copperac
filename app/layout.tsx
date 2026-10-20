@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Oswald } from "next/font/google";
+import localFont from "next/font/local";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -7,17 +7,32 @@ import "./globals.css";
  * The root: fonts, body, sitewide metadata. No chrome. The customer pages
  * get theirs from app/(site)/layout.tsx and the workroom gets its own from
  * app/workroom/layout.tsx, so neither inherits the other's header.
+ *
+ * THE FONTS ARE IN THE REPO, not fetched from Google at build time. Until
+ * 20 Oct 2026 they came through next/font/google, which downloads the
+ * files during `next build`; that day a Vercel production build with no
+ * cache failed on exactly that download, surfacing as fifteen Turbopack
+ * "Module not found: @vercel/turbopack-next/internal/font/google/font"
+ * errors, on a commit that had built green an hour earlier with the
+ * cache warm. The same commit built fine here on Node 22 and Node 24 with
+ * a cold cache and Google reachable, so the failure was the fetch, not
+ * the code. A build that can fail on a third party's availability is a
+ * launch-day risk, so the two latin files (the same woff2 Google serves:
+ * Oswald variable 200 to 700, Inter variable 100 to 900, both under the
+ * SIL Open Font License) live in app/fonts/ and next/font/local serves
+ * them the same way, same CSS variables, nothing else on the site changed.
  */
 
-const oswald = Oswald({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const oswald = localFont({
+  src: "./fonts/oswald-latin.woff2",
+  weight: "200 700",
   variable: "--font-oswald",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "./fonts/inter-latin.woff2",
+  weight: "100 900",
   variable: "--font-inter",
   display: "swap",
 });
