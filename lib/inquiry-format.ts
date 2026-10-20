@@ -78,14 +78,24 @@ export function inquiryHtml(opts: {
     )
     .join("");
   const reply = escapeHtml(opts.replyTo.email);
+  // The href gets the URL-significant characters percent-encoded as well:
+  // the address regex upstream admits "me?bcc=x@evil.example", which as a
+  // bare mailto: would open the club's composer with a Bcc nobody chose.
+  const href = escapeHtml(
+    opts.replyTo.email.replace(/[?#&%]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
+  );
+  const pad = "padding:18px 22px;";
+  // Tables, not divs, for the card itself: Outlook's desktop engine ignores
+  // max-width and padding on a div and would run the card edge to edge.
   return (
-    `<!doctype html><html><body style="margin:0;padding:24px;background:#f6f3ee;font-family:Helvetica,Arial,sans-serif;color:#1d1a16;">` +
-    `<div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e6e2da;border-radius:6px;overflow:hidden;">` +
-    `<div style="padding:18px 22px;background:#1d1a16;color:#f6f3ee;font-size:20px;font-weight:700;">${escapeHtml(opts.heading)}</div>` +
-    `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">${rows}</table>` +
-    `<div style="padding:16px 22px;font-size:15px;line-height:1.5;color:#5a5248;">` +
-    `Reply to this email to answer ${escapeHtml(opts.replyTo.name)} at <a href="mailto:${reply}" style="color:#b86d2a;">${reply}</a>.<br>` +
-    `Sent from <a href="${escapeHtml(opts.sourceUrl)}" style="color:#b86d2a;">${escapeHtml(opts.sourceUrl)}</a></div>` +
-    `</div></body></html>`
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>` +
+    `<body style="margin:0;padding:24px;background:#f6f3ee;font-family:Helvetica,Arial,sans-serif;color:#1d1a16;">` +
+    `<table role="presentation" align="center" width="640" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:640px;margin:0 auto;border-collapse:separate;background:#ffffff;border:1px solid #e6e2da;border-radius:6px;">` +
+    `<tr><td style="${pad}background:#1d1a16;color:#f6f3ee;font-size:20px;font-weight:700;border-radius:6px 6px 0 0;">${escapeHtml(opts.heading)}</td></tr>` +
+    `<tr><td style="padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">${rows}</table></td></tr>` +
+    `<tr><td style="padding:16px 22px;font-size:15px;line-height:1.5;color:#5a5248;">` +
+    `Reply to this email to answer ${escapeHtml(opts.replyTo.name)} at <a href="mailto:${href}" style="color:#b86d2a;">${reply}</a>.<br>` +
+    `Sent from <a href="${escapeHtml(opts.sourceUrl)}" style="color:#b86d2a;">${escapeHtml(opts.sourceUrl)}</a></td></tr>` +
+    `</table></body></html>`
   );
 }
