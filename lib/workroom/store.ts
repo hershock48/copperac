@@ -40,6 +40,9 @@ export type Collection<T extends Row> = {
   remove(id: string): Promise<void>;
   /** Newest first. */
   list(limit?: number): Promise<T[]>;
+  /** Ids and timestamps only, newest first: a sweep over photos must not
+      pull every photo's bytes into the lambda to learn which are unused. */
+  meta(limit?: number): Promise<Row[]>;
 };
 
 export type Store = {
@@ -83,6 +86,9 @@ function memoryCollection<T extends Row>(table: string): Collection<T> {
     },
     async list(limit = 1000) {
       return [...rows().values()].sort((a, b) => b.createdAt - a.createdAt).slice(0, limit);
+    },
+    async meta(limit = 1000) {
+      return (await this.list(limit)).map(({ id, createdAt }) => ({ id, createdAt }));
     },
   };
 }
@@ -153,29 +159,32 @@ async function pgPool(): Promise<PgPool> {
   */
   if (!g.__copperWorkroomReady) {
     g.__copperWorkroomReady = (async () => {
-      const { Pool } = await import("pg");
-      const cs = connectionString();
-      const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
-      const pool = new Pool({
-        connectionString: cs,
-        ssl: local ? undefined : { rejectUnauthorized: false },
-        max: 3,
-      }) as unknown as PgPool;
-      const creates = JSON_TABLES.map(
-        (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
-      ).join("\n");
+      // The whole body is inside the try: a throw from the import or the
+      // constructor would otherwise leave a rejected promise cached for the
+      // life of the process (second review, 20 Oct 2026).
+      let pool: PgPool | undefined;
       try {
+        const { Pool } = await import("pg");
+        const cs = connectionString();
+        const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
+        pool = new Pool({
+          connectionString: cs,
+          ssl: local ? undefined : { rejectUnauthorized: false },
+          max: 3,
+        }) as unknown as PgPool;
+        const creates = JSON_TABLES.map(
+          (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
+        ).join("\n");
         await pool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`);
+        return pool;
       } catch (err: unknown) {
         const code = (err as { code?: string } | null)?.code;
         // Two workers racing the same CREATE: the table exists, which is what we wanted.
-        if (code !== "23505" && code !== "42P07") {
-          g.__copperWorkroomReady = undefined;
-          if (pool.end) await pool.end().catch(() => {});
-          throw err;
-        }
+        if (pool && (code === "23505" || code === "42P07")) return pool;
+        g.__copperWorkroomReady = undefined;
+        if (pool?.end) await pool.end().catch(() => {});
+        throw err;
       }
-      return pool;
     })();
   }
   return g.__copperWorkroomReady;
@@ -206,6 +215,15 @@ function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Colle
         [limit]
       );
       return rows.map((r) => r.data as T);
+    },
+    async meta(limit = 1000) {
+      const pool = await pgPool();
+      // pg hands int8 back as a string, hence the Number().
+      const { rows } = await pool.query(
+        `SELECT key, (data->>'createdAt')::bigint AS created FROM ${table} ORDER BY created DESC NULLS LAST LIMIT $1`,
+        [limit]
+      );
+      return rows.map((r) => ({ id: String(r.key), createdAt: Number(r.created) }));
     },
   };
 }

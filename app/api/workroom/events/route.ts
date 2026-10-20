@@ -29,17 +29,29 @@ function clean(v: unknown, max: number): string {
 /**
  * Photos are stored the moment they are picked, before the event is saved,
  * so a photo picked twice, or picked and then cancelled, is a row nobody
- * points at. Every save and delete sweeps those, leaving anything under an
- * hour old alone so an upload in another tab is not pulled out from under
- * its editor (review, 20 Oct 2026).
+ * points at. Every save and delete sweeps those, leaving anything under a
+ * day old alone so an editor left open over a long evening is not pulled
+ * out from under its planner (review, 20 Oct 2026).
+ *
+ * Housekeeping never fails the request: the event has been written by the
+ * time DELETE sweeps, and a thrown sweep would tell the planner it had not
+ * saved, and a retry would save it twice (second review, same day). PUT
+ * sweeps BEFORE it checks the photo exists, so a photo this request would
+ * have swept is reported as missing instead of saved as a dangling id.
  */
-async function sweepOrphanPhotos() {
-  const store = getStore();
-  const [events, images] = await Promise.all([store.events.list(), store.images.list()]);
-  const used = new Set(events.map((e) => e.imageId).filter(Boolean));
-  const cutoff = Date.now() - 60 * 60 * 1000;
-  for (const img of images) {
-    if (!used.has(img.id) && img.createdAt < cutoff) await store.images.remove(img.id);
+const PHOTO_GRACE_MS = 24 * 60 * 60 * 1000;
+
+async function sweepOrphanPhotos(): Promise<void> {
+  try {
+    const store = getStore();
+    const [events, images] = await Promise.all([store.events.list(), store.images.meta()]);
+    const used = new Set(events.map((e) => e.imageId).filter(Boolean));
+    const cutoff = Date.now() - PHOTO_GRACE_MS;
+    for (const img of images) {
+      if (!used.has(img.id) && img.createdAt < cutoff) await store.images.remove(img.id);
+    }
+  } catch (err) {
+    console.error("[events] photo sweep failed", err);
   }
 }
 
@@ -80,6 +92,7 @@ export async function PUT(req: Request) {
   }
 
   const store = getStore();
+  await sweepOrphanPhotos();
   if (draft.imageId && !(await store.images.get(draft.imageId))) {
     return NextResponse.json({ error: "That photo did not finish uploading. Add it again." }, { status: 400 });
   }
@@ -98,7 +111,6 @@ export async function PUT(req: Request) {
   await store.events.put(event);
   // A photo swapped out is a photo nobody reads any more.
   if (existing?.imageId && existing.imageId !== event.imageId) await store.images.remove(existing.imageId);
-  await sweepOrphanPhotos();
 
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true, event, ...(await listing()) });
