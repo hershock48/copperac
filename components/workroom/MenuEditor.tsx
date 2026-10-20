@@ -179,8 +179,9 @@ export default function MenuEditor() {
           Change a price or a description and the menu page shows it within a few seconds. Clear a price to go back
           to the printed one. Switch an item off to take it off the site without losing it. Add an item under any
           section, or start a new section, for what the printed menu does not have yet; remove it when it is gone.
-          Each added item has a &quot;per&quot; box next to its price for &quot;per person&quot;, &quot;per dozen&quot; and the like;
-          on the Reserve menu it starts as &quot;per person&quot;. Leave it empty for a flat price.
+          Each added item has a &quot;per&quot; box next to its price for &quot;per person&quot;, &quot;per dozen&quot; and the like.
+          On the Reserve menu everything is per person unless the box says otherwise, the same rule as the printed
+          menu, so an empty box there still reads &quot;per person&quot;; type &quot;each&quot; for a flat price.
         </p>
       </div>
 
@@ -331,7 +332,7 @@ export default function MenuEditor() {
                             style={{ marginTop: 8 }}
                             aria-label={`${a.name || "New item"} priced per`}
                             value={a.unit}
-                            placeholder="per…"
+                            placeholder={a.menu === "reserve" ? "per person" : "per…"}
                             onChange={(e) => updateAdded(a.id, { unit: e.target.value })}
                             aria-invalid={unitErr ? true : undefined}
                             aria-describedby={unitErr ? `${rowId}-unit-err` : undefined}
