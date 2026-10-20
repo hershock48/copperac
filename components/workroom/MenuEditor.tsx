@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { additionErrors, priceError, type MenuAddition, type MenuId } from "@/lib/workroom/menu-def";
+import { additionErrors, priceError, UNIT_SUGGESTIONS, type MenuAddition, type MenuId } from "@/lib/workroom/menu-def";
 import type { MenuEditorState } from "@/lib/content";
 
 /**
@@ -79,7 +79,12 @@ export default function MenuEditor() {
   }
 
   function addItem(menu: MenuId, section: string) {
-    setAdded((list) => [...list, { id: tmpId(), menu, section, name: "", desc: "", price: "" }]);
+    // The Reserve is priced per person, so a new item there starts that way;
+    // she clears the box for a flat price.
+    setAdded((list) => [
+      ...list,
+      { id: tmpId(), menu, section, name: "", desc: "", price: "", unit: menu === "reserve" ? "per person" : "" },
+    ]);
     setSaved("");
   }
 
@@ -163,14 +168,19 @@ export default function MenuEditor() {
 
   return (
     <>
+      <datalist id="wr-units">
+        {UNIT_SUGGESTIONS.map((u) => (
+          <option key={u} value={u} />
+        ))}
+      </datalist>
       <div className="wr-head">
         <h1>Menu</h1>
         <p className="wr-muted">
           Change a price or a description and the menu page shows it within a few seconds. Clear a price to go back
           to the printed one. Switch an item off to take it off the site without losing it. Add an item under any
           section, or start a new section, for what the printed menu does not have yet; remove it when it is gone.
-          The Reserve menu is priced per person; the &quot;per person&quot; stays with each printed item, and an item added
-          there reads as a flat price unless the description says otherwise.
+          Each added item has a &quot;per&quot; box next to its price for &quot;per person&quot;, &quot;per dozen&quot; and the like;
+          on the Reserve menu it starts as &quot;per person&quot;. Leave it empty for a flat price.
         </p>
       </div>
 
@@ -252,6 +262,7 @@ export default function MenuEditor() {
                     // own worth marking; they read under the description.
                     const nameErr = errors[`${a.id}:name`];
                     const priceErr = errors[`${a.id}:price`];
+                    const unitErr = errors[`${a.id}:unit`];
                     const otherErr = errors[`${a.id}:section`] ?? errors[`${a.id}:desc`];
                     return (
                       <div key={a.id} className="wr-menu-item wr-field">
@@ -312,6 +323,22 @@ export default function MenuEditor() {
                           {priceErr && (
                             <p className="wr-field-error" id={`${rowId}-price-err`} role="alert">
                               {priceErr}
+                            </p>
+                          )}
+                          <input
+                            type="text"
+                            list="wr-units"
+                            style={{ marginTop: 8 }}
+                            aria-label={`${a.name || "New item"} priced per`}
+                            value={a.unit}
+                            placeholder="per…"
+                            onChange={(e) => updateAdded(a.id, { unit: e.target.value })}
+                            aria-invalid={unitErr ? true : undefined}
+                            aria-describedby={unitErr ? `${rowId}-unit-err` : undefined}
+                          />
+                          {unitErr && (
+                            <p className="wr-field-error" id={`${rowId}-unit-err`} role="alert">
+                              {unitErr}
                             </p>
                           )}
                         </div>

@@ -128,6 +128,7 @@ export async function PUT(req: Request) {
         name: typeof r.name === "string" ? r.name.replace(/\s+/g, " ").trim() : "",
         desc: typeof r.desc === "string" ? r.desc.replace(/[\r\n]+/g, " ").trim() : "",
         price: typeof r.price === "string" ? r.price.replace(/^\$/, "").trim() : "",
+        unit: typeof r.unit === "string" ? r.unit.replace(/\s+/g, " ").trim() : "",
       };
       const errs = additionErrors(a);
       if (Object.keys(errs).length > 0) {

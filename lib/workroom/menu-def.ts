@@ -56,9 +56,20 @@ export type MenuAddition = {
   desc: string;
   /** "12.00" style, or "" for no price (a market-price special) */
   price: string;
+  /**
+   * What the price is per: "per person", "per dozen", "each", or "" for a
+   * flat price. Shown after the price the way the printed Reserve items
+   * show theirs. Abbie, 20 Oct 2026, adding dessert nachos to the Reserve:
+   * "how do I add the per person thing instead of it just saying six
+   * dollars". Before this field, she could not.
+   */
+  unit: string;
 };
 
-export type AdditionErrors = Partial<Record<"section" | "name" | "desc" | "price", string>>;
+/** Offered as suggestions under the box; anything else she types is kept. */
+export const UNIT_SUGGESTIONS = ["per person", "per dozen", "per tray", "each"] as const;
+
+export type AdditionErrors = Partial<Record<"section" | "name" | "desc" | "price" | "unit", string>>;
 
 export function additionErrors(a: MenuAddition): AdditionErrors {
   const errors: AdditionErrors = {};
@@ -71,6 +82,7 @@ export function additionErrors(a: MenuAddition): AdditionErrors {
   if (a.desc.length > 400) errors.desc = "Keep the description under 400 characters.";
   const price = priceError(a.price.replace(/^\$/, ""));
   if (price) errors.price = price;
+  if (a.unit.length > 30) errors.unit = "Keep the \"per\" note short, like \"per person\".";
   return errors;
 }
 
