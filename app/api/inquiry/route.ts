@@ -83,9 +83,16 @@ export async function POST(request: Request) {
 
   // Trim, and strip control characters (including CR/LF) so nothing a guest
   // types can smuggle a line break into the email subject built from these.
+  // The message keeps its newlines: it is the one multi-line field, it never
+  // reaches the subject, and a guest's paragraphs ("food on one line, the
+  // room on the next") used to arrive as one run of text (second review,
+  // 20 Oct 2026).
   const get = (k: string) =>
     typeof fields[k] === "string"
-      ? (fields[k] as string).replace(/[\u0000-\u001f\u007f]/g, " ").trim()
+      ? (fields[k] as string)
+          .replace(/\r\n?/g, "\n")
+          .replace(k === "message" ? /[\u0000-\u0009\u000b-\u001f\u007f]/g : /[\u0000-\u001f\u007f]/g, " ")
+          .trim()
       : "";
 
   const oversized = Object.keys(LABELS).find(
