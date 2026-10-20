@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { SITE } from "@/lib/site";
+import { formatEventDate, formatEventTime, inquiryHtml } from "@/lib/inquiry-format";
 
 /**
  * Reserve and contact enquiries.
@@ -116,17 +117,29 @@ export async function POST(request: Request) {
   }
 
   const variant = get("variant") === "reserve" ? "reserve" : "contact";
+  // Dates and times are spelled out everywhere the club reads them (subject,
+  // text, table); the form's own YYYY-MM-DD and HH:MM never reach the inbox.
+  const shown = (k: string) =>
+    k === "date" ? formatEventDate(get(k)) : k === "start" || k === "end" ? formatEventTime(get(k)) : get(k);
   const subject =
     variant === "reserve"
-      ? `Copper Reserve enquiry: ${get("eventType") || "private event"}${get("date") ? ` on ${get("date")}` : ""}`
+      ? `Copper Reserve enquiry: ${get("eventType") || "private event"}${get("date") ? ` on ${shown("date")}` : ""}`
       : `Website enquiry: ${get("subject") || "general"}`;
+  const source = `${SITE.url}${variant === "reserve" ? "/reserve" : "/contact"}`;
 
-  const lines = Object.entries(LABELS)
+  const rows = Object.entries(LABELS)
     .filter(([k]) => get(k))
-    .map(([k, label]) => `${label}: ${get(k)}`);
-  lines.push("", `Sent from ${SITE.url}${variant === "reserve" ? "/reserve" : "/contact"}`);
+    .map(([k, label]) => ({ label, value: shown(k) }));
+  const lines = rows.map((r) => `${r.label}: ${r.value}`);
+  lines.push("", `Sent from ${source}`);
 
   const text = lines.join("\n");
+  const html = inquiryHtml({
+    heading: variant === "reserve" ? "Copper Reserve enquiry" : "Website enquiry",
+    rows,
+    replyTo: { name: `${get("first")} ${get("last")}`.trim(), email: get("email") },
+    sourceUrl: source,
+  });
 
   /*
    * One enquiry, one email. A double-click, a back-then-resubmit, a second
@@ -162,6 +175,7 @@ export async function POST(request: Request) {
         reply_to: get("email"),
         subject,
         text,
+        html,
       }),
     });
     if (!res.ok) {
