@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   blankEvent,
   contactErrors,
@@ -26,7 +26,10 @@ import { resizeToJpegDataUrl } from "./resize";
  */
 
 type Listing = { events: WorkroomEvent[]; contact: EventsContact; backend: "postgres" | "memory" };
-type Editing = { id: string | null; draft: EventDraft };
+// `opened` tells one editor from the next: two new events share id null,
+// and a photo that finishes uploading after Cancel must not land on
+// whichever editor is open by then.
+type Editing = { id: string | null; opened: number; draft: EventDraft };
 
 function todayDetroit(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Detroit" }).format(new Date());
@@ -49,6 +52,7 @@ export default function EventsScreen() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loadError, setLoadError] = useState("");
   const [editing, setEditing] = useState<Editing | null>(null);
+  const openedSeq = useRef(0);
   const [errors, setErrors] = useState<EventErrors>({});
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
@@ -73,7 +77,7 @@ export default function EventsScreen() {
   }, []);
 
   function startNew() {
-    setEditing({ id: null, draft: blankEvent() });
+    setEditing({ id: null, opened: ++openedSeq.current, draft: blankEvent() });
     setErrors({});
     setNote("");
     setFailed("");
@@ -83,7 +87,7 @@ export default function EventsScreen() {
     const { id, createdAt, updatedAt, ...draft } = e;
     void createdAt;
     void updatedAt;
-    setEditing({ id, draft });
+    setEditing({ id, opened: ++openedSeq.current, draft });
     setErrors({});
     setNote("");
     setFailed("");
@@ -158,6 +162,7 @@ export default function EventsScreen() {
 
   async function pickPhoto(file: File | undefined) {
     if (!file || !editing) return;
+    const target = editing.opened;
     setUploading(true);
     setFailed("");
     try {
@@ -168,8 +173,11 @@ export default function EventsScreen() {
         body: JSON.stringify({ dataUrl }),
       });
       const data = (await res.json().catch(() => ({}))) as { id?: string; error?: string };
-      if (res.ok && data.id) set("imageId", data.id);
-      else setFailed(data.error || "That photo did not upload.");
+      if (res.ok && data.id) {
+        const id = data.id;
+        setEditing((cur) => (cur && cur.opened === target ? { ...cur, draft: { ...cur.draft, imageId: id } } : cur));
+        setNote("");
+      } else setFailed(data.error || "That photo did not upload.");
     } catch {
       setFailed("That photo could not be read. Try a JPEG or PNG.");
     }
