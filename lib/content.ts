@@ -204,9 +204,11 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
     if (printed.has(nameKey) || names.has(nameKey)) continue;
     const price = typeof r.price === "string" && /^\d{1,3}\.\d{2}$/.test(r.price) ? r.price : "";
     const desc = typeof r.desc === "string" ? r.desc.slice(0, 400) : "";
+    // Rows saved before the field existed have no unit: a flat price.
+    const unit = typeof r.unit === "string" ? r.unit.trim().slice(0, 30) : "";
     ids.add(r.id);
     names.add(nameKey);
-    clean.push({ id: r.id, menu: r.menu as MenuId, section, name, desc, price });
+    clean.push({ id: r.id, menu: r.menu as MenuId, section, name, desc, price, unit });
   }
   return clean;
 }
@@ -218,7 +220,7 @@ function applyEdits(
   additions: MenuAddition[]
 ): MenuSection[] {
   const mine = additions.filter((a) => a.menu === menu);
-  const asItem = (a: MenuAddition) => ({ name: a.name, desc: a.desc, price: a.price });
+  const asItem = (a: MenuAddition) => ({ name: a.name, desc: a.desc, price: a.price, unit: a.unit || undefined });
   const out: MenuSection[] = sections.map((s) => ({
     ...s,
     items: [
