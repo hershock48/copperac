@@ -72,7 +72,9 @@ export function inquiryHtml(opts: {
     .map(
       (r) =>
         `<tr><th align="left" style="${cell}font-weight:700;color:#5a5248;white-space:nowrap;width:140px;">${escapeHtml(r.label)}</th>` +
-        `<td style="${cell}color:#1d1a16;">${escapeHtml(r.value).replace(/\n/g, "<br>")}</td></tr>`
+        // overflow-wrap: a long email address or URL in a value must wrap on a
+        // phone instead of pushing the card wider than the screen.
+        `<td style="${cell}color:#1d1a16;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(r.value).replace(/\n/g, "<br>")}</td></tr>`
     )
     .join("");
   const reply = escapeHtml(opts.replyTo.email);
