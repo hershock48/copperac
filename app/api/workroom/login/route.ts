@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   if (!logins.allowed(key)) {
     return NextResponse.json(
       { error: "Too many tries. Wait a few minutes." },
-      { status: 429, headers: { "Retry-After": String(logins.retryAfterSec()) } }
+      { status: 429, headers: { "Retry-After": String(logins.retryAfterSec(key)) } }
     );
   }
 

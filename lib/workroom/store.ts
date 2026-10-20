@@ -133,51 +133,52 @@ type PgPool = {
 const JSON_TABLES = ["workroom_content", "workroom_events", "workroom_images"] as const;
 
 async function pgPool(): Promise<PgPool> {
-  const g = globalThis as typeof globalThis & {
-    __copperWorkroomPool?: PgPool;
-    __copperWorkroomReady?: Promise<unknown>;
-  };
-  if (!g.__copperWorkroomPool) {
-    const { Pool } = await import("pg");
-    const cs = connectionString();
-    const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
-    g.__copperWorkroomPool = new Pool({
-      connectionString: cs,
-      ssl: local ? undefined : { rejectUnauthorized: false },
-      max: 3,
-    }) as unknown as PgPool;
-    /*
-      The init takes an advisory lock because the customer pages read this
-      store at BUILD time and Next prerenders with several workers at once;
-      CREATE TABLE IF NOT EXISTS is not atomic against a concurrent creator
-      (anchor's first facts deploy died exactly there). A failed init is
-      never cached: pool and promise are dropped so the next request retries,
-      and the failed pool is closed on the way out (see the catch below).
-    */
-    const creates = JSON_TABLES.map(
-      (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
-    ).join("\n");
-    g.__copperWorkroomReady = g.__copperWorkroomPool
-      .query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`)
-      .catch(async (err: unknown) => {
+  const g = globalThis as typeof globalThis & { __copperWorkroomReady?: Promise<PgPool> };
+  /*
+    ONE promise, set before the first await. The earlier shape awaited the
+    import of pg and only then assigned the global, so two callers arriving
+    together on a cold start (getMenus runs the overrides and the additions
+    reads side by side) each built a Pool and ran the schema init, the
+    second overwrote the first, and a failure in either could clear the
+    global under the other (review, 20 Oct 2026). Now the second caller
+    finds the promise and waits on it.
+
+    The init takes an advisory lock because the customer pages read this
+    store at BUILD time and Next prerenders with several workers at once;
+    CREATE TABLE IF NOT EXISTS is not atomic against a concurrent creator
+    (anchor's first facts deploy died exactly there). A failed init is
+    never cached: the promise is dropped so the next request retries, and
+    the failed pool is closed on the way out rather than left holding its
+    sockets (Neon counts connections; from the closed intake-trace branch).
+  */
+  if (!g.__copperWorkroomReady) {
+    g.__copperWorkroomReady = (async () => {
+      const { Pool } = await import("pg");
+      const cs = connectionString();
+      const local = /localhost|127\.0\.0\.1|\[::1\]/.test(cs ?? "") || cs?.includes("sslmode=disable");
+      const pool = new Pool({
+        connectionString: cs,
+        ssl: local ? undefined : { rejectUnauthorized: false },
+        max: 3,
+      }) as unknown as PgPool;
+      const creates = JSON_TABLES.map(
+        (t) => `CREATE TABLE IF NOT EXISTS ${t} (key text PRIMARY KEY, data jsonb NOT NULL);`
+      ).join("\n");
+      try {
+        await pool.query(`SELECT pg_advisory_xact_lock(4213702);\n${creates}`);
+      } catch (err: unknown) {
         const code = (err as { code?: string } | null)?.code;
-        if (code === "23505" || code === "42P07") return;
-        // Dropping the reference alone leaks the sockets the pool already
-        // opened. Neon counts connections, and a database refusing the schema
-        // statement is usually refusing everything, so each retry would add
-        // another `max: 3` set until the deployment could not connect at
-        // all. Close it, then let the next request build a fresh one. end()
-        // failing is not interesting here; the original error is what the
-        // caller needs. (From the closed intake-trace branch, #7.)
-        const failed = g.__copperWorkroomPool;
-        g.__copperWorkroomPool = undefined;
-        g.__copperWorkroomReady = undefined;
-        if (failed?.end) await failed.end().catch(() => {});
-        throw err;
-      });
+        // Two workers racing the same CREATE: the table exists, which is what we wanted.
+        if (code !== "23505" && code !== "42P07") {
+          g.__copperWorkroomReady = undefined;
+          if (pool.end) await pool.end().catch(() => {});
+          throw err;
+        }
+      }
+      return pool;
+    })();
   }
-  await g.__copperWorkroomReady;
-  return g.__copperWorkroomPool!;
+  return g.__copperWorkroomReady;
 }
 
 function pgCollection<T extends Row>(table: (typeof JSON_TABLES)[number]): Collection<T> {

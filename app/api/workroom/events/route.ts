@@ -26,6 +26,23 @@ function clean(v: unknown, max: number): string {
   return typeof v === "string" ? v.replace(CONTROL, "").replace(/\r\n?/g, "\n").slice(0, max) : "";
 }
 
+/**
+ * Photos are stored the moment they are picked, before the event is saved,
+ * so a photo picked twice, or picked and then cancelled, is a row nobody
+ * points at. Every save and delete sweeps those, leaving anything under an
+ * hour old alone so an upload in another tab is not pulled out from under
+ * its editor (review, 20 Oct 2026).
+ */
+async function sweepOrphanPhotos() {
+  const store = getStore();
+  const [events, images] = await Promise.all([store.events.list(), store.images.list()]);
+  const used = new Set(events.map((e) => e.imageId).filter(Boolean));
+  const cutoff = Date.now() - 60 * 60 * 1000;
+  for (const img of images) {
+    if (!used.has(img.id) && img.createdAt < cutoff) await store.images.remove(img.id);
+  }
+}
+
 async function listing() {
   const store = getStore();
   const events = (await store.events.list()).sort((a, b) =>
@@ -81,6 +98,7 @@ export async function PUT(req: Request) {
   await store.events.put(event);
   // A photo swapped out is a photo nobody reads any more.
   if (existing?.imageId && existing.imageId !== event.imageId) await store.images.remove(existing.imageId);
+  await sweepOrphanPhotos();
 
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true, event, ...(await listing()) });
@@ -97,6 +115,7 @@ export async function DELETE(req: Request) {
     await store.events.remove(id);
     if (existing.imageId) await store.images.remove(existing.imageId);
   }
+  await sweepOrphanPhotos();
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true, ...(await listing()) });
 }

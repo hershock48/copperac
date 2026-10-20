@@ -28,6 +28,18 @@ export const EVENTS_CONTACT_KEY = "events-contact";
 export const MENU_OVERRIDES_KEY = "menu-overrides";
 export const MENU_ADDITIONS_KEY = "menu-additions";
 
+/**
+ * The one section the menu page swaps for Scooplist's live list: the
+ * printed cocktails on the main menu. Its printed items are the fallback
+ * when the board is down, so they can be edited; nothing can be added to
+ * it from the workroom, and it is never dropped from the menu even when
+ * every printed item is switched off, because the page finds it by name
+ * to put the live rows in.
+ */
+export function isLiveSection(menu: MenuId, section: string): boolean {
+  return menu === "food" && section === COCKTAILS.name;
+}
+
 /** Every printed menu the workroom can lay edits over, by id. */
 const PRINTED_MENUS = [
   ["food", FOOD_MENU],
@@ -99,10 +111,21 @@ export function toSiteEvent(e: WorkroomEvent): CACEvent {
 }
 
 /** Every event the site could show: the workroom's published rows plus the
-    checked-in seed, seed rows yielding to a workroom row of the same slug. */
+    checked-in seed, seed rows yielding to a workroom row of the same slug.
+    A stored row the formatter cannot read (a time or date no client of
+    this build should have saved) is skipped, never thrown: one bad row
+    must not take the homepage and /events down for every visitor. */
 async function allSiteEvents(): Promise<CACEvent[]> {
   const stored = await getStore().events.list();
-  const fromWorkroom = stored.filter((e) => e.published).map(toSiteEvent);
+  const fromWorkroom: CACEvent[] = [];
+  for (const e of stored) {
+    if (!e.published) continue;
+    try {
+      fromWorkroom.push(toSiteEvent(e));
+    } catch (err) {
+      console.error(`[content] skipping event ${e.id}: ${e.date} ${e.startTime} does not format`, err);
+    }
+  }
   const taken = new Set(fromWorkroom.map((e) => e.slug));
   return [...fromWorkroom, ...EVENTS.filter((e) => !taken.has(e.slug))];
 }
@@ -175,8 +198,8 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
     const section = r.section.trim().slice(0, 60);
     const name = r.name.trim().slice(0, 80);
     if (!section || !name) continue;
-    // The live section belongs to Scooplist (see getMenus); nothing added here could render.
-    if (r.menu === "food" && section === COCKTAILS.name) continue;
+    // The live section belongs to Scooplist (see isLiveSection); nothing added here could render.
+    if (isLiveSection(r.menu as MenuId, section)) continue;
     const nameKey = `${r.menu}|${section}|${name.toLowerCase()}`;
     if (printed.has(nameKey) || names.has(nameKey)) continue;
     const price = typeof r.price === "string" && /^\d{1,3}\.\d{2}$/.test(r.price) ? r.price : "";
@@ -219,7 +242,7 @@ function applyEdits(
     known.add(a.section);
     out.push({ name: a.section, items: mine.filter((x) => x.section === a.section).map(asItem) });
   }
-  return out.filter((s) => s.items.length > 0);
+  return out.filter((s) => s.items.length > 0 || isLiveSection(menu, s.name));
 }
 
 /**
@@ -272,7 +295,7 @@ export async function menuEditorState(): Promise<MenuEditorState> {
     label,
     sections: sections.map((s) => ({
       name: s.name,
-      live: id === "food" && s.name === COCKTAILS.name,
+      live: isLiveSection(id, s.name),
       items: s.items.map((i) => {
         const key = menuItemKey(id, s.name, i.name);
         const o = overrides[key];
