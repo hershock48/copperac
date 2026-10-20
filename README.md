@@ -374,7 +374,18 @@ or memory), so a dashboard change can be confirmed without signing in.
 
 ## Cutover day
 
-**Where it stands, 16 Oct 2026.** Kyle, who looked after the old site, says
+**Live, night of 19 Oct 2026.** Kevin changed the GoDaddy records himself
+(the `@` A record to `216.150.1.1` plus a second A `216.150.16.1`, the `www`
+CNAME to `cname.vercel-dns.com`; MX and everything else untouched). Within
+minutes Vercel read both domains back as configured, the certificate for
+`copperac.com` and `www.copperac.com` was issued (auto-renewing, to April
+2027), and `https://copperac.com/` answered 200 from the production
+deployment with `Strict-Transport-Security` set, no `X-Robots-Tag`, and a
+self canonical. Steps 1 to 6 below are done; 7 to 9 are Kevin's, and so is
+telling Kyle (after asking for a backup of the old site). The paragraph
+below is kept as the record of how it got here.
+
+**Where it stood, 16 Oct 2026.** Kyle, who looked after the old site, says
 the domain is registered at GoDaddy and has started a "transfer to another
 GoDaddy account" into Kevin's account. The nameservers are GoDaddy's own
 (`ns47`/`ns48.domaincontrol.com`, read from Vercel's domain check), so the
