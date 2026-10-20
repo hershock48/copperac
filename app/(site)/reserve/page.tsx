@@ -94,11 +94,12 @@ export default async function ReservePage() {
             Marshall&rsquo;s premier private bar and rental space, upstairs from the Copper
             Athletic Club. No setup, no cleanup. Just show up.
           </p>
+          {/* No phone number anywhere on this page (Kevin, 20 Oct 2026): the
+              bar's line rings the front of the house, who would only point the
+              caller at this form. Every Reserve enquiry goes to the events
+              manager through it. */}
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <Button href="#inquire">Check Your Date</Button>
-            <Button href={SITE.phoneHref} variant="outline">
-              Call {SITE.phone}
-            </Button>
           </div>
         </div>
       </section>
@@ -196,14 +197,9 @@ export default async function ReservePage() {
             <Heading className="mt-5">Check your date</Heading>
             <p className="mt-7 text-base leading-relaxed text-cream-dim">
               Send us the details and our events manager will confirm availability within
-              one business day. Working on a tight timeline? Call and we will check the
-              calendar while you are on the phone.
+              one business day. The form is the way in: it goes straight to the person
+              who keeps the Reserve calendar.
             </p>
-            <div className="mt-9">
-              <Button href={SITE.phoneHref} variant="outline">
-                Call {SITE.phone}
-              </Button>
-            </div>
             <div className="mt-12 rounded-sm border border-ink-line p-6">
               <h3 className="display text-xs uppercase tracking-[0.2em] text-copper-light">
                 Accessibility

@@ -86,7 +86,9 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
       // rather than pretending the message went through.
       window.location.href = composeEmail(data);
       setError(
-        "We could not send that from the page, so your email app should be opening with the details filled in. If it did not, call us and we will take it down over the phone."
+        variant === "reserve"
+          ? `We could not send that from the page, so your email app should be opening with the details filled in. If it did not, email ${SITE.email} and our events manager will take it from there.`
+          : "We could not send that from the page, so your email app should be opening with the details filled in. If it did not, call us and we will take it down over the phone."
       );
     } catch {
       window.location.href = composeEmail(data);
@@ -107,17 +109,22 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
         <p className="display text-2xl uppercase tracking-wide text-copper">
           Thanks, we got it
         </p>
+        {/* The Reserve never offers the phone: the bar's line is answered by
+            the front of the house, who would only point the caller back at
+            this form (Kevin, 20 Oct 2026). The contact form keeps it. */}
         <p className="mt-4 text-base leading-relaxed text-cream-dim">
           {variant === "reserve"
-            ? "Our events manager will get back to you within one business day. If your date is close, call us and we will sort it out right now."
+            ? "Our events manager will get back to you within one business day, and will reply to the email address you gave us."
             : "We will get back to you within one business day. For anything time-sensitive, give us a call."}
         </p>
-        <a
-          href={SITE.phoneHref}
-          className="display mt-7 inline-block rounded-sm border border-copper px-6 py-3 text-sm uppercase tracking-widest text-copper-light transition-colors hover:bg-copper hover:text-ink"
-        >
-          Call {SITE.phone}
-        </a>
+        {variant !== "reserve" && (
+          <a
+            href={SITE.phoneHref}
+            className="display mt-7 inline-block rounded-sm border border-copper px-6 py-3 text-sm uppercase tracking-widest text-copper-light transition-colors hover:bg-copper hover:text-ink"
+          >
+            Call {SITE.phone}
+          </a>
+        )}
       </div>
     );
   }
@@ -184,10 +191,16 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
       )}
 
       <p className="text-xs text-cream-dim/70">
-        We reply within one business day. Prefer to talk it through?{" "}
-        <a href={SITE.phoneHref} className="text-copper-light underline underline-offset-4">
-          {SITE.phone}
-        </a>
+        {variant === "reserve" ? (
+          "Our events manager replies within one business day."
+        ) : (
+          <>
+            We reply within one business day. Prefer to talk it through?{" "}
+            <a href={SITE.phoneHref} className="text-copper-light underline underline-offset-4">
+              {SITE.phone}
+            </a>
+          </>
+        )}
       </p>
     </form>
   );

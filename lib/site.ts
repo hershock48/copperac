@@ -88,7 +88,8 @@ export const SITE = {
 // homepage card, the Reserve page and its metadata, the events page, the
 // enquiry form's guest field). Six copies before this constant existed.
 export const RESERVE = {
-  seats: 72,
+  // 75 per Kevin, 20 Oct 2026 (was 72 from the old site's copy).
+  seats: 75,
   hourlyRate: 50,
   halfHourRate: 25,
 } as const;
