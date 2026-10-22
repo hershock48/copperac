@@ -10,7 +10,7 @@
     "test": "for f in lib/__tests__/*.mjs lib/__tests__/*.cjs; do node \"$f\" || exit 1; done"
   },
   "dependencies": {
-    "next": "^16.3.4",
+    "next": "^16.4.2",
     "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -23,7 +23,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.3.4",
+    "eslint-config-next": "^16.4.2",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3"
   }
