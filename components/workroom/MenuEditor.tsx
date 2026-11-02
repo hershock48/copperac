@@ -1,8 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { additionErrors, priceError, UNIT_SUGGESTIONS, type MenuAddition, type MenuId } from "@/lib/workroom/menu-def";
-import type { MenuEditorState } from "@/lib/content";
+import {
+  additionErrors,
+  orderIds,
+  priceError,
+  sectionKey,
+  UNIT_SUGGESTIONS,
+  type MenuAddition,
+  type MenuId,
+  type MenuOrder,
+} from "@/lib/workroom/menu-def";
+import type { MenuEditorItem, MenuEditorState } from "@/lib/content";
 
 /**
  * The menu, editable, for the main menu, Sunday brunch and the Reserve's
@@ -22,7 +31,17 @@ import type { MenuEditorState } from "@/lib/content";
  *
  * The cocktails section is the one exception: the menu page swaps it for
  * the bar's live Scooplist list, so it takes no additions here and says so.
+ *
+ * Every row, printed or hers, has Up, Down and Top (2 Nov 2026: a new
+ * brunch item landed at the bottom of Brunch Entrees and the only way to
+ * get it to the top was to delete everything above it). The order is a
+ * list of row ids per section, sent with the rest on Save; a new row joins
+ * the end until it is moved.
  */
+
+type Row =
+  | { kind: "printed"; id: string; label: string; item: MenuEditorItem }
+  | { kind: "added"; id: string; label: string; a: MenuAddition };
 
 type Draft = Record<string, { price: string; desc: string; hidden: boolean }>;
 
@@ -37,6 +56,7 @@ export default function MenuEditor() {
   const [state, setState] = useState<MenuEditorState | null>(null);
   const [draft, setDraft] = useState<Draft>({});
   const [added, setAdded] = useState<MenuAddition[]>([]);
+  const [order, setOrder] = useState<MenuOrder>({});
   const [newSection, setNewSection] = useState<Record<MenuId, string>>({ food: "", brunch: "", reserve: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState("");
@@ -50,6 +70,17 @@ export default function MenuEditor() {
     setState(s);
     setDraft(d);
     setAdded(s.additions);
+    setOrder(s.order ?? {});
+  }
+
+  /** Move a row within its section. `ids` is the section as it is laid out now. */
+  function move(key: string, ids: string[], from: number, to: number) {
+    if (to < 0 || to >= ids.length || to === from) return;
+    const next = [...ids];
+    const [id] = next.splice(from, 1);
+    next.splice(to, 0, id);
+    setOrder((o) => ({ ...o, [key]: next }));
+    setSaved("");
   }
 
   useEffect(() => {
@@ -139,7 +170,7 @@ export default function MenuEditor() {
       const res = await fetch("/api/workroom/menu", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: draft, additions: added }),
+        body: JSON.stringify({ items: draft, additions: added, order }),
       });
       const data = (await res.json().catch(() => ({}))) as Partial<MenuEditorState> & { error?: string; errors?: Record<string, string> };
       if (res.ok && data.menus) {
@@ -179,6 +210,7 @@ export default function MenuEditor() {
           Change a price or a description and the menu page shows it within a few seconds. Clear a price to go back
           to the printed one. Switch an item off to take it off the site without losing it. Add an item under any
           section, or start a new section, for what the printed menu does not have yet; remove it when it is gone.
+          Use Up, Down and Top on any item to change where it sits in its section; the site follows on Save.
           Each added item has a &quot;per&quot; box next to its price for &quot;per person&quot;, &quot;per dozen&quot; and the like.
           On the Reserve menu everything is per person unless the box says otherwise, the same rule as the printed
           menu, so an empty box there still reads &quot;per person&quot;; type &quot;each&quot; for a flat price.
@@ -201,63 +233,85 @@ export default function MenuEditor() {
             {sectionsOf(m.id).map((sectionName) => {
               const printed = m.sections.find((s) => s.name === sectionName);
               const mine = added.filter((a) => a.menu === m.id && a.section === sectionName);
+              const key = sectionKey(m.id, sectionName);
+              const byId = new Map<string, Row>();
+              for (const item of printed?.items ?? []) byId.set(item.key, { kind: "printed", id: item.key, label: item.name, item });
+              for (const a of mine) byId.set(a.id, { kind: "added", id: a.id, label: a.name || "New item", a });
+              const ids = orderIds([...byId.keys()], order[key]);
+              const rows = ids.map((id) => byId.get(id)!);
+              const moveControls = (idx: number, label: string) =>
+                rows.length > 1 ? (
+                  <div className="wr-move" role="group" aria-label={`Move ${label}`}>
+                    <button type="button" className="wr-link" onClick={() => move(key, ids, idx, idx - 1)} disabled={idx === 0} aria-label={`Move ${label} up`}>
+                      ↑ Up
+                    </button>
+                    <button type="button" className="wr-link" onClick={() => move(key, ids, idx, idx + 1)} disabled={idx === rows.length - 1} aria-label={`Move ${label} down`}>
+                      ↓ Down
+                    </button>
+                    <button type="button" className="wr-link" onClick={() => move(key, ids, idx, 0)} disabled={idx === 0} aria-label={`Move ${label} to the top`}>
+                      ⤒ Top
+                    </button>
+                  </div>
+                ) : null;
               return (
                 <div key={sectionName} className="wr-panel">
                   <h3 className="wr-h2" style={{ marginTop: 0 }}>
                     {sectionName}
                     {!printed && <span className="wr-chip wr-chip-on" style={{ marginLeft: 10 }}>Added</span>}
                   </h3>
-                  {printed?.items.map((i) => {
-                    const v = draft[i.key];
-                    if (!v) return null;
-                    const err = errors[i.key];
-                    const priceId = `p-${i.key.replace(/[^a-z0-9]+/gi, "-")}`;
-                    const changed = v.price !== i.builtInPrice || v.desc !== i.builtInDesc || v.hidden;
-                    return (
-                      <div key={i.key} className={`wr-menu-item wr-field${v.hidden ? " wr-hidden" : ""}`}>
-                        <div>
-                          <div className="wr-name">
-                            <label htmlFor={priceId} style={{ margin: 0 }}>
-                              {i.name}
-                            </label>
-                            {(i.edited || changed) && <span className="wr-chip wr-chip-on">Edited</span>}
-                          </div>
-                          <textarea
-                            aria-label={`${i.name} description`}
-                            value={v.desc}
-                            placeholder={i.builtInDesc || "No description on the printed menu"}
-                            onChange={(e) => update(i.key, { desc: e.target.value })}
-                          />
-                          <label className="wr-check">
-                            <input type="checkbox" checked={v.hidden} onChange={(e) => update(i.key, { hidden: e.target.checked })} />
-                            Off the site
-                          </label>
-                        </div>
-                        <div>
-                          <div className="wr-price">
-                            <span aria-hidden="true">$</span>
-                            <input
-                              id={priceId}
-                              type="text"
-                              inputMode="decimal"
-                              value={v.price}
-                              placeholder={i.builtInPrice || "none"}
-                              onChange={(e) => update(i.key, { price: e.target.value })}
-                              aria-invalid={err ? true : undefined}
-                              aria-describedby={err ? `${priceId}-err` : undefined}
+                  {rows.map((row, idx) => {
+                    if (row.kind === "printed") {
+                      const i = row.item;
+                      const v = draft[i.key];
+                      if (!v) return null;
+                      const err = errors[i.key];
+                      const priceId = `p-${i.key.replace(/[^a-z0-9]+/gi, "-")}`;
+                      const changed = v.price !== i.builtInPrice || v.desc !== i.builtInDesc || v.hidden;
+                      return (
+                        <div key={i.key} className={`wr-menu-item wr-field${v.hidden ? " wr-hidden" : ""}`}>
+                          <div>
+                            <div className="wr-name">
+                              <label htmlFor={priceId} style={{ margin: 0 }}>
+                                {i.name}
+                              </label>
+                              {(i.edited || changed) && <span className="wr-chip wr-chip-on">Edited</span>}
+                            </div>
+                            <textarea
+                              aria-label={`${i.name} description`}
+                              value={v.desc}
+                              placeholder={i.builtInDesc || "No description on the printed menu"}
+                              onChange={(e) => update(i.key, { desc: e.target.value })}
                             />
+                            <label className="wr-check">
+                              <input type="checkbox" checked={v.hidden} onChange={(e) => update(i.key, { hidden: e.target.checked })} />
+                              Off the site
+                            </label>
+                            {moveControls(idx, row.label)}
                           </div>
-                          {err && (
-                            <p className="wr-field-error" id={`${priceId}-err`} role="alert">
-                              {err}
-                            </p>
-                          )}
+                          <div>
+                            <div className="wr-price">
+                              <span aria-hidden="true">$</span>
+                              <input
+                                id={priceId}
+                                type="text"
+                                inputMode="decimal"
+                                value={v.price}
+                                placeholder={i.builtInPrice || "none"}
+                                onChange={(e) => update(i.key, { price: e.target.value })}
+                                aria-invalid={err ? true : undefined}
+                                aria-describedby={err ? `${priceId}-err` : undefined}
+                              />
+                            </div>
+                            {err && (
+                              <p className="wr-field-error" id={`${priceId}-err`} role="alert">
+                                {err}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-
-                  {mine.map((a) => {
+                      );
+                    }
+                    const a = row.a;
                     const rowId = `a-${a.id}`;
                     // Section and description complaints are rare and have no box of their
                     // own worth marking; they read under the description.
@@ -305,6 +359,7 @@ export default function MenuEditor() {
                           <button type="button" className="wr-link wr-link-danger" onClick={() => removeAdded(a.id)}>
                             Remove
                           </button>
+                          {moveControls(idx, row.label)}
                         </div>
                         <div>
                           <div className="wr-price">

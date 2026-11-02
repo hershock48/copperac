@@ -2,14 +2,23 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isWorkroomAuthed } from "@/lib/workroom/auth";
 import { getStore, newId } from "@/lib/workroom/store";
-import { MENU_ADDITIONS_KEY, MENU_OVERRIDES_KEY, getMenuOverrides, menuEditorState } from "@/lib/content";
+import {
+  MENU_ADDITIONS_KEY,
+  MENU_ORDER_KEY,
+  MENU_OVERRIDES_KEY,
+  getMenuAdditions,
+  getMenuOverrides,
+  menuEditorState,
+} from "@/lib/content";
 import {
   MENU_IDS,
   additionErrors,
+  sectionKey,
   normalizePrice,
   priceError,
   type MenuAddition,
   type MenuId,
+  type MenuOrder,
   type MenuOverrides,
 } from "@/lib/workroom/menu-def";
 
@@ -28,6 +37,11 @@ import {
  *               stored. A row missing from the list is a row she removed.
  *               Absent from the body altogether (an older tab still open),
  *               the stored additions stay as they are.
+ *
+ *   order       the row order per section, as lists of row ids. New rows
+ *               arrive under their tmp_ ids and are translated to the ids
+ *               minted here; ids that name no row in that section are
+ *               dropped. Absent (an older tab), the stored order stays.
  *
  * Errors come back keyed by row: a printed item by its key, an added row by
  * "<its id>:<field>" (section, name, desc or price), so the editor can mark
@@ -51,7 +65,11 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   if (!(await isWorkroomAuthed())) return locked();
-  const body = (await req.json().catch(() => null)) as { items?: Record<string, unknown>; additions?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as {
+    items?: Record<string, unknown>;
+    additions?: unknown;
+    order?: unknown;
+  } | null;
   if (!body?.items || typeof body.items !== "object") return NextResponse.json({ error: "Malformed." }, { status: 400 });
 
   // Only keys this build's menu knows are even looked at.
@@ -106,6 +124,9 @@ export async function PUT(req: Request) {
   // anything else, is minted fresh, since the read side drops a second row
   // with a known id and that would lose an item without a word.
   let additions: MenuAddition[] | null = null;
+  // The id each row arrived under, to the id it is stored under, so the
+  // order the editor sent (written against tmp_ ids) still names the rows.
+  const idMap = new Map<string, string>();
   if (Array.isArray(body.additions)) {
     additions = [];
     if (body.additions.length > MAX_ADDITIONS) {
@@ -151,6 +172,7 @@ export async function PUT(req: Request) {
       names.add(a.name.toLowerCase());
       taken.set(sectionKey, names);
       ids.add(a.id);
+      idMap.set(clientId, a.id);
       additions.push({ ...a, price: a.price === "" ? "" : normalizePrice(a.price) });
     }
   }
@@ -159,23 +181,53 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Check the marked rows.", errors }, { status: 400 });
   }
 
-  // Two rows, one Save. There is no transaction across setValue, so if the
-  // second write fails the first is put back the way it was, best effort,
-  // and the answer is "nothing saved" rather than a half-saved menu behind
-  // an error message. revalidatePath runs only once both are in.
+  // The order, cleaned against the rows that will exist once this saves.
+  let order: MenuOrder | null = null;
+  if (body.order && typeof body.order === "object" && !Array.isArray(body.order)) {
+    const rowsOf = new Map<string, Set<string>>();
+    for (const m of state.menus) {
+      for (const s of m.sections) rowsOf.set(sectionKey(m.id, s.name), new Set(s.items.map((i) => i.key)));
+    }
+    for (const a of additions ?? (await getMenuAdditions())) {
+      const k = sectionKey(a.menu, a.section);
+      if (!rowsOf.has(k)) rowsOf.set(k, new Set());
+      rowsOf.get(k)!.add(a.id);
+    }
+    order = {};
+    for (const [key, list] of Object.entries(body.order as Record<string, unknown>)) {
+      const rows = rowsOf.get(key);
+      if (!rows || !Array.isArray(list)) continue;
+      const ids: string[] = [];
+      for (const raw of list.slice(0, 500)) {
+        if (typeof raw !== "string") continue;
+        const id = idMap.get(raw) ?? raw;
+        if (rows.has(id) && !ids.includes(id)) ids.push(id);
+      }
+      if (ids.length > 0) order[key] = ids;
+    }
+  }
+
+  // Up to three rows, one Save. There is no transaction across setValue, so
+  // if a later write fails the earlier ones are put back the way they were,
+  // best effort, and the answer is "nothing saved" rather than a half-saved
+  // menu behind an error message. revalidatePath runs only once all are in.
   const store = getStore();
-  const before = await getMenuOverrides();
+  // The order is written last, so it never needs putting back.
+  const [beforeOverrides, beforeAdditions] = await Promise.all([
+    getMenuOverrides(),
+    store.getValue<unknown>(MENU_ADDITIONS_KEY),
+  ]);
+  const undo: (() => Promise<void>)[] = [];
   try {
     await store.setValue(MENU_OVERRIDES_KEY, overrides);
+    undo.push(() => store.setValue(MENU_OVERRIDES_KEY, beforeOverrides));
     if (additions !== null) {
-      try {
-        await store.setValue(MENU_ADDITIONS_KEY, additions);
-      } catch (err) {
-        await store.setValue(MENU_OVERRIDES_KEY, before).catch(() => {});
-        throw err;
-      }
+      await store.setValue(MENU_ADDITIONS_KEY, additions);
+      undo.push(() => store.setValue(MENU_ADDITIONS_KEY, beforeAdditions ?? []));
     }
+    if (order !== null) await store.setValue(MENU_ORDER_KEY, order);
   } catch (err) {
+    for (const u of undo.reverse()) await u().catch(() => {});
     console.error("[workroom] menu save failed", err);
     return NextResponse.json({ error: "The database did not answer. Nothing was saved." }, { status: 500 });
   }

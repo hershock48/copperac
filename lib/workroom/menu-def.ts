@@ -66,6 +66,41 @@ export type MenuAddition = {
   unit: string;
 };
 
+/**
+ * The order of the rows in a section, keyed by sectionKey(), as a list of
+ * row ids: a printed item's menuItemKey() or an added item's add_ id.
+ * Abbie, 2 Nov 2026: "is there a way to re-order menu items? when i add
+ * the new brunch items online, they automatically go to the bottom of
+ * brunch entrees as opposed to the top ... only option i have rn is to
+ * delete all of the other ones first". A section with no saved order is
+ * the printed order with her additions after it, as it always was.
+ */
+export type MenuOrder = Record<string, string[]>;
+
+export function sectionKey(menu: MenuId, section: string): string {
+  return `${menu}|${section}`;
+}
+
+/**
+ * The rows the saved order names, in that order, then every row it does
+ * not name in their built-in order: a newly added item lands at the end
+ * until she moves it, and an id for a row that no longer exists is skipped.
+ */
+export function orderIds(builtIn: string[], saved: string[] | undefined): string[] {
+  if (!saved || saved.length === 0) return builtIn;
+  const present = new Set(builtIn);
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const id of saved) {
+    if (present.has(id) && !seen.has(id)) {
+      out.push(id);
+      seen.add(id);
+    }
+  }
+  for (const id of builtIn) if (!seen.has(id)) out.push(id);
+  return out;
+}
+
 /** Offered as suggestions under the box; anything else she types is kept. */
 export const UNIT_SUGGESTIONS = ["per person", "per dozen", "per tray", "each"] as const;
 
