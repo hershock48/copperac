@@ -239,8 +239,10 @@ export default function MenuEditor() {
               for (const a of mine) byId.set(a.id, { kind: "added", id: a.id, label: a.name || "New item", a });
               const ids = orderIds([...byId.keys()], order[key]);
               const rows = ids.map((id) => byId.get(id)!);
+              // Not on the live cocktails: the site shows the Scooplist board's
+              // order there, so moving them here would change nothing visible.
               const moveControls = (idx: number, label: string) =>
-                rows.length > 1 ? (
+                rows.length > 1 && !printed?.live ? (
                   <div className="wr-move" role="group" aria-label={`Move ${label}`}>
                     <button type="button" className="wr-link" onClick={() => move(key, ids, idx, idx - 1)} disabled={idx === 0} aria-label={`Move ${label} up`}>
                       ↑ Up
@@ -404,8 +406,8 @@ export default function MenuEditor() {
 
                   {printed?.live ? (
                     <p className="wr-help" style={{ marginTop: 12 }}>
-                      The site shows the live list from the Scooplist board here, so new cocktails are added there
-                      (the Taps tab). These printed ones are what shows if the board is ever down.
+                      The site shows the live list from the Scooplist board here, so new cocktails are added and
+                      ordered there (the Taps tab). These printed ones are what shows if the board is ever down.
                     </p>
                   ) : (
                     <div className="wr-save-row" style={{ marginTop: 12 }}>

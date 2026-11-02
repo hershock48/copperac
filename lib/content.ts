@@ -225,9 +225,9 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
 
 /**
  * The saved row order, re-checked on read: only "menu|section" keys on a
- * menu this build knows, only lists of short strings. Ids that name no
- * row are left in and skipped by orderIds at render, so a row hidden for
- * the season comes back where it was.
+ * menu this build knows, only lists of short strings. An id that names no
+ * row (an item since removed from the print) is skipped by orderIds at
+ * render and dropped by the next save.
  */
 export async function getMenuOrder(): Promise<MenuOrder> {
   const stored = await getStore().getValue<unknown>(MENU_ORDER_KEY);

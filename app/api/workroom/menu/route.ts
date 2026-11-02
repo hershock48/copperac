@@ -194,14 +194,27 @@ export async function PUT(req: Request) {
       rowsOf.get(k)!.add(a.id);
     }
     order = {};
-    for (const [key, list] of Object.entries(body.order as Record<string, unknown>)) {
+    for (const [sent, list] of Object.entries(body.order as Record<string, unknown>)) {
+      if (!Array.isArray(list)) continue;
+      // A section spelled another way on an older row ("brunch entrees")
+      // is filed under its printed spelling above, so its order follows it
+      // there rather than being dropped (second review, 2 Nov 2026).
+      const bar = sent.indexOf("|");
+      const menu = sent.slice(0, bar) as MenuId;
+      const canonical = bar > 0 ? spelled.get(`${menu}|${sent.slice(bar + 1).toLowerCase()}`) : undefined;
+      const key = canonical ? sectionKey(menu, canonical) : sent;
+      // The live cocktails list is ordered on the Scooplist board; an order
+      // saved here would never show while the feed is up.
+      if (live.has(key)) continue;
       const rows = rowsOf.get(key);
-      if (!rows || !Array.isArray(list)) continue;
-      const ids: string[] = [];
+      if (!rows) continue;
+      const ids = order[key] ?? [];
       for (const raw of list.slice(0, 500)) {
         if (typeof raw !== "string") continue;
-        const id = idMap.get(raw) ?? raw;
-        if (rows.has(id) && !ids.includes(id)) ids.push(id);
+        // A real row's own id first, then the id a new row was minted under,
+        // so a re-minted duplicate can never take another row's place.
+        const id = rows.has(raw) ? raw : idMap.get(raw);
+        if (id && rows.has(id) && !ids.includes(id)) ids.push(id);
       }
       if (ids.length > 0) order[key] = ids;
     }
@@ -227,8 +240,19 @@ export async function PUT(req: Request) {
     }
     if (order !== null) await store.setValue(MENU_ORDER_KEY, order);
   } catch (err) {
-    for (const u of undo.reverse()) await u().catch(() => {});
+    let undone = true;
+    for (const u of undo.reverse()) await u().catch(() => (undone = false));
     console.error("[workroom] menu save failed", err);
+    if (!undone) {
+      // Part of it is in the database and could not be taken back out, so
+      // say so, and publish what is there rather than leave the site to
+      // pick it up at some unrelated later save.
+      revalidatePath("/", "layout");
+      return NextResponse.json(
+        { error: "The database stopped answering partway through, so some of this may have saved. Reload and check, then save again." },
+        { status: 500 }
+      );
+    }
     return NextResponse.json({ error: "The database did not answer. Nothing was saved." }, { status: 500 });
   }
   revalidatePath("/", "layout");
