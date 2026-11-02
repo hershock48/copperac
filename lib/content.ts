@@ -4,7 +4,16 @@ import { BRUNCH_MENU, COCKTAILS, FOOD_MENU, RESERVE_MENU, type MenuSection } fro
 import { EVENTS, type CACEvent } from "@/lib/site";
 import { getStore } from "@/lib/workroom/store";
 import type { EventsContact, WorkroomEvent } from "@/lib/workroom/events-def";
-import { MENU_IDS, menuItemKey, type MenuAddition, type MenuId, type MenuOverrides } from "@/lib/workroom/menu-def";
+import {
+  MENU_IDS,
+  menuItemKey,
+  type MenuAddition,
+  type MenuId,
+  type MenuOverrides,
+  orderIds,
+  sectionKey,
+  type MenuOrder,
+} from "@/lib/workroom/menu-def";
 
 /**
  * The content seam: what the customer pages read instead of lib/site.ts and
@@ -27,6 +36,7 @@ const EVENT_GRACE_MS = 4 * 60 * 60 * 1000;
 export const EVENTS_CONTACT_KEY = "events-contact";
 export const MENU_OVERRIDES_KEY = "menu-overrides";
 export const MENU_ADDITIONS_KEY = "menu-additions";
+export const MENU_ORDER_KEY = "menu-order";
 
 /**
  * The one section the menu page swaps for Scooplist's live list: the
@@ -213,11 +223,31 @@ export async function getMenuAdditions(): Promise<MenuAddition[]> {
   return clean;
 }
 
+/**
+ * The saved row order, re-checked on read: only "menu|section" keys on a
+ * menu this build knows, only lists of short strings. Ids that name no
+ * row are left in and skipped by orderIds at render, so a row hidden for
+ * the season comes back where it was.
+ */
+export async function getMenuOrder(): Promise<MenuOrder> {
+  const stored = await getStore().getValue<unknown>(MENU_ORDER_KEY);
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
+  const clean: MenuOrder = {};
+  for (const [key, list] of Object.entries(stored as Record<string, unknown>)) {
+    const menu = key.slice(0, key.indexOf("|"));
+    if (!MENU_IDS.includes(menu as MenuId) || !Array.isArray(list)) continue;
+    const ids = list.filter((x): x is string => typeof x === "string" && x.length > 0 && x.length <= 200).slice(0, 500);
+    if (ids.length > 0) clean[key] = ids;
+  }
+  return clean;
+}
+
 function applyEdits(
   menu: MenuId,
   sections: MenuSection[],
   overrides: MenuOverrides,
-  additions: MenuAddition[]
+  additions: MenuAddition[],
+  order: MenuOrder
 ): MenuSection[] {
   const mine = additions.filter((a) => a.menu === menu);
   // The Reserve menu's own rule, printed on it: everything is per person
@@ -231,20 +261,30 @@ function applyEdits(
     price: a.price,
     unit: a.unit || (menu === "reserve" ? "per person" : undefined),
   });
+  type Item = MenuSection["items"][number];
+  // Every row keyed by its id, then laid out in the saved order. Without one
+  // that is the printed items and then hers, which is how it always read.
+  const ordered = (name: string, rows: [string, Item | null][]): Item[] => {
+    const byId = new Map(rows);
+    return orderIds(
+      rows.map(([id]) => id),
+      order[sectionKey(menu, name)]
+    )
+      .map((id) => byId.get(id) ?? null)
+      .filter((i): i is Item => i !== null);
+  };
   const out: MenuSection[] = sections.map((s) => ({
     ...s,
-    items: [
-      ...s.items
-        .map((i) => {
-          const o = overrides[menuItemKey(menu, s.name, i.name)];
-          if (!o) return i;
-          if (o.hidden) return null;
-          return { ...i, price: o.price ?? i.price, desc: o.desc ?? i.desc };
-        })
-        .filter((i): i is MenuSection["items"][number] => i !== null),
-      // Added items join the end of their printed section.
-      ...mine.filter((a) => a.section === s.name).map(asItem),
-    ],
+    items: ordered(s.name, [
+      ...s.items.map((i): [string, Item | null] => {
+        const key = menuItemKey(menu, s.name, i.name);
+        const o = overrides[key];
+        if (!o) return [key, i];
+        if (o.hidden) return [key, null];
+        return [key, { ...i, price: o.price ?? i.price, desc: o.desc ?? i.desc }];
+      }),
+      ...mine.filter((a) => a.section === s.name).map((a): [string, Item] => [a.id, asItem(a)]),
+    ]),
   }));
   // A section the print does not have comes after the printed ones, in the
   // order the club first used its name.
@@ -252,7 +292,13 @@ function applyEdits(
   for (const a of mine) {
     if (known.has(a.section)) continue;
     known.add(a.section);
-    out.push({ name: a.section, items: mine.filter((x) => x.section === a.section).map(asItem) });
+    out.push({
+      name: a.section,
+      items: ordered(
+        a.section,
+        mine.filter((x) => x.section === a.section).map((x): [string, Item] => [x.id, asItem(x)])
+      ),
+    });
   }
   return out.filter((s) => s.items.length > 0 || isLiveSection(menu, s.name));
 }
@@ -269,11 +315,11 @@ export async function getMenus(): Promise<{
   reserve: MenuSection[];
   cocktailsName: string;
 }> {
-  const [overrides, additions] = await Promise.all([getMenuOverrides(), getMenuAdditions()]);
+  const [overrides, additions, order] = await Promise.all([getMenuOverrides(), getMenuAdditions(), getMenuOrder()]);
   return {
-    food: applyEdits("food", FOOD_MENU, overrides, additions),
-    brunch: applyEdits("brunch", BRUNCH_MENU, overrides, additions),
-    reserve: applyEdits("reserve", RESERVE_MENU, overrides, additions),
+    food: applyEdits("food", FOOD_MENU, overrides, additions, order),
+    brunch: applyEdits("brunch", BRUNCH_MENU, overrides, additions, order),
+    reserve: applyEdits("reserve", RESERVE_MENU, overrides, additions, order),
     cocktailsName: COCKTAILS.name,
   };
 }
@@ -297,11 +343,13 @@ export type MenuEditorState = {
   menus: { id: MenuId; label: string; sections: { name: string; live: boolean; items: MenuEditorItem[] }[] }[];
   /** The club's own items, every menu together; the editor files them by menu and section. */
   additions: MenuAddition[];
+  /** The saved row order per section; the editor lays rows out with orderIds, as the site does. */
+  order: MenuOrder;
   backend: "postgres" | "memory";
 };
 
 export async function menuEditorState(): Promise<MenuEditorState> {
-  const [overrides, additions] = await Promise.all([getMenuOverrides(), getMenuAdditions()]);
+  const [overrides, additions, order] = await Promise.all([getMenuOverrides(), getMenuAdditions(), getMenuOrder()]);
   const build = (id: MenuId, label: string, sections: MenuSection[]) => ({
     id,
     label,
@@ -331,6 +379,7 @@ export async function menuEditorState(): Promise<MenuEditorState> {
       build("reserve", "The Copper Reserve", RESERVE_MENU),
     ],
     additions,
+    order,
     backend: getStore().backend,
   };
 }

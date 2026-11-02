@@ -105,6 +105,9 @@ export default function WorkroomLayout({ children }: { children: React.ReactNode
         .wr-menu-item .wr-price span { position: absolute; left: 12px; top: 12px; color: var(--color-cream-dim); }
         .wr-menu-item .wr-price input { padding-left: 24px; font-variant-numeric: tabular-nums; }
         .wr-menu-item.wr-hidden .wr-name, .wr-menu-item.wr-hidden textarea { opacity: .45; }
+        .wr-move { display: flex; gap: 14px; flex-wrap: wrap; }
+        .wr-move .wr-link { font-size: 13px; text-decoration: none; }
+        .wr-move .wr-link:disabled { opacity: .35; cursor: default; }
 
         .wr-gate { max-width: 380px; margin: 40px auto; }
         .wr-gate h1 { font-family: var(--font-display); font-size: 30px; text-transform: uppercase; letter-spacing: .04em; color: var(--color-cream); }
