@@ -94,6 +94,8 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
             ? "One of the fields is longer than we can take. The message can hold about 4,000 characters; the rest hold 200. Trim it and try again."
             : json.reason === "bad_email"
               ? "That email address does not look right. Check it and try again."
+              : json.reason === "past_date"
+                ? "That event date has already passed. Check the date and try again."
               : "A required field is empty. Fill in the marked fields and try again."
         );
         return;
