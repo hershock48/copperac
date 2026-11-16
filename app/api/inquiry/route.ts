@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { SITE } from "@/lib/site";
+import { limiter } from "@/lib/workroom/ratelimit";
 import { formatEventDate, formatEventTime, inquiryHtml } from "@/lib/inquiry-format";
 
 /**
@@ -67,6 +68,31 @@ const LABELS: Record<string, string> = {
 const MAX_LEN: Record<string, number> = { message: 4000 };
 const DEFAULT_MAX = 200;
 
+/*
+ * Bots. Abbie, 16 Nov 2026: "a couple test emails every night". Nothing on
+ * the site or the studio's side sends on a schedule; the form simply had no
+ * defence, and form-crawling bots submit "test" overnight. Three gates, none
+ * of which a person ever meets:
+ *
+ *   HONEYPOT     a field the form renders off-screen and labels "leave this
+ *                empty". A person cannot see it; a bot fills every input.
+ *   TOO FAST     the form sends how long it was open. Under three seconds is
+ *                a script, not someone typing a name, email, phone and a
+ *                message. Absent (an older page from before this shipped)
+ *                passes, so no real enquiry is dropped on a deploy.
+ *   RATE         five sends an hour from one address. A guest sends one.
+ *
+ * The first two answer ok:true and send nothing, the one place this route
+ * reports success without a provider acceptance: telling a bot it was
+ * caught teaches it to retry differently, and no person can reach either
+ * gate. Every accepted or dropped enquiry logs one line with the variant
+ * and the reason, never the guest's words, so the next "why did she get
+ * this" has an answer in the Vercel logs.
+ */
+const HONEYPOT = "copper_hp";
+const MIN_FILL_MS = 3000;
+const sends = limiter("inquiry-send", { windowMs: 60 * 60 * 1000, max: 5 });
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -80,6 +106,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
   const fields = body as Record<string, unknown>;
+  const ua = (request.headers?.get?.("user-agent") ?? "").slice(0, 80);
+  const tag = fields.variant === "reserve" ? "reserve" : "contact";
+
+  if (typeof fields[HONEYPOT] === "string" && fields[HONEYPOT].trim() !== "") {
+    console.log(`[inquiry] dropped ${tag}: honeypot filled ua="${ua}"`);
+    return NextResponse.json({ ok: true });
+  }
+  if (typeof fields.elapsedMs === "number" && fields.elapsedMs >= 0 && fields.elapsedMs < MIN_FILL_MS) {
+    console.log(`[inquiry] dropped ${tag}: sent ${Math.round(fields.elapsedMs)}ms after the page opened ua="${ua}"`);
+    return NextResponse.json({ ok: true });
+  }
+  const fwd = request.headers?.get?.("x-forwarded-for");
+  const addr = (fwd ? fwd.split(",")[0] : request.headers?.get?.("x-real-ip"))?.trim() || "unknown";
+  if (!sends.allowed(addr)) {
+    console.log(`[inquiry] refused ${tag}: more than five an hour from one address ua="${ua}"`);
+    return NextResponse.json({ ok: false, reason: "rate_limited" }, { status: 429 });
+  }
 
   // Trim, and strip control characters (including CR/LF) so nothing a guest
   // types can smuggle a line break into the email subject built from these.
@@ -204,5 +247,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "network_error" }, { status: 502 });
   }
 
+  sends.fail(addr);
+  console.log(`[inquiry] sent ${variant} ua="${ua}"`);
   return NextResponse.json({ ok: true });
 }

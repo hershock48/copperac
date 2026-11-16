@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RESERVE, SITE } from "@/lib/site";
 
 type Variant = "reserve" | "contact";
@@ -36,6 +36,12 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // When the form appeared, so the route can tell a person from a script
+  // that submits the instant the page loads (see app/api/inquiry).
+  const openedAt = useRef(0);
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   function composeEmail(data: Record<string, string>) {
     const subject =
@@ -62,7 +68,11 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
       const res = await fetch("/api/inquiry", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ variant, ...data }),
+        body: JSON.stringify({
+          variant,
+          ...data,
+          ...(openedAt.current ? { elapsedMs: Date.now() - openedAt.current } : {}),
+        }),
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.ok) {
@@ -72,6 +82,12 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
       // The route refused the input itself. That is the visitor's to fix on
       // the page, not a delivery problem, so no mail-app handoff: it would
       // open with the same too-long or malformed content and no explanation.
+      // Five sends in an hour from one address: a person's to read, not a
+      // delivery problem, so no mail-app handoff either.
+      if (res.status === 429) {
+        setError(`We have had a few messages from you already. We will be in touch; if it cannot wait, email ${SITE.email}.`);
+        return;
+      }
       if (res.status === 422) {
         setError(
           json.reason === "too_long"
@@ -131,6 +147,12 @@ export default function InquiryForm({ variant }: { variant: Variant }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
+      {/* The honeypot: off-screen, out of the tab order and hidden from
+          screen readers, so only a bot that fills every input finds it. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label htmlFor="copper_hp">Leave this empty</label>
+        <input id="copper_hp" name="copper_hp" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="First name" name="first" required />
         <Field label="Last name" name="last" required />
