@@ -155,6 +155,19 @@ export async function POST(request: Request) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(get("email"))) {
     return NextResponse.json({ ok: false, reason: "bad_email" }, { status: 422 });
   }
+  // A Reserve date that has already passed. The overnight bot Abbie forwarded
+  // (16 Nov 2026) booked a party for 31 May 1970; nobody real does. Said out
+  // loud, not dropped silently, because a guest can mistype a year and should
+  // be told. Compared as YYYY-MM-DD strings against yesterday in UTC, so a
+  // guest booking for today is never refused whatever the server's clock zone.
+  const eventDate = get("date");
+  if (fields.variant === "reserve" && /^\d{4}-\d{2}-\d{2}$/.test(eventDate)) {
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    if (eventDate < yesterday) {
+      console.log(`[inquiry] refused reserve: event date ${eventDate} is in the past ua="${ua}"`);
+      return NextResponse.json({ ok: false, reason: "past_date" }, { status: 422 });
+    }
+  }
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const to = process.env.INQUIRY_TO?.trim() || SITE.email;
